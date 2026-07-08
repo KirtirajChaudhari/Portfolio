@@ -55,7 +55,7 @@ export function ModeToggle() {
     <button
       type="button"
       onClick={() => setMode(target)}
-      className="group flex items-center gap-3 rounded-full border border-white/15 bg-white/[0.04] py-1.5 pl-1.5 pr-4 transition-colors duration-200 hover:border-white/30 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0C0C0C] motion-reduce:transition-none"
+      className="group flex items-center gap-3 rounded-full border border-foreground/15 bg-foreground/[0.04] py-1.5 pl-1.5 pr-4 transition-colors duration-200 hover:border-foreground/30 hover:bg-foreground/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/80 focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transition-none"
     >
       {/* Avatar slot for the TARGET side — replace with that side's image. */}
       <span
@@ -63,18 +63,18 @@ export function ModeToggle() {
         className={`h-8 w-8 shrink-0 rounded-full ${TARGET_AVATAR_CLASS[target]}`}
       />
       <span className="flex flex-col items-start leading-tight">
-        <span className="text-[10px] uppercase tracking-[0.18em] text-white/40">
+        <span className="text-[10px] uppercase tracking-[0.18em] text-foreground/40">
           Switch to
         </span>
         {/* Visible text forms the accessible name: "Switch to Artistic side". */}
-        <span className="text-sm font-medium text-white/90">
+        <span className="text-sm font-medium text-foreground/90">
           {TARGET_LABEL[target]}
         </span>
       </span>
       {/* Hover nudge uses transform only — never a layout property. */}
       <span
         aria-hidden="true"
-        className="text-white/40 transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none"
+        className="text-foreground/40 transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none"
       >
         &rarr;
       </span>

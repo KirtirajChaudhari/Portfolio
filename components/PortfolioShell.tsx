@@ -43,7 +43,7 @@ export function PortfolioShell({
   return (
     <div
       ref={swipeRef}
-      className="min-h-screen bg-[#0C0C0C] text-white antialiased"
+      className="min-h-screen bg-background text-foreground antialiased"
     >
       {/* ——— Stable hero frame: shared by both modes, never unmounts ——— */}
       <header className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-6 pb-12 pt-20 text-center">
@@ -53,7 +53,7 @@ export function PortfolioShell({
           cheap, and disabled under reduced motion). Swap the gradients for
           the two real avatar images later.
         */}
-        <div className="relative h-24 w-24 overflow-hidden rounded-full ring-1 ring-white/15">
+        <div className="relative h-24 w-24 overflow-hidden rounded-full ring-1 ring-foreground/15">
           <div
             className={`absolute inset-0 bg-gradient-to-br from-sky-400/70 to-slate-700 transition-opacity duration-500 motion-reduce:transition-none ${
               mode === "professional" ? "opacity-100" : "opacity-0"
@@ -69,7 +69,7 @@ export function PortfolioShell({
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Your Name</h1>
           {/* Copy may react to mode; the element itself stays put. */}
-          <p className="mt-1 text-sm text-white/50">
+          <p className="mt-1 text-sm text-foreground/50">
             {mode === "professional"
               ? "Engineer — the day job"
               : "Artist — after hours"}
@@ -86,15 +86,15 @@ export function PortfolioShell({
         <div className="flex items-center gap-3 md:hidden" aria-hidden="true">
           <span
             className={`h-1.5 w-1.5 rounded-full transition-colors duration-300 motion-reduce:transition-none ${
-              mode === "professional" ? "bg-white/80" : "bg-white/25"
+              mode === "professional" ? "bg-foreground/80" : "bg-foreground/25"
             }`}
           />
           <span
             className={`h-1.5 w-1.5 rounded-full transition-colors duration-300 motion-reduce:transition-none ${
-              mode === "artistic" ? "bg-white/80" : "bg-white/25"
+              mode === "artistic" ? "bg-foreground/80" : "bg-foreground/25"
             }`}
           />
-          <span className="text-[11px] tracking-wide text-white/35">swipe</span>
+          <span className="text-[11px] tracking-wide text-foreground/35">swipe</span>
         </div>
       </header>
 

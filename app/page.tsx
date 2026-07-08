@@ -44,12 +44,12 @@ function DummyView({
   blurb: string;
 }) {
   return (
-    <section className={`rounded-2xl border ${accent} bg-white/[0.03] p-8`}>
+    <section className={`rounded-2xl border ${accent} bg-foreground/[0.03] p-8`}>
       <h2 className="text-3xl font-semibold tracking-tight">{title}</h2>
-      <p className="mt-3 max-w-prose text-white/60">{blurb}</p>
+      <p className="mt-3 max-w-prose text-foreground/60">{blurb}</p>
       <div className="mt-8 space-y-4">
         {Array.from({ length: 8 }, (_, i) => (
-          <div key={i} className="h-16 rounded-xl bg-white/[0.05]" />
+          <div key={i} className="h-16 rounded-xl bg-foreground/[0.05]" />
         ))}
       </div>
     </section>
