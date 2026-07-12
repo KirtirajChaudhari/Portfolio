@@ -11,10 +11,12 @@ export const artisticDisciplines: CreativeDiscipline[] = [
     icon: "tabla",
     spotifyProfile: "https://open.spotify.com/artist/3zAV56brdo1aaVpR5WReag",
     spotifyEmbedUrl: "https://open.spotify.com/embed/track/4VkfpcwdnNnzNWVlCRupxY?utm_source=generator&theme=0",
+    // inside content/artistic.ts
     works: [
       {
         id: "music-1",
-        media: "", 
+        title: "My Awesome Track", // <-- Add this missing property!
+        media: "",
         mediaType: "audio",
       }
     ],
@@ -28,19 +30,19 @@ export const artisticDisciplines: CreativeDiscipline[] = [
     works: [
       {
         id: "photo-1",
-        title: "Urban Shadows", 
+        title: "Urban Shadows",
         media: "/avatars/professional-full.png", // Replace with actual photo paths
         mediaType: "image",
       },
       {
         id: "photo-2",
-        title: "Neon Nights", 
+        title: "Neon Nights",
         media: "/avatars/artistic-full.png", // Replace with actual photo paths
         mediaType: "image",
       },
       {
         id: "photo-3",
-        title: "Minimalism", 
+        title: "Minimalism",
         media: "/avatars/professional-full.png", // Replace with actual photo paths
         mediaType: "image",
       }
