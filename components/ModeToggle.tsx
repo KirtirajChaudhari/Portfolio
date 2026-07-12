@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useViewMode, type ViewMode } from "@/store/useViewMode";
 
 /**
@@ -38,10 +39,15 @@ const TARGET_LABEL: Record<ViewMode, string> = {
   artistic: "Artistic side",
 };
 
-/** Placeholder avatar treatment per TARGET side. Swap for that side's <Image>. */
-const TARGET_AVATAR_CLASS: Record<ViewMode, string> = {
-  professional: "bg-gradient-to-br from-sky-400/80 to-slate-600",
-  artistic: "bg-gradient-to-br from-fuchsia-400/80 to-amber-500/80",
+/** Icon headshot per TARGET side. */
+const TARGET_AVATAR_SRC: Record<ViewMode, string> = {
+  professional: "/avatars/professional-icon.png",
+  artistic: "/avatars/artistic-icon.png",
+};
+
+const TARGET_AVATAR_ALT: Record<ViewMode, string> = {
+  professional: "Professional avatar",
+  artistic: "Artistic avatar",
 };
 
 export function ModeToggle() {
@@ -57,10 +63,18 @@ export function ModeToggle() {
       onClick={() => setMode(target)}
       className="group flex items-center gap-3 rounded-full border border-foreground/15 bg-foreground/[0.04] py-1.5 pl-1.5 pr-4 transition-colors duration-200 hover:border-foreground/30 hover:bg-foreground/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/80 focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transition-none"
     >
-      {/* Avatar slot for the TARGET side — replace with that side's image. */}
-      <span
+      {/*
+        Target-side icon headshot. Stays aria-hidden (decorative) so the button's
+        accessible name remains exactly the visible "Switch to … side" text — see
+        the semantics rationale above; alt is set only for robustness.
+      */}
+      <Image
+        src={TARGET_AVATAR_SRC[target]}
+        alt={TARGET_AVATAR_ALT[target]}
         aria-hidden="true"
-        className={`h-8 w-8 shrink-0 rounded-full ${TARGET_AVATAR_CLASS[target]}`}
+        width={32}
+        height={32}
+        className="h-8 w-8 shrink-0 rounded-full object-cover"
       />
       <span className="flex flex-col items-start leading-tight">
         <span className="text-[10px] uppercase tracking-[0.18em] text-foreground/40">

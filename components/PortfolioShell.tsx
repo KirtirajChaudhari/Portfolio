@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Image from "next/image";
 import { useViewMode } from "@/store/useViewMode";
 import { useSwipe } from "@/hooks/useSwipe";
 import { useModeHotkeys } from "@/hooks/useModeHotkeys";
@@ -50,17 +51,31 @@ export function PortfolioShell({
         {/*
           Shared avatar frame. The frame element persists across switches;
           only its treatment cross-fades (two stacked layers, opacity-only —
-          cheap, and disabled under reduced motion). Swap the gradients for
-          the two real avatar images later.
+          cheap, and disabled under reduced motion). Each layer is a fill
+          <Image> that inherits the same opacity toggle the gradients used.
+          priority on professional only — the default first-paint mode.
+          The inactive layer is aria-hidden so only the shown avatar reaches
+          assistive tech (both stay mounted for the cross-fade).
         */}
         <div className="relative h-24 w-24 overflow-hidden rounded-full ring-1 ring-foreground/15">
-          <div
-            className={`absolute inset-0 bg-gradient-to-br from-sky-400/70 to-slate-700 transition-opacity duration-500 motion-reduce:transition-none ${
+          <Image
+            src="/avatars/professional-full.png"
+            alt="Professional avatar"
+            fill
+            sizes="96px"
+            priority
+            aria-hidden={mode !== "professional"}
+            className={`object-cover transition-opacity duration-500 motion-reduce:transition-none ${
               mode === "professional" ? "opacity-100" : "opacity-0"
             }`}
           />
-          <div
-            className={`absolute inset-0 bg-gradient-to-br from-fuchsia-400/70 to-amber-500/70 transition-opacity duration-500 motion-reduce:transition-none ${
+          <Image
+            src="/avatars/artistic-full.png"
+            alt="Artistic avatar"
+            fill
+            sizes="96px"
+            aria-hidden={mode !== "artistic"}
+            className={`object-cover transition-opacity duration-500 motion-reduce:transition-none ${
               mode === "artistic" ? "opacity-100" : "opacity-0"
             }`}
           />
