@@ -18,7 +18,7 @@ export const siteMeta: SiteMeta = {
   role: "AI/ML Engineer",
   location: "Remote",
   email: "mrkirtirajchaudhari@gmail.com",
-  resumeUrl: "/resume/Kirtiraj_Chaudhari_Resume.pdf",
+  resumeUrl: "https://drive.google.com/uc?export=download&id=1b3u4cVlTh15P98zMX_uKlaHce-XZvx0t",
   socials: {
     github: "https://github.com/KirtirajChaudhari",
     linkedin: "https://linkedin.com/in/kirtirajchaudhari",

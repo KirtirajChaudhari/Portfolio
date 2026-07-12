@@ -37,6 +37,9 @@ export function Contact() {
             </a>
             <a
               href={siteMeta.resumeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              download="Kirtiraj_Chaudhari_Resume.pdf"
               className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-7 py-3 text-sm font-semibold text-text transition-all duration-300 hover:border-accent/40 hover:bg-surface-2 motion-reduce:transition-none"
             >
               <FileDown className="h-4 w-4" />
