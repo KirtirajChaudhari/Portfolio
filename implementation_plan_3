@@ -1,0 +1,49 @@
+# Artistic Disciplines Redesign
+
+This plan outlines the approach to transform the generic "Creative Work" tabs into bespoke, highly aesthetic layouts for Music, Photography, and Writing, drawing heavy inspiration from premium Framer templates.
+
+## User Review Required
+> [!IMPORTANT]
+> The architectural approach involves creating custom, individualized layouts for each creative discipline rather than reusing a generic card component. This will allow us to use Spotify embeds, masonry photo galleries, and elegant typography for poetry.
+
+## Open Questions
+> [!WARNING]
+> Before I can fully implement this, I need the actual content from you:
+> 1. **Music**: What is the URL for your Spotify Artist Profile, and what is the URL (or Spotify embed link) for your debut song?
+> 2. **Photography**: What is your photography Instagram handle? Also, do you have 3-5 specific image files you want to use (e.g., in the `public/` folder), or should I use high-quality Unsplash placeholders for now?
+> 3. **Writing**: What is the short poem you'd like to display, and what is your writer-specific Instagram handle?
+
+## Proposed Changes
+
+### 1. Data Structure Updates
+#### [MODIFY] [artistic.ts](file:///d:/Resume/Portfolio/MyPortfolioDev/sia-portfolio/content/artistic.ts)
+- Update the `artisticDisciplines` array to include the new links and content fields (Spotify URLs, Instagram handles, poetry text).
+- Add new properties to the types (e.g., `embedUrl`, `socialLink`, `poemContent`) in `content/types.ts`.
+
+### 2. Redesigning `Disciplines.tsx`
+#### [MODIFY] [Disciplines.tsx](file:///d:/Resume/Portfolio/MyPortfolioDev/sia-portfolio/components/artistic/Disciplines.tsx)
+Instead of a generic mapping of `GlassCard`s, we will build conditional, bespoke layouts for each tab to match a premium artistic aesthetic.
+
+- **Music Tab**: 
+  - A beautiful, glowing container featuring a live Spotify `<iframe>` embed of your debut song.
+  - A stylized "Listen on Spotify" button linking to your Artist Profile, using hover effects and micro-animations.
+  
+- **Photography Tab**:
+  - An asymmetric masonry grid or a horizontal scrolling gallery for your photographs.
+  - A floating Instagram handle badge overlay (`@your_photo_handle`) with a glassmorphism backdrop.
+  - Image components will use Next/Image with blur placeholders for a premium loading experience.
+  
+- **Writing Tab**:
+  - A minimalist, editorial design focusing entirely on typography.
+  - The poem will be displayed using a classic serif font (e.g., `Playfair Display` or similar, depending on your global CSS) with generous line height, subtle text shadows, and italicized accents.
+  - A distinct "Read more on Instagram" link (`@your_writer_handle`) positioned elegantly below the poem.
+
+### 3. Animations
+- We will heavily utilize the newly integrated `AnimeReveal` component to orchestrate the entrance of these bespoke layouts. For example, the poem lines could fade in sequentially, and the photography gallery could stagger-load its images.
+
+## Verification Plan
+### Automated Tests
+- Run `npm run build` to ensure the new types and iframe embeds compile correctly without SSR issues.
+### Manual Verification
+- Test the tab switching locally to ensure smooth transitions between the highly varied layouts of Music, Photography, and Writing.
+- Verify the Spotify embed plays correctly and the Instagram links route properly.

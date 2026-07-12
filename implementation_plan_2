@@ -1,0 +1,43 @@
+# Refactoring Layout & Introducing Anime.js
+
+This plan outlines the steps to restructure the layout sequence of the Professional Mode and significantly upgrade the animation fidelity using **Anime.js**. 
+
+## User Review Required
+> [!WARNING]
+> We will be integrating `animejs` into the project to handle exaggerated animations. This is a shift from standard `framer-motion` reveal animations to a more timeline-based, physics-driven approach using Anime.js and Intersection Observers. Do you want to **completely replace** Framer Motion throughout the site, or should we just use Anime.js for the scroll reveals and hero animations while keeping Framer Motion for the layout transitions (the perspective rotation between views)? I recommend keeping Framer Motion for the overarching layout transition and using Anime.js for all in-view and entry animations.
+
+## Proposed Changes
+
+### 1. Structural Reordering
+We will update `ProfessionalView.tsx` to precisely match the requested flow:
+`Hero` ➔ `About` ➔ `Projects` ➔ `Skills` ➔ `Experience & Education` ➔ `Certifications` ➔ `Contact`
+
+### 2. Extracting Certifications
+- **`Timeline.tsx`**: Will be stripped of the Certifications section, focusing solely on the Work Experience and Education timeline columns.
+- **`Certifications.tsx`**: A brand new component will be created to house the certifications grid, allowing it to be placed after the Timeline in the layout flow.
+
+### 3. Exaggerated Animations (Anime.js)
+We will install `animejs` and `@types/animejs`.
+
+#### `components/ui/AnimeReveal.tsx` [NEW]
+We will create a reusable wrapper component that replaces `SectionReveal`. This component will use `IntersectionObserver` to detect when elements enter the viewport and trigger an Anime.js timeline. Features will include:
+- Staggered children animations (using Anime's `stagger` function).
+- Complex transforms (e.g., translating from deep Z-axis, scaling up, spring physics).
+- Exaggerated easing functions commonly found in premium Framer templates (like `easeOutElastic` or `spring(1, 80, 10, 0)`).
+
+#### Updates to Existing Sections
+- **`Hero.tsx`**: Add an Anime.js timeline on mount to orchestrate the entrance of the avatar, titles, and buttons with overlapping delays and spring physics.
+- **`Projects.tsx` / `Skills.tsx`**: Wrap items in the new `AnimeReveal` to create a cascading "domino" effect as the user scrolls them into view.
+- **`About.tsx` / `Contact.tsx`**: Add split-text or exaggerated slide-up animations.
+
+## Verification Plan
+
+### Automated Tests
+- Run `npm install animejs` and `npm i -D @types/animejs`.
+- Run `npx tsc --noEmit` to ensure the new `AnimeReveal` component is type-safe and correctly replaces `SectionReveal`.
+- Run `npm run build` to verify Anime.js works properly in the Next.js SSR environment (ensuring animations only run in `useEffect` on the client).
+
+### Manual Verification
+- Start the local dev server and test the scroll behavior.
+- Verify that the layout order matches the prompt.
+- Confirm that scroll animations trigger precisely when elements enter the viewport and have the exaggerated, premium feel of top-tier templates.

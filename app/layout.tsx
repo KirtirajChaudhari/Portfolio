@@ -1,20 +1,37 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Portfolio",
-  description: "Dual-mode portfolio — professional and artistic.",
+  title: "Kirtiraj Chaudhari — AI/ML Engineer & Creative",
+  description:
+    "Portfolio of Kirtiraj Nitin Chaudhari — M.Tech AI/ML student at MIT WPU, B.E. Computer Engineering (Hons. AI/ML). Applied ML, full-stack development, and creative work.",
+  keywords: [
+    "AI/ML Engineer",
+    "Machine Learning",
+    "Portfolio",
+    "Full-Stack Developer",
+    "Kirtiraj Chaudhari",
+  ],
+  authors: [{ name: "Kirtiraj Nitin Chaudhari" }],
+  openGraph: {
+    title: "Kirtiraj Chaudhari — AI/ML Engineer & Creative",
+    description:
+      "Applied ML, full-stack development, and creative work by Kirtiraj Chaudhari.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -25,9 +42,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      data-mode="professional"
+      className={`${inter.variable} ${spaceGrotesk.variable}`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="noise-overlay" suppressHydrationWarning>
+        {children}
+      </body>
     </html>
   );
 }

@@ -1,0 +1,80 @@
+import { CreativeDiscipline } from "./types";
+
+export const artisticTagline = "Exploring the intersection of code, sound, and visual storytelling."; // Placeholder
+
+export const artisticStory = "My journey isn't just about logic and algorithms. It's about finding rhythm in code and harmony in pixels. Whether I'm capturing moments through a vintage lens or composing melodies, I believe true innovation happens when technical precision meets creative expression."; // Placeholder
+
+export const artisticDisciplines: CreativeDiscipline[] = [
+  {
+    id: "music",
+    name: "Music",
+    icon: "tabla",
+    spotifyProfile: "https://open.spotify.com/artist/3zAV56brdo1aaVpR5WReag",
+    spotifyEmbedUrl: "https://open.spotify.com/embed/track/4VkfpcwdnNnzNWVlCRupxY?utm_source=generator&theme=0",
+    works: [
+      {
+        id: "music-1",
+        media: "", 
+        mediaType: "audio",
+      }
+    ],
+  },
+  {
+    id: "photography",
+    name: "Photography",
+    icon: "camera",
+    instaHandle: "@kirtiraj_chaudhari",
+    instaLink: "https://instagram.com/kirtiraj_chaudhari",
+    works: [
+      {
+        id: "photo-1",
+        title: "Urban Shadows", 
+        media: "/avatars/professional-full.png", // Replace with actual photo paths
+        mediaType: "image",
+      },
+      {
+        id: "photo-2",
+        title: "Neon Nights", 
+        media: "/avatars/artistic-full.png", // Replace with actual photo paths
+        mediaType: "image",
+      },
+      {
+        id: "photo-3",
+        title: "Minimalism", 
+        media: "/avatars/professional-full.png", // Replace with actual photo paths
+        mediaType: "image",
+      }
+    ],
+  },
+  {
+    id: "writing",
+    name: "Writing",
+    icon: "pen-notebook",
+    instaHandle: "@introvert.balak",
+    instaLink: "https://instagram.com/introvert.balak",
+    poemContent: "There is a quiet rhythm in the space between words,\nWhere logic ends and the abstract begins.\nA subtle hum of creation,\nEchoing through the pixels and the silence.\n\nWe build worlds out of nothing,\nNot just with code,\nBut with the unseen poetry of thought.", // Replace with your short poem
+    works: [
+      {
+        id: "writer-profile",
+        title: "Writer Profile",
+        media: "/avatars/professional-full.png", // Replace with actual profile screenshot
+        mediaType: "image",
+      }
+    ],
+  }
+];
+
+export const artisticFeaturedWork = {
+  id: "featured-1",
+  title: "The Sound of Silence", // Placeholder
+  story: "This project started as a simple experiment but evolved into a full-fledged audio-visual experience...", // Placeholder
+  media: "/artistic/featured/main.webp", // Placeholder
+  mediaType: "image" as const,
+};
+
+export const artisticReflections = [
+  {
+    date: "July 12, 2026",
+    content: "Sometimes the most elegant solution isn't the most efficient one, but the one that reads like poetry.", // Placeholder
+  }
+];
