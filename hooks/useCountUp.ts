@@ -45,7 +45,7 @@ export function useCountUp({
     ).matches;
 
     if (prefersReducedMotion) {
-      setCount(end);
+      setTimeout(() => setCount(end), 0);
       return;
     }
 
