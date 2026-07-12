@@ -44,10 +44,9 @@ export function Disciplines() {
                   inline-flex items-center gap-2 rounded-full px-6 py-3
                   text-sm font-medium transition-all duration-500
                   motion-reduce:transition-none
-                  ${
-                    isActive
-                      ? "bg-accent text-bg shadow-[0_0_30px_rgba(245,158,11,0.4)] scale-105"
-                      : "border border-border bg-surface text-text-muted hover:border-accent/40 hover:text-text hover:bg-surface-2 hover:scale-105"
+                  ${isActive
+                    ? "bg-accent text-bg shadow-[0_0_30px_rgba(245,158,11,0.4)] scale-105"
+                    : "border border-border bg-surface text-text-muted hover:border-accent/40 hover:text-text hover:bg-surface-2 hover:scale-105"
                   }
                 `}
               >
@@ -66,22 +65,22 @@ export function Disciplines() {
             <GlassCard className="relative overflow-hidden p-8 sm:p-12">
               {/* Decorative glow */}
               <div className="absolute -top-32 -right-32 h-64 w-64 rounded-full bg-accent-glow/20 blur-[80px]" aria-hidden="true" />
-              
+
               <div className="relative z-10 flex flex-col items-center text-center">
                 <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-accent/10">
                   <Headphones className="h-8 w-8 text-accent" />
                 </div>
-                
+
                 <h3 className="mb-8 font-display text-2xl font-bold text-text">Debut Single</h3>
-                
+
                 {/* Spotify Embed */}
                 {activeDiscipline.spotifyEmbedUrl ? (
                   <div className="w-full max-w-md overflow-hidden rounded-xl shadow-lg ring-1 ring-border transition-all duration-300 hover:shadow-accent/20">
-                    <iframe 
-                      src={activeDiscipline.spotifyEmbedUrl} 
-                      width="100%" 
-                      height="152" 
-                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                    <iframe
+                      src={activeDiscipline.spotifyEmbedUrl}
+                      width="100%"
+                      height="152"
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                       loading="lazy"
                       className="border-0 bg-transparent"
                     />
@@ -91,7 +90,7 @@ export function Disciplines() {
                     Spotify Embed Placeholder
                   </div>
                 )}
-                
+
                 {activeDiscipline.spotifyProfile && (
                   <a
                     href={activeDiscipline.spotifyProfile}
@@ -130,7 +129,7 @@ export function Disciplines() {
                   <div className="relative w-full overflow-hidden" style={{ minHeight: "250px", height: "auto" }}>
                     <Image
                       src={work.media || "/avatars/professional-full.png"}
-                      alt={work.title}
+                      alt={work.title || "Artwork"}
                       width={600}
                       height={800}
                       className="h-auto w-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -153,7 +152,7 @@ export function Disciplines() {
               <div className="pointer-events-none absolute -top-10 -left-10 text-9xl text-accent/10 font-serif">
                 &ldquo;
               </div>
-              
+
               <div className="prose prose-invert prose-lg mx-auto text-center font-serif leading-loose">
                 {activeDiscipline.works && activeDiscipline.works.length > 0 && (
                   <div className="mb-8 flex justify-center">
