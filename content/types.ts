@@ -82,7 +82,7 @@ export interface CreativeDiscipline {
 
 export interface CreativeWork {
   id: string;
-  title: string;
+  title?: string;
   description?: string;
   media: string;
   mediaType: "image" | "audio" | "video";
