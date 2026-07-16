@@ -11,41 +11,77 @@ import { Reveal } from "../Reveal";
 
 const DEVICON = "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons";
 
+/*
+ * Dual-highlight cinematic glass (user spec): every sphere keeps a white
+ * translucent base with a sharp pure-white specular; a skill-category
+ * Fresnel rim tints only the edges so the logo stays legible.
+ */
+const RIM = {
+  aiml: "#bb86fc", // Neon Amethyst — AI/ML core
+  python: "#306998", // Sapphire Blue — Python backend logic
+  react: "#61dafb", // Electric Cyan — React & Next.js interfaces
+  data: "#4db33d", // Emerald Green — Django & database architecture
+  fastapi: "#00d4c0", // Iridescent Teal — FastAPI services
+} as const;
+
 const SKILLS = [
   // AI/ML Core
-  { name: "PyTorch", icon: "/skills/pytorch.png" },
-  { name: "TensorFlow", icon: "/skills/Tensorflow_logo.svg.webp" },
-  { name: "scikit-learn", icon: "/skills/scikit learn.webp" },
-  { name: "OpenCV", icon: "/skills/38-384674_opencv-logo-png-transparent-png.png" },
-  { name: "pandas", icon: "/skills/pandas.png" },
-  { name: "NumPy", icon: "/skills/numpy.png" },
-  { name: "Neo4j", icon: "/skills/neo4j.png" },
-  { name: "XGBoost", icon: "/skills/66d8691e2943609aef09f8ee_xgboost.png" },
-  { name: "YOLO", icon: "/skills/yolo.jpg" },
-  { name: "GradCAM", icon: "/skills/gradcam.png" },
-  
+  { name: "PyTorch", icon: "/skills/pytorch.png", rim: RIM.aiml },
+  { name: "TensorFlow", icon: "/skills/Tensorflow_logo.svg.webp", rim: RIM.aiml },
+  { name: "scikit-learn", icon: "/skills/scikit learn.webp", rim: RIM.aiml },
+  { name: "OpenCV", icon: "/skills/38-384674_opencv-logo-png-transparent-png.png", rim: RIM.aiml },
+  { name: "pandas", icon: "/skills/pandas.png", rim: RIM.aiml },
+  { name: "NumPy", icon: "/skills/numpy.png", rim: RIM.aiml },
+  { name: "Neo4j", icon: "/skills/neo4j.png", rim: RIM.data },
+  { name: "XGBoost", icon: "/skills/66d8691e2943609aef09f8ee_xgboost.png", rim: RIM.aiml },
+  { name: "YOLO", icon: "/skills/yolo.jpg", rim: RIM.aiml },
+  { name: "GradCAM", icon: "/skills/gradcam.png", rim: RIM.aiml },
+
   // Python & C++
-  { name: "Python", icon: "/skills/Python-logo.png" },
-  { name: "C++", icon: "/skills/ISO_C++_Logo.svg.webp" },
-  
+  { name: "Python", icon: "/skills/Python-logo.png", rim: RIM.python },
+  { name: "C++", icon: "/skills/ISO_C++_Logo.svg.webp", rim: RIM.python },
+
   // React & Next.js
-  { name: "Next.js", icon: `${DEVICON}/nextjs/nextjs-original.svg` },
-  { name: "React", icon: `${DEVICON}/react/react-original.svg` },
-  { name: "TypeScript", icon: `${DEVICON}/typescript/typescript-original.svg` },
-  { name: "JavaScript", icon: `${DEVICON}/javascript/javascript-original.svg` },
-  
-  // Django & MongoDB
-  { name: "Django", icon: "/skills/django.jpeg" },
-  { name: "MongoDB", icon: "/skills/mongodb-logo-png_seeklogo-481256.png" },
-  { name: "PostgreSQL", icon: "/skills/Postgresql_elephant.svg" },
-  { name: "MySQL", icon: "/skills/logo-mysql-mysql-logo-png-images-are-download-crazypng-21.png" },
-  
+  { name: "Next.js", icon: `${DEVICON}/nextjs/nextjs-original.svg`, rim: RIM.react },
+  { name: "React", icon: `${DEVICON}/react/react-original.svg`, rim: RIM.react },
+  { name: "TypeScript", icon: `${DEVICON}/typescript/typescript-original.svg`, rim: RIM.react },
+  { name: "JavaScript", icon: `${DEVICON}/javascript/javascript-original.svg`, rim: RIM.react },
+
+  // Django & databases
+  { name: "Django", icon: "/skills/django.jpeg", rim: RIM.data },
+  { name: "MongoDB", icon: "/skills/mongodb-logo-png_seeklogo-481256.png", rim: RIM.data },
+  { name: "PostgreSQL", icon: "/skills/Postgresql_elephant.svg", rim: RIM.data },
+  { name: "MySQL", icon: "/skills/logo-mysql-mysql-logo-png-images-are-download-crazypng-21.png", rim: RIM.data },
+
   // FastAPI
-  { name: "FastAPI", icon: "/skills/fastapi.png" },
-  
+  { name: "FastAPI", icon: "/skills/fastapi.png", rim: RIM.fastapi },
+
   // Tools
-  { name: "Git", icon: `${DEVICON}/git/git-original.svg` },
+  { name: "Git", icon: `${DEVICON}/git/git-original.svg`, rim: RIM.python },
 ];
+
+/* ——— Fresnel rim shader (edge-only color, additive) ——— */
+const RIM_VERTEX = /* glsl */ `
+  varying vec3 vNormal;
+  varying vec3 vView;
+  void main() {
+    vNormal = normalize(normalMatrix * normal);
+    vec4 mv = modelViewMatrix * vec4(position, 1.0);
+    vView = normalize(-mv.xyz);
+    gl_Position = projectionMatrix * mv;
+  }
+`;
+
+const RIM_FRAGMENT = /* glsl */ `
+  uniform vec3 uColor;
+  uniform float uIntensity;
+  varying vec3 vNormal;
+  varying vec3 vView;
+  void main() {
+    float fresnel = pow(1.0 - abs(dot(normalize(vNormal), normalize(vView))), 3.0);
+    gl_FragColor = vec4(uColor, fresnel * uIntensity);
+  }
+`;
 
 const DOUBLE_SKILLS = [...SKILLS, ...SKILLS];
 
@@ -81,29 +117,50 @@ function Pointer({ vec = new THREE.Vector3(), isActive }: { vec?: THREE.Vector3;
 /* ——— Swarming Skill Sphere ——— */
 function SkillSphere({
   skill,
+  index,
   isActive,
   vec = new THREE.Vector3(),
   r = THREE.MathUtils.randFloatSpread,
 }: {
   skill: (typeof SKILLS)[number];
+  index: number;
   isActive: boolean;
   vec?: THREE.Vector3;
   r?: typeof THREE.MathUtils.randFloatSpread;
 }) {
   const api = useRef<RapierRigidBody>(null);
-  
-  // Determine scale for this sphere instance based on the reference code
-  const scale = useMemo(() => [1.2, 1.6, 1.4, 1.6, 1.6][Math.floor(Math.random() * 5)], []);
+
+  // Deterministic per-instance scale (index-seeded — render must stay pure)
+  const scale = useMemo(() => [1.2, 1.6, 1.4, 1.6, 1.6][index % 5], [index]);
   const sphereGeometry = useMemo(() => new THREE.SphereGeometry(1, 64, 64), []);
-  
-  const texture = useTexture(skill.icon);
-  if (texture) {
-    texture.colorSpace = THREE.SRGBColorSpace;
-  }
-  const image = texture && texture.image ? (texture.image as any) : null;
-  const aspectRatio = image && image.width && image.height ? image.width / image.height : 1;
-  const decalScaleX = 1.2 * (aspectRatio > 1 ? 1 : aspectRatio);
-  const decalScaleY = 1.2 * (aspectRatio < 1 ? 1 : 1 / aspectRatio);
+
+  // colorSpace is set in the loader callback — mutating a hook-returned
+  // value in render/effects trips the react compiler's immutability rule.
+  const texture = useTexture(skill.icon, (tex) => {
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.needsUpdate = true;
+  });
+
+  // Skill-specific Fresnel rim — colored edges only, logo center stays clean.
+  const rimMaterial = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        vertexShader: RIM_VERTEX,
+        fragmentShader: RIM_FRAGMENT,
+        uniforms: {
+          uColor: { value: new THREE.Color(skill.rim) },
+          uIntensity: { value: 0.85 },
+        },
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      }),
+    [skill.rim]
+  );
+  // Fixed square decal — reading texture.image during render is impure
+  // (react-hooks/immutability) and the logos are near-square anyway.
+  const decalScaleX = 1.2;
+  const decalScaleY = 1.2;
 
   useFrame((_state, delta) => {
     if (!isActive) return;
@@ -145,17 +202,20 @@ function SkillSphere({
         geometry={sphereGeometry}
         rotation={[0.3, 1, 1]}
       >
+        {/* White translucent glass base + sharp pure-white specular */}
         <meshPhysicalMaterial
           color="#ffffff"
           emissive="#ffffff"
-          emissiveIntensity={0.05}
+          emissiveIntensity={0.04}
           metalness={0.1}
-          roughness={0.05}
+          roughness={0.04}
           clearcoat={1.0}
-          clearcoatRoughness={0.05}
+          clearcoatRoughness={0.03}
           transmission={0.95}
           thickness={1.5}
           ior={1.5}
+          specularIntensity={1.25}
+          specularColor="#ffffff"
           envMapIntensity={2.0}
         />
         <Decal
@@ -172,6 +232,8 @@ function SkillSphere({
         >
           <meshBasicMaterial map={texture} transparent polygonOffset polygonOffsetFactor={-1} depthWrite={false} />
         </Decal>
+        {/* Fresnel rim shell — additive colored edge light */}
+        <mesh geometry={sphereGeometry} scale={1.02} material={rimMaterial} />
       </mesh>
     </RigidBody>
   );
@@ -196,7 +258,7 @@ function Scene({ isActive }: { isActive: boolean }) {
       <Physics gravity={[0, 0, 0]}>
         <Pointer isActive={isActive} />
         {DOUBLE_SKILLS.map((skill, i) => (
-          <SkillSphere key={`${skill.name}-${i}`} skill={skill} isActive={isActive} />
+          <SkillSphere key={`${skill.name}-${i}`} skill={skill} index={i} isActive={isActive} />
         ))}
       </Physics>
 

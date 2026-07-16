@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import {
   motion,
   useMotionValue,
-  useTransform,
   animate,
   PanInfo,
 } from "motion/react";
@@ -93,7 +92,8 @@ function CarouselTrack({ entries, label }: CarouselTrackProps) {
   const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const swipe = info.offset.x;
     if (Math.abs(swipe) > 60) {
-      swipe < 0 ? next() : prev();
+      if (swipe < 0) next();
+      else prev();
     } else {
       goTo(active);
     }

@@ -106,6 +106,37 @@ export function MusicSection() {
             </span>
           </div>
 
+          {/* Tabla reels — link out to Instagram */}
+          <div
+            data-polaroid
+            className="polaroid relative"
+            style={{ "--tilt": "1.4deg" } as React.CSSProperties}
+          >
+            <span className="tape -top-3 left-[14%] rotate-2" />
+            <div className="flex flex-col gap-2 bg-[#161210] p-5">
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#a89f8d]">
+                Performance reels
+              </span>
+              {musicSection.reels.map((reel) => (
+                <a
+                  key={reel.id}
+                  href={reel.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center justify-between rounded border border-white/10 px-4 py-2.5 transition-colors hover:border-accent/60"
+                >
+                  <span className="type-hand text-lg text-[#f5f2ea] transition-colors group-hover:text-accent">
+                    {reel.label}
+                  </span>
+                  <span className="text-xs text-[#a89f8d]">Instagram ↗</span>
+                </a>
+              ))}
+            </div>
+            <span className="type-hand block px-3 py-3 text-lg text-[#44403c]">
+              taal, on camera
+            </span>
+          </div>
+
           {/* Debut single */}
           <div
             data-polaroid

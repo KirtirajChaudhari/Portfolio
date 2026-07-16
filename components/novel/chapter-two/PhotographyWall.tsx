@@ -1,15 +1,16 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { Reveal } from "../Reveal";
 import { PolaroidGrid } from "./PolaroidGrid";
+import { InstagramEmbed } from "./InstagramEmbed";
 import { photographyWall, photographyMeta } from "@/content/novel";
 
 /*
- * Instagram polaroids as static supplied assets (never scraped).
- * Frames follow each photo's NATURAL aspect ratio — `img` keeps its
- * intrinsic dimensions and the white border stays constant. Placeholders
- * (no src yet) fall back to a 4/5 film frame.
+ * Instagram polaroids — live Meta embeds (real photo, caption, likes),
+ * not scraped, not manually exported. Each card keeps the scrapbook tilt
+ * + tape + shadow frame; the embed's own white card sits inside it like a
+ * printed photo in a polaroid mount. Single column below md so Instagram's
+ * 326px embed minimum never overflows a masonry column.
  */
 export function PhotographyWall() {
   return (
@@ -30,14 +31,11 @@ export function PhotographyWall() {
       </Reveal>
 
       {/* Loose scatter: masonry columns, varied offsets and tilts */}
-      <PolaroidGrid className="columns-2 gap-8 md:columns-3 md:gap-10 [&>*]:mb-8 md:[&>*]:mb-10">
+      <PolaroidGrid className="columns-1 gap-8 md:columns-2 lg:columns-3 md:gap-10 [&>*]:mb-8 md:[&>*]:mb-10">
         {photographyWall.map((photo, i) => (
-          <a
+          <div
             key={photo.id}
             data-polaroid
-            href={photo.href}
-            target="_blank"
-            rel="noopener noreferrer"
             className="polaroid relative block break-inside-avoid"
             style={{ "--tilt": `${photo.rotate}deg` } as React.CSSProperties}
           >
@@ -49,24 +47,10 @@ export function PhotographyWall() {
                 transform: `rotate(${photo.rotate * -2}deg)`,
               }}
             />
-            {photo.src ? (
-              <div className="relative overflow-hidden bg-[#262220]">
-                <img
-                  src={photo.src}
-                  alt={photo.caption}
-                  loading="lazy"
-                  className="block h-auto w-full"
-                />
-              </div>
-            ) : (
-              <div className="polaroid-photo">
-                <div className="film-placeholder" />
-              </div>
-            )}
-            <span className="type-hand block px-1 py-3 text-center text-lg text-[#44403c]">
-              {photo.caption}
-            </span>
-          </a>
+            <div className="overflow-hidden">
+              <InstagramEmbed url={photo.href} />
+            </div>
+          </div>
         ))}
       </PolaroidGrid>
     </section>
