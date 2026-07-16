@@ -2,7 +2,7 @@
 
 import { useRef, useState, Suspense, useMemo, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment, useTexture } from "@react-three/drei";
+import { Environment, useTexture, Decal } from "@react-three/drei";
 import { EffectComposer, N8AO } from "@react-three/postprocessing";
 import { Physics, RigidBody, BallCollider, CylinderCollider } from "@react-three/rapier";
 import type { RapierRigidBody } from "@react-three/rapier";
@@ -93,13 +93,16 @@ function SkillSphere({
   const api = useRef<RapierRigidBody>(null);
   
   // Determine scale for this sphere instance based on the reference code
-  const scale = useMemo(() => [0.7, 1, 0.8, 1, 1][Math.floor(Math.random() * 5)], []);
+  const scale = useMemo(() => [1.2, 1.6, 1.4, 1.6, 1.6][Math.floor(Math.random() * 5)], []);
   const sphereGeometry = useMemo(() => new THREE.SphereGeometry(1, 64, 64), []);
   
   const texture = useTexture(skill.icon);
   if (texture) {
     texture.colorSpace = THREE.SRGBColorSpace;
   }
+  const aspectRatio = texture && texture.image ? texture.image.width / texture.image.height : 1;
+  const decalScaleX = 1.2 * (aspectRatio > 1 ? 1 : aspectRatio);
+  const decalScaleY = 1.2 * (aspectRatio < 1 ? 1 : 1 / aspectRatio);
 
   useFrame((_state, delta) => {
     if (!isActive) return;
@@ -142,10 +145,8 @@ function SkillSphere({
         rotation={[0.3, 1, 1]}
       >
         <meshPhysicalMaterial
-          map={texture}
-          emissive="#ffffff"
-          emissiveMap={texture}
-          emissiveIntensity={0.15}
+          color="#ffffff"
+          emissive="#222222"
           metalness={0.1}
           roughness={0.05}
           clearcoat={1.0}
@@ -153,6 +154,18 @@ function SkillSphere({
           transmission={0.2}
           thickness={1.5}
           ior={1.5}
+        />
+        <Decal
+          position={[0, 0, 1]}
+          rotation={[0, 0, 0]}
+          scale={[decalScaleX, decalScaleY, 1.2]}
+          map={texture}
+        />
+        <Decal
+          position={[0, 0, -1]}
+          rotation={[0, Math.PI, 0]}
+          scale={[decalScaleX, decalScaleY, 1.2]}
+          map={texture}
         />
       </mesh>
     </RigidBody>

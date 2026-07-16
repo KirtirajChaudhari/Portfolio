@@ -109,8 +109,11 @@ export function ProjectCardGrid({
 }
 
 export function ProjectsGrid({ projects }: { projects: ProjectCase[] }) {
+  const [showAll, setShowAll] = useState(false);
+  const visibleProjects = showAll ? projects : projects.slice(0, 4);
+
   return (
-    <section aria-label="Projects" className="mx-auto max-w-6xl px-6 py-28 md:py-36">
+    <section aria-label="Projects" className="mx-auto max-w-6xl px-6 pt-28 pb-12 md:pt-36 md:pb-16">
       <Reveal className="mb-14 md:mb-20">
         <span className="type-heading text-sm tracking-[0.4em] text-accent">
           OTHER PAGES FROM THIS CHAPTER
@@ -119,7 +122,21 @@ export function ProjectsGrid({ projects }: { projects: ProjectCase[] }) {
           Academic & Personal Projects
         </h3>
       </Reveal>
-      <ProjectCardGrid projects={projects} />
+      <ProjectCardGrid projects={visibleProjects} />
+      
+      {projects.length > 4 && (
+        <Reveal className="mt-12 flex justify-center">
+          <button
+            onClick={() => setShowAll(!showAll)}
+            className="group relative overflow-hidden rounded-full border border-surface/50 bg-surface/20 px-8 py-3 backdrop-blur-md transition-colors hover:bg-surface/40 hover:border-accent/30"
+          >
+            <span className="type-body relative z-10 text-sm tracking-widest text-text uppercase">
+              {showAll ? "View Less Projects" : "View All Projects"}
+            </span>
+            <div className="absolute inset-0 z-0 bg-gradient-to-r from-accent/0 via-accent/10 to-accent/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+          </button>
+        </Reveal>
+      )}
     </section>
   );
 }
