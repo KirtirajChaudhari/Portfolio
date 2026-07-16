@@ -100,7 +100,8 @@ function SkillSphere({
   if (texture) {
     texture.colorSpace = THREE.SRGBColorSpace;
   }
-  const aspectRatio = texture && texture.image ? texture.image.width / texture.image.height : 1;
+  const image = texture && texture.image ? (texture.image as any) : null;
+  const aspectRatio = image && image.width && image.height ? image.width / image.height : 1;
   const decalScaleX = 1.2 * (aspectRatio > 1 ? 1 : aspectRatio);
   const decalScaleY = 1.2 * (aspectRatio < 1 ? 1 : 1 / aspectRatio);
 
