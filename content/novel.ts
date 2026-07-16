@@ -163,9 +163,31 @@ export const musicSection = {
   spotifyArtistUrl: musicDiscipline?.spotifyProfile ?? "https://open.spotify.com/artist/3zAV56brdo1aaVpR5WReag",
   spotifyTrackUrl: "https://open.spotify.com/track/4VkfpcwdnNnzNWVlCRupxY",
   spotifyEmbedUrl: "https://open.spotify.com/embed/track/4VkfpcwdnNnzNWVlCRupxY?utm_source=generator&theme=0",
-  debutLabel: "Debut single",
+
+  /* — YouTube channel block — profile fetched live 2026-07-16 (og:title,
+     og:image avatar, subscriber count from the channel page) and stored as
+     a local asset so the card never depends on a hotlink. */
   youtubeChannelUrl: siteMeta.socials.other?.find((s) => s.label === "Youtube")?.url ?? "",
-  /** Tabla performance reels — link out to Instagram. */
+  youtubeName: "Musical Kirtiraj",
+  youtubeHandle: "@MusicalKirtiraj",
+  youtubeStats: "370 subscribers",
+  youtubeTagline: "Tabla performances, one taal at a time.",
+  youtubeImage: "/creator/youtube-profile.jpg",
+
+  /* — Spotify artist profile block — name + artwork from Spotify's public
+     oEmbed endpoint, stored locally. */
+  artistName: "Kirtiraj Nitin Chaudhari",
+  artistBio: "Tabla player turned songwriter — rhythm first, everything else after.",
+  artistImage: "/creator/spotify-artist.jpg",
+
+  /* — Debut song block — */
+  debutLabel: "Debut single",
+  debutTitle: "Invisible Available Replaceable",
+  // TODO(kirtiraj): rewrite this in your own words if you want a different story beat.
+  debutStory:
+    "After years of keeping taal for other people's melodies, this is the first track with my own name on it. It went from a notebook line to a released song — the same notebook the poems live in.",
+
+  /** Tabla performance reels — rendered as live Instagram embeds. */
   reels: [
     { id: "reel-1", label: "taal, take one", href: "https://www.instagram.com/reel/C5Z3F-uy0fR/?igsh=MXV2aGllY3RuczgyOA==" },
     { id: "reel-2", label: "taal, take two", href: "https://www.instagram.com/reel/DYzedDGsn7v/?igsh=NXgyMHowMnl6YW0=" },

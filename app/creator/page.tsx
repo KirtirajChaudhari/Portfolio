@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { NovelShell } from "@/components/novel/NovelShell";
-import { ChapterTitle } from "@/components/novel/ChapterTitle";
+import { CreatorHero } from "@/components/novel/chapter-two/CreatorHero";
 import { CreatorIntro } from "@/components/novel/chapter-two/CreatorIntro";
 import { PhotographyWall } from "@/components/novel/chapter-two/PhotographyWall";
 import { PoetryWall } from "@/components/novel/chapter-two/PoetryWall";
 import { MusicSection } from "@/components/novel/chapter-two/MusicSection";
-import { chapterTwoMeta } from "@/content/novel";
 import { siteMeta } from "@/content/shared";
 
 export const metadata: Metadata = {
@@ -34,12 +33,7 @@ export default function CreatorPage() {
           <span className="type-hand text-xl text-text-muted">the scrapbook</span>
         </div>
 
-        <ChapterTitle
-          kicker={chapterTwoMeta.kicker}
-          title={chapterTwoMeta.title}
-          epigraph={chapterTwoMeta.epigraph}
-          serif
-        />
+        <CreatorHero />
         <CreatorIntro />
         <div className="torn-edge" />
         <PhotographyWall />
