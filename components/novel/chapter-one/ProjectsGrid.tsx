@@ -125,16 +125,45 @@ export function ProjectsGrid({ projects }: { projects: ProjectCase[] }) {
       <ProjectCardGrid projects={visibleProjects} />
       
       {projects.length > 4 && (
-        <Reveal className="mt-12 flex justify-center">
-          <button
+        <Reveal className="mt-16 flex justify-center">
+          <motion.button
+            whileHover="hover"
+            whileTap="tap"
             onClick={() => setShowAll(!showAll)}
-            className="group relative overflow-hidden rounded-full border border-surface/50 bg-surface/20 px-8 py-3 backdrop-blur-md transition-colors hover:bg-surface/40 hover:border-accent/30"
+            className="group relative overflow-hidden rounded-full border border-border/60 bg-surface/40 px-10 py-4 shadow-[0_8px_32px_rgba(0,0,0,0.12)] backdrop-blur-md transition-all duration-300 hover:border-accent/60 hover:bg-surface/80 hover:shadow-[0_8px_32px_rgba(0,0,0,0.2)]"
           >
-            <span className="type-body relative z-10 text-sm tracking-widest text-text uppercase">
+            <span className="type-heading relative z-10 flex items-center gap-3 text-sm font-semibold tracking-widest text-text transition-colors duration-300 uppercase group-hover:text-accent">
               {showAll ? "View Less Projects" : "View All Projects"}
+              <motion.span
+                variants={{ hover: { y: showAll ? -4 : 4 } }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                className="text-lg leading-none"
+              >
+                {showAll ? "↑" : "↓"}
+              </motion.span>
             </span>
-            <div className="absolute inset-0 z-0 bg-gradient-to-r from-accent/0 via-accent/10 to-accent/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-          </button>
+            
+            {/* Animated Shimmer Highlight */}
+            <motion.div
+              className="absolute inset-0 z-0 bg-gradient-to-r from-transparent via-accent/15 to-transparent w-[200%]"
+              initial={{ x: "-100%" }}
+              variants={{
+                hover: { 
+                  x: "50%", 
+                  transition: { 
+                    repeat: Infinity, 
+                    duration: 1.2, 
+                    ease: "linear" 
+                  } 
+                }
+              }}
+            />
+            
+            {/* Subtle glow background layer */}
+            <motion.div
+              className="absolute inset-0 z-0 bg-accent/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            />
+          </motion.button>
         </Reveal>
       )}
     </section>

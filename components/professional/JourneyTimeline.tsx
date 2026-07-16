@@ -27,7 +27,11 @@ function TimelineItem({ item }: { item: JourneyEntry }) {
   return (
     <div data-journey-item className="relative pl-12 pb-12 last:pb-0">
       {/* Logo / Node */}
-      <div className="absolute -left-1 top-1 z-10 flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg border border-white/20 bg-white/10 backdrop-blur-md shadow-sm">
+      <div 
+        className={`absolute -left-1 top-1 z-10 flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg border border-white/20 backdrop-blur-md shadow-sm ${
+          item.logo ? "bg-white/95" : "bg-white/10"
+        }`}
+      >
         {item.logo ? (
           <Image
             src={item.logo}
