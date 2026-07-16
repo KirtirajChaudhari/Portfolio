@@ -14,17 +14,16 @@ export const novelHero = {
     "I build machine learning for places where a wrong prediction has real consequences — clinical nutrition, disease screening, railway safety. My focus is models that explain their reasoning to the people who have to trust them.",
   swipeHint: "Swipe for Chapter Two",
   /*
-   * Four identity clips (Seedance 2.0, std, 1080p, 16:9, silent, ~8s).
-   * Wardrobe locked across all four: charcoal smart-casual shirt, round
-   * wire-rim glasses. Cool studio/rim light only — amber belongs to /creator.
-   * Missing files render a bg-zinc-800 animate-pulse placeholder (never a
-   * stock avatar or reused asset).
+   * Four identity clips, pre-split into WebP frame sequences (240 frames
+   * each, 1280×720, under public/videos/frames/<id>/frame_NNNN.webp).
+   * The hero scrubs these on a canvas — <video> currentTime scrubbing was
+   * too jittery. Source mp4s/zips live in assets-src/videos (not deployed).
    */
   phases: [
-    { id: "boot", label: "HERO", video: "/videos/hero-boot.mp4" },
-    { id: "builder", label: "THE BUILDER", video: "/videos/hero-builder.mp4" },
-    { id: "explainer", label: "THE EXPLAINER", video: "/videos/hero-explainer.mp4" },
-    { id: "closer", label: "THE CLOSER", video: "/videos/hero-closer.mp4" },
+    { id: "boot", label: "HERO", frames: "/videos/frames/boot" },
+    { id: "builder", label: "THE BUILDER", frames: "/videos/frames/builder" },
+    { id: "explainer", label: "THE EXPLAINER", frames: "/videos/frames/explainer" },
+    { id: "closer", label: "THE CLOSER", frames: "/videos/frames/closer" },
   ],
 };
 

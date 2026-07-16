@@ -19,29 +19,38 @@ export function NovelShell({ children }: { children: React.ReactNode }) {
     ).matches;
     if (prefersReducedMotion) return;
 
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      touchMultiplier: 1.5,
-    });
-    setLenis(lenis);
+    let lenis: Lenis;
+    let frame: number;
 
-    if (process.env.NODE_ENV === "development") {
-      // Dev-only: lets automated checks drive the clock when rAF is throttled.
-      (window as unknown as Record<string, unknown>).__novelDebug = { lenis, gsap };
-    }
+    const initLenis = () => {
+      lenis = new Lenis({
+        duration: 1.2,
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        touchMultiplier: 1.5,
+      });
+      setLenis(lenis);
 
-    lenis.on("scroll", ScrollTrigger.update);
-    gsap.ticker.lagSmoothing(0);
+      if (process.env.NODE_ENV === "development") {
+        (window as unknown as Record<string, unknown>).__novelDebug = { lenis, gsap };
+      }
 
-    let frame = requestAnimationFrame(function raf(time: number) {
-      lenis.raf(time);
-      frame = requestAnimationFrame(raf);
-    });
+      lenis.on("scroll", ScrollTrigger.update);
+      gsap.ticker.lagSmoothing(0);
+
+      frame = requestAnimationFrame(function raf(time: number) {
+        lenis.raf(time);
+        frame = requestAnimationFrame(raf);
+      });
+    };
+
+    // Defer initialization to let Next.js complete its route-change scroll 
+    // to top or history scroll restoration before Lenis locks it in.
+    const timeoutId = setTimeout(initLenis, 50);
 
     return () => {
-      cancelAnimationFrame(frame);
-      lenis.destroy();
+      clearTimeout(timeoutId);
+      if (frame) cancelAnimationFrame(frame);
+      if (lenis) lenis.destroy();
       setLenis(null);
     };
   }, []);
