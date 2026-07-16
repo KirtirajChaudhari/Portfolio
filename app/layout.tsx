@@ -1,15 +1,38 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Antonio, Caveat, Fraunces, Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+// Editorial display face for Professional-mode headings (spec: uppercase, wght 100–700)
+const antonio = Antonio({
+  variable: "--font-antonio",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+// Editorial serif for The Creator chapter — the "mood shift" face.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+// Handwritten face for diary notes and captions on /creator.
+const caveat = Caveat({
+  variable: "--font-caveat",
   subsets: ["latin"],
   display: "swap",
 });
@@ -43,7 +66,7 @@ export default function RootLayout({
     <html
       lang="en"
       data-mode="professional"
-      className={`${inter.variable} ${spaceGrotesk.variable}`}
+      className={`${inter.variable} ${spaceGrotesk.variable} ${antonio.variable} ${fraunces.variable} ${caveat.variable}`}
       suppressHydrationWarning
     >
       <body className="noise-overlay" suppressHydrationWarning>

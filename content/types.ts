@@ -60,11 +60,14 @@ export interface TimelineEntry {
   dateRange: string;
   description?: string;
   link?: string;
+  /** Visual-weight bucket for certifications */
+  tier?: "program" | "platform" | "simulation";
 }
 
 export interface Achievement {
   label: string;
   value: number;
+  suffix?: string;
 }
 
 export interface CreativeDiscipline {
@@ -75,6 +78,7 @@ export interface CreativeDiscipline {
   // Bespoke fields for the artistic mode redesign
   spotifyProfile?: string;
   spotifyEmbedUrl?: string;
+  youtubeChannel?: string;
   instaHandle?: string;
   instaLink?: string;
   poemContent?: string;

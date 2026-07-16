@@ -2,6 +2,20 @@ import { CreativeDiscipline } from "./types";
 
 export const artisticTagline = "Exploring the intersection of code, sound, and visual storytelling."; // Placeholder
 
+export const artisticHero = {
+  headingTop: "BEYOND",
+  headingBottom: "THE CODE",
+  metaLeft: "© 2026",
+  metaRight: "/ TABLA · LENS · INK",
+  heyLabel: "Hey —",
+  introParagraph:
+    "Same Kirtiraj as the other side, just off the clock. When I'm not training models, I'm keeping taal on the tabla, chasing light with a camera, or filling notebooks with lines that may never become poems.",
+  supportingCopy:
+    "Nothing here is a case study. It's rhythm, frames, and words — the things I make because I can't not make them.",
+  ctaLabel: "Explore the work",
+  ctaHref: "#creative-work",
+};
+
 export const artisticStory = "My journey isn't just about logic and algorithms. It's about finding rhythm in code and harmony in pixels. Whether I'm capturing moments through a vintage lens or composing melodies, I believe true innovation happens when technical precision meets creative expression."; // Placeholder
 
 export const artisticDisciplines: CreativeDiscipline[] = [
@@ -11,14 +25,33 @@ export const artisticDisciplines: CreativeDiscipline[] = [
     icon: "tabla",
     spotifyProfile: "https://open.spotify.com/artist/3zAV56brdo1aaVpR5WReag",
     spotifyEmbedUrl: "https://open.spotify.com/embed/track/4VkfpcwdnNnzNWVlCRupxY?utm_source=generator&theme=0",
+    youtubeChannel: "https://www.youtube.com/@MusicalKirtiraj",
     // inside content/artistic.ts
     works: [
       {
-        id: "music-1",
-        title: "My Awesome Track", // <-- Add this missing property!
+        id: "music-spotify",
+        title: "Debut Single",
         media: "",
         mediaType: "audio",
-      }
+      },
+      {
+        id: "reel-1",
+        title: "Taal, Take One",
+        media: "https://www.instagram.com/reel/C5Z3F-uy0fR/?igsh=MXV2aGllY3RuczgyOA==",
+        mediaType: "video",
+      },
+      {
+        id: "reel-2",
+        title: "Taal, Take Two",
+        media: "https://www.instagram.com/reel/DYzedDGsn7v/?igsh=NXgyMHowMnl6YW0=",
+        mediaType: "video",
+      },
+      {
+        id: "reel-3",
+        title: "Taal, Take Three",
+        media: "https://www.instagram.com/reel/Cx5x690ylbT/?igsh=MTVlZTE5am53djVpZA==",
+        mediaType: "video",
+      },
     ],
   },
   {

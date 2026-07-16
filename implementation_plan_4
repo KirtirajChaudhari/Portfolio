@@ -1,0 +1,188 @@
+# Hero / Service / About Rebuild + AnimatedProjects Effect
+
+Rebuild Professional mode's editorial sections per the `hero-service-about-spec.md` and adapt the AnimatedProjects scroll effect — all using real content, `motion/react`, and the existing design-token system.
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Stat card numbers** — The existing `professionalAchievements` data uses real-ish counts (7 projects, 8 certifications, 4 internships). These are derived from the content data and reasonable, but please confirm whether these are the final numbers you want displayed, or if you'd like different metrics (e.g., hackathons, papers, GitHub repos). The spec warned against fabricating numbers.
+
+> [!IMPORTANT]
+> **Phone number visibility** — `shared.ts` includes `tel:+919730100346`. The spec flags publishing a personal number on a public page. This plan **excludes the phone card** from the rebuilt About section. Say the word if you want it included.
+
+> [!WARNING]
+> **Social links** — Only GitHub and LinkedIn have real URLs in `shared.ts`. Instagram is empty, and there's no Behance/Dribbble. The About section will only show GitHub + LinkedIn + Email. If you have other real profiles, provide the URLs.
+
+## Open Questions
+
+> [!IMPORTANT]
+> **"My Story" destination** — I'm making this an in-page anchor (`#timeline`) that smooth-scrolls to the Experience & Education timeline section already on the page. This avoids creating a separate `/about` route for content that's already present. Is that acceptable, or do you want a dedicated subpage?
+
+---
+
+## Proposed Changes
+
+### Content Layer
+
+#### [MODIFY] [professional.ts](file:///d:/Resume/Portfolio/MyPortfolioDev/sia-portfolio/content/professional.ts)
+
+- Update `professionalAbout` to include `description` (Body Medium spec text) and the `story` sub-object for the My Story CTA
+- Keep `professionalFacts` (will be consumed by the rebuilt About section's contact-info cards rather than the old quick-facts grid)
+- The `professionalAchievements` export stays but gets a `suffix` field (e.g., `"+"`) to support the count-up format from the spec
+- `professionalHero` already has the right shape — no changes needed
+
+#### [MODIFY] [types.ts](file:///d:/Resume/Portfolio/MyPortfolioDev/sia-portfolio/content/types.ts)
+
+- Add optional `suffix` to the `Achievement` interface for the count-up `+` suffix
+
+---
+
+### Shared UI — CountUpStat
+
+#### [NEW] [CountUpStat.tsx](file:///d:/Resume/Portfolio/MyPortfolioDev/sia-portfolio/components/professional/CountUpStat.tsx)
+
+One reusable count-up stat card (spec: "build one `<CountUpStat />`, not three bespoke copies"):
+- Uses `motion/react`'s `useInView` to trigger
+- `useMotionValue` + `animate()` tween from 0 → end value over ~1.2s ease-out
+- Renders the number + suffix + label
+- Accepts `value: number`, `suffix?: string`, `label: string`
+- SSR-safe: renders the final number server-side, count-up is client-only decoration
+
+---
+
+### Hero Section (rebuild)
+
+#### [MODIFY] [Hero.tsx](file:///d:/Resume/Portfolio/MyPortfolioDev/sia-portfolio/components/professional/Hero.tsx)
+
+Full rebuild per the spec. The existing component is already close (two columns, spring entrance, Antonio headings), but needs refinement:
+- Ensure `height: 100dvh` via Tailwind class `h-dvh`
+- Layout: horizontal stack, max-width 1200px, large gap between columns
+- Left column: right-aligned, name label absolutely positioned above, big word "Machine"
+- Right column: left-aligned, big word "Learning", tagline absolutely positioned below
+- Animation: left from `x: +150`, right from `x: -150`, spring `{ bounce: 0, duration: 1, delay: 0.3 }`
+- All headings use `type-heading` utility (Antonio + uppercase) — already in place
+- Phone: stacks vertically, tagline in-flow (no absolute positioning)
+
+---
+
+### AnimatedProjects Section
+
+#### [NEW] [AnimatedProjects.tsx](file:///d:/Resume/Portfolio/MyPortfolioDev/sia-portfolio/components/professional/AnimatedProjects.tsx)
+
+Adapted from the provided source with these changes:
+- `"use client"` + `motion/react` imports (not `framer-motion`)
+- Uses the rich `Project` type from `content/types.ts` instead of `{ id, title, category, image, href }`
+- Card shows: title, `oneLiner`, `techStack` badges, `role`, and links (GitHub/Live/Demo)
+- **Removes the `↗ LaunchNow` watermark** entirely
+- Replaces `image` (which has no real thumbnails) with a gradient + icon placeholder (matching existing project card icon map)
+- Filters `professionalProjects.filter(p => p.featured)` to get exactly 4 featured projects
+- `desktopTransforms` pixel offsets tuned to the new section heights (will need visual verification)
+- Keeps the existing `@media (prefers-reduced-motion: reduce)` fallback from the CSS
+- "View all my projects" link removed (no `/projects` route exists) — replaced with a subtle "More projects below" or kept if a projects route is planned
+
+#### [NEW] [AnimatedProjects.css](file:///d:/Resume/Portfolio/MyPortfolioDev/sia-portfolio/components/professional/AnimatedProjects.css)
+
+Adapted CSS with:
+- Colors updated to use CSS custom properties (`var(--bg)`, `var(--surface)`, `var(--text)`, etc.) instead of hardcoded hex values
+- Font references use `var(--font-inter)` / `var(--font-antonio)`
+- Breakpoints aligned to the spec's 810px/1200px via `@media` queries
+- The `prefers-reduced-motion` block preserved as-is
+
+---
+
+### Service Section (refine)
+
+#### [MODIFY] [Service.tsx](file:///d:/Resume/Portfolio/MyPortfolioDev/sia-portfolio/components/professional/Service.tsx)
+
+The existing component is already well-built. Changes:
+- Add `h-dvh` so it takes a full viewport section per spec
+- Verify the accordion, FollowCursor integration, and Plus icon rotation already match the spec (they do)
+- No content changes — `professionalExpertise` already uses areas-of-expertise framing
+
+---
+
+### About Section (full rebuild)
+
+#### [MODIFY] [About.tsx](file:///d:/Resume/Portfolio/MyPortfolioDev/sia-portfolio/components/professional/About.tsx)
+
+Complete rewrite to match the spec — this is the biggest single change. Now absorbs Achievements + Contact functionality:
+
+**Structure:**
+- Full viewport height (`h-dvh`), vertical stack, centered
+- Container: max-width 1200px, horizontal padding 40px
+- About Wrap: max-width 600px
+
+**Content blocks (top to bottom):**
+1. **Heading** (H2, type-heading) + **Description** (Body Medium)
+2. **Number Card Wrap** — 3-col grid of `<CountUpStat>` cards using `professionalAchievements` data
+   - `{/* TODO: confirm these numbers before shipping — derived from content data */}`
+3. **Contact Info Grid** — 3-col grid with Email card (from `siteMeta.email`), no phone card
+4. **Social Icon Wrap** — horizontal stack: GitHub + LinkedIn icons from `siteMeta.socials`, each wrapped in `<FollowCursor>`
+5. **"My Story" button** — pill-shaped, links to `#timeline`, wrapped in `<FollowCursor>`
+
+---
+
+### Cleanup — Remove Absorbed Sections
+
+#### [DELETE] [Achievements.tsx](file:///d:/Resume/Portfolio/MyPortfolioDev/sia-portfolio/components/professional/Achievements.tsx)
+
+Absorbed into the rebuilt About section's count-up stat cards.
+
+#### [MODIFY] [Contact.tsx](file:///d:/Resume/Portfolio/MyPortfolioDev/sia-portfolio/components/professional/Contact.tsx)
+
+Contact functionality absorbed into About. This component becomes a minimal **Resume CTA** at the bottom of the page (the "Download Resume" button still needs to live somewhere). Renamed to `ResumeCTA.tsx` or simplified.
+
+---
+
+### Section Ordering
+
+#### [MODIFY] [ProfessionalView.tsx](file:///d:/Resume/Portfolio/MyPortfolioDev/sia-portfolio/components/professional/ProfessionalView.tsx)
+
+New section order:
+```
+Hero → AnimatedProjects → Service → About (stats, contact, social, My Story CTA)
+→ Skills → Timeline → Certifications → ResumeCTA → Footer
+```
+
+This matches the spec's required order. Skills and Timeline are placed after About as "remaining sections" — this reads naturally because the About section's "My Story" CTA scrolls down to Timeline.
+
+---
+
+### Styles
+
+#### [MODIFY] [globals.css](file:///d:/Resume/Portfolio/MyPortfolioDev/sia-portfolio/app/globals.css)
+
+- Already has `type-heading` utility, `tablet`/`desktop` breakpoints, and all design tokens
+- No changes needed — the breakpoints and tokens are already in place from prior work
+
+---
+
+## Decisions Made
+
+| Decision | Choice | Rationale |
+|---|---|---|
+| "My Story" button | In-page anchor `#timeline` | Content already on the page; a separate `/about` route would duplicate it |
+| Phone number | **Excluded** | Spec flags it as optional; email + LinkedIn suffice |
+| Social icons | GitHub + LinkedIn only | Only ones with real URLs in `shared.ts` |
+| Stat card numbers | 7 projects / 8 certs / 4 internships | Derived from actual content data — **flagged for confirmation** |
+| Skills + Timeline placement | After About, before Footer | Natural reading order; "My Story" CTA anchors to Timeline |
+| `"View all projects"` link | Kept, anchors to `#projects-all` | Links to the remaining non-featured projects shown below |
+| `↗ LaunchNow` watermark | **Removed** | Template branding, not Kirtiraj's |
+
+## Verification Plan
+
+### Automated Tests
+```bash
+npx tsc --noEmit --strict
+```
+- Zero type errors, zero `framer-motion` imports remaining
+
+### Manual Verification
+- `npm run dev` and visually verify:
+  - Hero entrance animation (spring inward)
+  - AnimatedProjects scroll scatter → grid effect
+  - Service accordion expand/collapse + follow cursor
+  - About count-up stats trigger on scroll
+  - My Story button scrolls to Timeline
+  - All responsive breakpoints (phone/tablet/desktop)
+  - `prefers-reduced-motion` fallbacks disable all animations

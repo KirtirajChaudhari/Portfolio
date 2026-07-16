@@ -1,10 +1,103 @@
 import { SkillGroup, Project, TimelineEntry, Achievement } from "./types";
 import { siteMeta } from "./shared";
 
-export const professionalHeadline = `${siteMeta.role}`;
-export const professionalValueProposition = "Open to remote internships and research collaborations in applied ML.";
+/*
+ * Editorial hero (spec: two columns, a big word ending the left column and a
+ * big word starting the right, with the name as the label and the tagline
+ * absolutely positioned under the right word). The template's "Duncan Robert"
+ * + "digital / designer" become Kirtiraj's real name and field.
+ */
+export const professionalHero = {
+  label: siteMeta.fullName.split(" ").slice(0, 2).join(" "), // "Kirtiraj Nitin" → shown as name label
+  bigWordLeft: "Machine",
+  bigWordRight: "Learning",
+  tagline:
+    "I build explainable, auditable ML for high-stakes domains — clinical nutrition, disease screening, railway safety.",
+};
 
-export const professionalAbout = `Currently pursuing an M.Tech in AI & ML at MIT WPU (First Year), following a B.E. in Computer Engineering with Honours in AI & ML from MVPS's KBT College of Engineering, Nashik. My work sits at the intersection of applied AI and systems that matter in the real world — from RasaCare, a HIPAA-aligned clinical platform generating Ayurvedic diet prescriptions at 89.1% accuracy, to DrishtiManas, an explainable ocular and neurological screening tool, to PRAVAAS, a real-time obstacle-detection system for railway safety. I'm drawn to AI that earns trust — explainable, auditable, and built to be reviewed by the humans who rely on it. Open to internships and research collaborations in applied ML.`;
+export const professionalAbout = {
+  heading: "About",
+  description:
+    "I'm a first-year M.Tech (AI & ML) student at MIT-WPU, building ML systems for domains where a wrong answer has a cost. Everything I ship is explainable and auditable — models that show their reasoning to the doctors, reviewers, and operators who rely on them.",
+  lede:
+    "I'm a first-year M.Tech (AI & ML) student at MIT-WPU, building ML systems for domains where a wrong answer has a cost.",
+  detail:
+    "Everything I ship is explainable and auditable — models that show their reasoning to the doctors, reviewers, and operators who rely on them. Four internships across Python, Django, MERN, and cybersecurity have taught me that production code is never just about the model.",
+};
+
+export const professionalFacts: {
+  label: string;
+  value: string;
+  href?: string;
+}[] = [
+  { label: "Location", value: "Pune, India" },
+  { label: "Education", value: "M.Tech AI & ML — MIT-WPU" },
+  { label: "Experience", value: "4 internships" },
+  {
+    label: "GitHub",
+    value: "github.com/KirtirajChaudhari",
+    href: "https://github.com/KirtirajChaudhari",
+  },
+  {
+    label: "LinkedIn",
+    value: "linkedin.com/in/kirtirajchaudhari",
+    href: "https://linkedin.com/in/kirtirajchaudhari",
+  },
+];
+
+/** "My Story" primary button target — in-page anchor to the journey (Experience & Education). */
+export const professionalMyStoryHref = "#timeline";
+
+/**
+ * Service section, reframed from the template's billable services into
+ * areas of expertise (Kirtiraj is a student/fresher, not freelancing).
+ * Each row drives a distinct follow-cursor label per the spec.
+ */
+export const professionalExpertise: {
+  id: string;
+  index: string;
+  title: string;
+  cursorLabel: string;
+  description: string;
+  tools: string[];
+}[] = [
+  {
+    id: "ml",
+    index: "01",
+    title: "Machine Learning",
+    cursorLabel: "Explainable",
+    description:
+      "Explainable, auditable models for high-stakes decisions — patient-constitution classification at 89% accuracy, Grad-CAM overlays that show clinicians why a prediction was made, and pipelines built to be reviewed, not just run.",
+    tools: ["PyTorch", "TensorFlow", "XGBoost", "scikit-learn"],
+  },
+  {
+    id: "fullstack",
+    index: "02",
+    title: "Full-Stack Development",
+    cursorLabel: "Production",
+    description:
+      "Shipping ML behind real products — FastAPI and Django backends, Next.js and React frontends, role-based access, audit logging, and PostgreSQL/Neo4j data layers. Four internships spent building for production, not for the notebook.",
+    tools: ["FastAPI", "Django", "Next.js", "React", "PostgreSQL"],
+  },
+  {
+    id: "data-science",
+    index: "03",
+    title: "Data Science & Analysis",
+    cursorLabel: "Insight",
+    description:
+      "Turning raw data into decisions — cleaning, feature engineering, EDA that catches bad data before training, and forecasting that compares models on held-out error rather than trusting one.",
+    tools: ["pandas", "NumPy", "Matplotlib", "XGBoost"],
+  },
+  {
+    id: "cv-nlp",
+    index: "04",
+    title: "Computer Vision & NLP",
+    cursorLabel: "Perception",
+    description:
+      "Real-time perception where latency and safety matter — YOLOv5 obstacle detection at 81% mAP and 28 FPS for railway safety, plus classification and knowledge-graph work spanning medical imaging and language.",
+    tools: ["OpenCV", "YOLOv5", "Grad-CAM", "Neo4j"],
+  },
+];
 
 export const professionalSkills: SkillGroup[] = [
   {
@@ -12,12 +105,8 @@ export const professionalSkills: SkillGroup[] = [
     items: ["Python", "C++", "JavaScript", "SQL"],
   },
   {
-    category: "Version Control",
-    items: ["Git", "GitHub"],
-  },
-  {
-    category: "Web Dev",
-    items: ["HTML5", "CSS3", "React", "Django", "FastAPI", "REST APIs"],
+    category: "Web Dev & Tools",
+    items: ["HTML5", "CSS3", "React", "Django", "FastAPI", "REST APIs", "Git", "GitHub"],
   },
   {
     category: "Databases",
@@ -37,11 +126,11 @@ export const professionalProjects: Project[] = [
   {
     id: "rasacare",
     title: "RasaCare",
-    oneLiner: "Ayurvedic Clinical Diet & Nutrition Portal",
-    description: "A HIPAA-aligned clinical platform generating Prakriti-aware Ayurvedic diet prescriptions. An XGBoost model classifies patient constitution (Vata/Pitta/Kapha) at 89.1% overall clinical accuracy; a Neo4j knowledge graph of 700 herbs, 741 recipes, and 25K+ triples powers condition-aware diet generation across 10 clinical conditions. Doctors review, prescribe, and version diet charts through a dedicated portal; patients access and download prescribed plans as PDF — all behind audit logging, role-based access, and encrypted transit.",
+    oneLiner: "Ayurvedic Clinical Diet Intelligence Platform",
+    description: "A HIPAA-aligned clinical platform generating Prakriti-aware Ayurvedic diet prescriptions. A knowledge graph of 700 herbs, 741 recipes, and 25K+ triples — with classical Rasa/Guna/Virya/Vipaka properties — powers condition-aware diet generation across 10 clinical conditions at 89.1% overall clinical accuracy. Doctors review, prescribe, and version diet charts through a dedicated portal; patients access and download prescribed plans as PDF — all behind audit logging, role-based access, and encrypted transit.",
     role: "Full-Stack AI Developer",
-    techStack: ["Python", "FastAPI", "PostgreSQL", "Next.js", "Neo4j", "XGBoost"],
-    outcome: "89.1% classification accuracy",
+    techStack: ["React", "Django", "MongoDB"],
+    outcome: "5th place, hackathon finals · live at rasacare.app",
     links: { live: "https://rasacare.app", github: "https://github.com/KirtirajChaudhari/rasacare" },
     thumbnail: "", // Placeholder - uses lucide-react icon gradient if missing
     featured: true,
@@ -49,11 +138,11 @@ export const professionalProjects: Project[] = [
   {
     id: "drishtimanas",
     title: "DrishtiManas",
-    oneLiner: "Ocular & Neurological Disease Screening",
-    description: "An AI-powered screening platform analyzing fundus, retinal, and OCT images for ocular and neurological conditions. PyTorch handles classification while Grad-CAM overlays highlight which image region drove each prediction, giving clinicians an explainable basis to confirm or override the call. Role-based workflows separate technician (upload, QC), doctor (review, sign-off), and admin (audit, model versioning) responsibilities.",
+    oneLiner: "AI-Driven Ocular Disease Screening Platform",
+    description: "An AI-driven screening platform for fundus images. A DenseNet121 multi-label classifier (8 conditions, 0.81 weighted F1 on ~7,530 test images) pairs with Grad-CAM overlays that highlight which image region drove each prediction, giving clinicians an explainable basis to confirm or override the call. Role-based workflows separate technician (upload, QC), doctor (review, sign-off), and admin (audit, model versioning) responsibilities across a Dockerized React + FastAPI + PostgreSQL platform.",
     role: "AI Developer",
-    techStack: ["PyTorch", "TensorFlow", "FastAPI", "React"],
-    outcome: "In Development",
+    techStack: ["PyTorch", "DenseNet121", "FastAPI", "React", "PostgreSQL"],
+    outcome: "0.81 weighted F1 · platform shipped",
     links: { github: "https://github.com/KirtirajChaudhari/drishtimanas" },
     thumbnail: "", // Placeholder
     featured: true,
@@ -61,11 +150,11 @@ export const professionalProjects: Project[] = [
   {
     id: "pravaas",
     title: "PRAVAAS",
-    oneLiner: "Obstacle Detection on Railway Tracks",
-    description: "A real-time obstacle-detection pipeline for railway safety. A YOLOv5 model trained on 400 labelled frames across 5 obstacle classes (people, animals, debris, vehicles, fallen objects) reaches 81% mAP@0.5 at 28 FPS on a mid-range GPU — fast enough for near-real-time track monitoring.",
+    oneLiner: "AI Railway Track Safety System",
+    description: "A two-model railway safety pipeline: a YOLO11s obstacle detector trained on a custom-annotated set across 6 classes (Animal, Debris, Human, Object, Stone, Tree) as a proof-of-concept dataset → training → deployable-weights workflow, paired with a YOLOv8-nano rail-surface defect detection module in a Streamlit app. Both deploy as lightweight local inference rather than cloud services.",
     role: "ML Engineer",
-    techStack: ["Python", "YOLOv5", "OpenCV"],
-    outcome: "81% mAP@0.5 at 28 FPS",
+    techStack: ["Python", "YOLO11s", "Ultralytics", "OpenCV"],
+    outcome: "Working two-model safety prototype",
     links: { github: "https://github.com/KirtirajChaudhari/pravaas" },
     thumbnail: "", // Placeholder
     featured: true,
@@ -86,7 +175,7 @@ export const professionalProjects: Project[] = [
     id: "autonomous-driving",
     title: "Autonomous Driving",
     oneLiner: "Vehicle Detection & Autopilot Safety Analysis",
-    description: "A two-part project. Part one trains a CNN-based object-detection model to classify and localize vehicles in road imagery with bounding boxes. Part two is a data-science investigation of the Tesla-Deaths dataset — cleaning, EDA across year, country, state, and model, and analysis of verified autopilot-involved fatalities and collision types. [PENDING: architecture used + mAP/accuracy achieved; one headline finding from the autopilot safety analysis]",
+    description: "A CNN-based object-detection model that classifies and localizes vehicles in road imagery, paired with a data-science investigation of the Tesla-Deaths dataset — cleaning, EDA across year, country, and model, and analysis of verified autopilot-involved fatalities.",
     role: "ML/Data Science Engineer",
     techStack: ["Python", "TensorFlow/PyTorch", "OpenCV", "pandas"],
     links: { github: "https://github.com/KirtirajChaudhari/autonomous-driving" },
@@ -98,7 +187,7 @@ export const professionalProjects: Project[] = [
     id: "preserving-heritage",
     title: "Preserving Heritage",
     oneLiner: "Structure Classification & Tourism Recommender",
-    description: "A two-part project. Part one uses transfer learning on a pretrained CNN backbone to classify 11 categories of historical architectural structure, trained with and without augmentation and monitored for overfitting. Part two builds a collaborative-filtering recommendation engine over Indonesian tourism data to suggest destinations from a tourist's current location. [PENDING: backbone used + validation accuracy; headline EDA finding from the tourism data]",
+    description: "Transfer learning on a pretrained CNN backbone to classify 11 categories of historical architecture — trained with and without augmentation and monitored for overfitting — plus a collaborative-filtering engine recommending Indonesian tourism destinations from a tourist's location.",
     role: "ML Engineer",
     techStack: ["Python", "TensorFlow", "OpenCV", "pandas"],
     links: { github: "https://github.com/KirtirajChaudhari/preserving-heritage" },
@@ -110,7 +199,7 @@ export const professionalProjects: Project[] = [
     id: "sales-forecasting",
     title: "Sales Forecasting",
     oneLiner: "Multi-Restaurant Demand Prediction",
-    description: "Forecasts item-level demand across a multi-restaurant chain. Merges sales, item, and store data, engineers temporal features, then builds and compares Linear Regression, Random Forest, and XGBoost models — holding out the last six months as the test set and scoring by RMSE — to produce a next-year forecast. [PENDING: winning model + its RMSE; one headline EDA finding]",
+    description: "Item-level demand forecasting across a multi-restaurant chain. Merges sales, item, and store data, engineers temporal features, then compares Linear Regression, Random Forest, and XGBoost — scored by RMSE on a held-out six months — to produce a next-year forecast.",
     role: "Data Scientist",
     techStack: ["Python", "scikit-learn", "XGBoost", "pandas"],
     links: { github: "https://github.com/KirtirajChaudhari/sales-forecasting" },
@@ -190,6 +279,7 @@ export const professionalTimeline: TimelineEntry[] = [
     title: "Gen. AI & Machine Learning",
     organization: "IIT-Kanpur",
     dateRange: "Completed",
+    tier: "program",
   },
   {
     id: "cert-2",
@@ -197,6 +287,7 @@ export const professionalTimeline: TimelineEntry[] = [
     title: "Meta Full-Stack Developer",
     organization: "Coursera",
     dateRange: "Completed",
+    tier: "program",
   },
   {
     id: "cert-3",
@@ -204,6 +295,7 @@ export const professionalTimeline: TimelineEntry[] = [
     title: "Micro-Credit Program in Computer Science",
     organization: "IIT-Guwahati",
     dateRange: "Completed",
+    tier: "program",
   },
   {
     id: "cert-4",
@@ -211,6 +303,7 @@ export const professionalTimeline: TimelineEntry[] = [
     title: "OCI Data Science",
     organization: "Oracle",
     dateRange: "Completed",
+    tier: "platform",
   },
   {
     id: "cert-5",
@@ -218,6 +311,7 @@ export const professionalTimeline: TimelineEntry[] = [
     title: "OCI Generative AI",
     organization: "Oracle",
     dateRange: "Completed",
+    tier: "platform",
   },
   {
     id: "cert-6",
@@ -225,6 +319,7 @@ export const professionalTimeline: TimelineEntry[] = [
     title: "Introduction to Machine Learning on AWS",
     organization: "Coursera",
     dateRange: "Completed",
+    tier: "platform",
   },
   {
     id: "cert-7",
@@ -232,6 +327,7 @@ export const professionalTimeline: TimelineEntry[] = [
     title: "Deloitte Australia Data Analytics Job Simulation",
     organization: "Forage",
     dateRange: "Completed",
+    tier: "simulation",
   },
   {
     id: "cert-8",
@@ -239,11 +335,18 @@ export const professionalTimeline: TimelineEntry[] = [
     title: "Tata GenAI Powered Data Analytics Job Simulation",
     organization: "Forage",
     dateRange: "Completed",
+    tier: "simulation",
   }
 ];
 
+/*
+ * About stat cards. These are REAL counts derived from the content above
+ * (7 projects, 8 certifications, 4 internships) — deliberately NOT the
+ * template's fabricated "12 years / 270 projects / 50 clients".
+ * TODO(kirtiraj): confirm/adjust these numbers before shipping.
+ */
 export const professionalAchievements: Achievement[] = [
-  { label: "Projects Shipped", value: 7 },
+  { label: "Projects Shipped", value: 7, suffix: "+" },
   { label: "Certifications", value: 8 },
   { label: "Internships", value: 4 },
 ];

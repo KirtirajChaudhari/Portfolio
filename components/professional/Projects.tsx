@@ -31,7 +31,7 @@ export function Projects() {
   const other = professionalProjects.filter((p) => !p.featured);
 
   return (
-    <section id="projects" className="mx-auto max-w-6xl px-6 py-24">
+    <section id="projects-all" className="mx-auto max-w-6xl px-6 py-24">
       <AnimeReveal>
         <SectionHeading
           overline="Projects"
@@ -155,7 +155,7 @@ export function Projects() {
           {other.map((project) => {
             const Icon = ICON_MAP[project.id] || Code2;
             return (
-                <GlassCard key={project.id} className="!p-5">
+                <GlassCard key={project.id} className="flex flex-col !p-5">
                   <div className="flex items-start gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-2">
                       <Icon className="h-5 w-5 text-accent/50" strokeWidth={1.5} />
@@ -174,8 +174,19 @@ export function Projects() {
                       )}
                     </div>
                   </div>
+
+                  <p className="mt-3 flex-1 text-xs leading-relaxed text-text-muted">
+                    {project.description}
+                  </p>
+
+                  {project.outcome && (
+                    <p className="mt-3 text-xs font-semibold text-accent">
+                      {project.outcome}
+                    </p>
+                  )}
+
                   <div className="mt-3 flex flex-wrap gap-1">
-                    {project.techStack.slice(0, 4).map((tech) => (
+                    {project.techStack.map((tech) => (
                       <span
                         key={tech}
                         className="rounded-full bg-surface-2 px-2 py-0.5 text-[10px] text-text-muted"
@@ -184,6 +195,18 @@ export function Projects() {
                       </span>
                     ))}
                   </div>
+
+                  {project.links?.github && (
+                    <a
+                      href={project.links.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-3 inline-flex items-center gap-1.5 text-xs text-text-muted transition-colors hover:text-accent"
+                    >
+                      <GithubIcon className="h-3.5 w-3.5" />
+                      Source
+                    </a>
+                  )}
                 </GlassCard>
             );
           })}

@@ -1,0 +1,236 @@
+/* ——— Journey Carousel (Education & Experience Slider) ——— */
+
+.journey-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+}
+
+@media (min-width: 1024px) {
+  .journey-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+  }
+}
+
+/* ——— Track ——— */
+.journey-track {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.journey-track__heading {
+  font-family: var(--font-display, inherit);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+/* ——— Dot Timeline (secondary index) ——— */
+.journey-track__dots {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.journey-track__dots-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  background: var(--border);
+  z-index: 0;
+}
+
+.journey-track__dot {
+  position: relative;
+  z-index: 1;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.journey-track__dot:hover {
+  border-color: var(--accent);
+  transform: scale(1.3);
+}
+
+.journey-track__dot--active {
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 40%, transparent);
+  transform: scale(1.3);
+}
+
+/* ——— Cards Viewport ——— */
+.journey-track__viewport {
+  overflow: hidden;
+  padding: 1rem 0;
+  cursor: grab;
+}
+
+.journey-track__viewport:active {
+  cursor: grabbing;
+}
+
+.journey-track__strip {
+  display: flex;
+  gap: 24px;
+  touch-action: pan-y;
+}
+
+/* ——— Card ——— */
+.journey-card {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  backdrop-filter: blur(12px);
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+  min-height: 280px;
+}
+
+.journey-card__logo-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--surface-2) 80%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.journey-card__logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 4px;
+}
+
+.journey-card__monogram {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--surface-2), color-mix(in srgb, var(--accent) 15%, var(--surface-2)));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display, inherit);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.journey-card__role {
+  font-family: var(--font-display, inherit);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+  margin: 0;
+}
+
+.journey-card__org {
+  font-size: 0.8rem;
+  color: var(--accent);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: opacity 0.2s;
+}
+
+.journey-card__org:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.journey-card__date {
+  display: inline-block;
+  width: fit-content;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.journey-card__desc {
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+  margin: 0;
+  flex: 1;
+}
+
+.journey-card__skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: auto;
+}
+
+.journey-card__skill-pill {
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.65rem;
+  font-weight: 500;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s;
+}
+
+.journey-card__skill-pill:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+/* ——— Nav Arrows ——— */
+.journey-track__nav {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.journey-track__arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.journey-track__arrow:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+}

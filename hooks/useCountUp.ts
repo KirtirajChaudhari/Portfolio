@@ -5,69 +5,51 @@ import { useEffect, useRef, useState } from "react";
 interface UseCountUpOptions {
   end: number;
   duration?: number;
-  startOnView?: boolean;
 }
 
 /**
- * Animated counter hook. Counts from 0 to `end` over `duration` ms.
- * Starts counting when the ref element enters the viewport.
+ * Animated counter hook. The REAL value is the initial state, so SSR,
+ * crawlers, screen readers, and no-JS users always see the true number —
+ * the 0→end count-up is a client-only enhancement that starts on view.
  */
-export function useCountUp({
-  end,
-  duration = 2000,
-  startOnView = true,
-}: UseCountUpOptions) {
-  const [count, setCount] = useState(0);
-  const [hasStarted, setHasStarted] = useState(false);
+export function useCountUp({ end, duration = 2000 }: UseCountUpOptions) {
+  const [count, setCount] = useState(end);
   const ref = useRef<HTMLDivElement>(null);
+  const started = useRef(false);
 
   useEffect(() => {
-    if (!startOnView || !ref.current) return;
+    const el = ref.current;
+    if (!el) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let frame: number;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !hasStarted) {
-          setHasStarted(true);
-        }
+        if (!entry.isIntersecting || started.current) return;
+        started.current = true;
+        observer.disconnect();
+
+        let startTime: number | null = null;
+        const animate = (timestamp: number) => {
+          if (startTime === null) startTime = timestamp;
+          const progress = Math.min((timestamp - startTime) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+          setCount(Math.round(eased * end));
+          if (progress < 1) frame = requestAnimationFrame(animate);
+        };
+        frame = requestAnimationFrame(animate);
       },
       { threshold: 0.3 }
     );
 
-    observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [startOnView, hasStarted]);
-
-  useEffect(() => {
-    if (!hasStarted) return;
-
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-
-    if (prefersReducedMotion) {
-      setTimeout(() => setCount(end), 0);
-      return;
-    }
-
-    let startTime: number | null = null;
-    let animationFrame: number;
-
-    const animate = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-
-      // Ease-out cubic
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.floor(eased * end));
-
-      if (progress < 1) {
-        animationFrame = requestAnimationFrame(animate);
-      }
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
     };
-
-    animationFrame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [hasStarted, end, duration]);
+  }, [end, duration]);
 
   return { count, ref };
 }

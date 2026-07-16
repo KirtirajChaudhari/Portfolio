@@ -50,6 +50,24 @@
   --color-accent-subtle: var(--accent-subtle);
   --font-sans: var(--font-inter);
   --font-display: var(--font-space-grotesk);
+  --font-heading: var(--font-antonio);
+  --font-serif: var(--font-fraunces);
+}
+
+/*
+ * Spec breakpoints (Hero/Service/About editorial sections).
+ * Base = phone (≤ 809.98px); `tablet:` = 810–1199.98px; `desktop:` = ≥ 1200px.
+ * Added alongside Tailwind's defaults — the rest of the site still uses sm/md/lg.
+ */
+@theme {
+  --breakpoint-tablet: 810px;
+  --breakpoint-desktop: 1200px;
+}
+
+/* Shared editorial heading token: Antonio + uppercase, applied once not inline everywhere. */
+@utility type-heading {
+  font-family: var(--font-antonio), sans-serif;
+  text-transform: uppercase;
 }
 
 /* ——— Base ——— */
@@ -170,4 +188,276 @@ body {
   .gradient-border {
     animation: none;
   }
+}
+
+/* ═══════════ "My Life as a Novel" layer ═══════════ */
+
+/* Serif utility for The Creator chapter headings/poetry. */
+@utility type-serif {
+  font-family: var(--font-fraunces), Georgia, serif;
+}
+
+/* ——— Hero split panes ——— */
+.hero-pane video,
+.hero-pane .hero-pane-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Animated gradient fallback shown until the identity clips exist/load. */
+.hero-pane-fallback {
+  background: linear-gradient(160deg, var(--pane-a) 0%, var(--pane-b) 45%, var(--pane-c) 100%);
+  background-size: 160% 160%;
+  animation: pane-drift 14s ease-in-out infinite alternate;
+}
+
+.hero-pane[data-side="engineer"] {
+  --pane-a: #060a14;
+  --pane-b: #0c1a30;
+  --pane-c: #071022;
+}
+
+.hero-pane[data-side="creator"] {
+  --pane-a: #140d06;
+  --pane-b: #2b1a0a;
+  --pane-c: #1a0f05;
+}
+
+@keyframes pane-drift {
+  from { background-position: 0% 0%; }
+  to { background-position: 100% 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-pane-fallback { animation: none; }
+}
+
+/* ——— Marquee (tech stack strip) ——— */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 36s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee-scroll {
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+}
+
+/* ——— Polaroid / scrapbook cards (The Creator) ——— */
+.polaroid {
+  background: #f5f2ea;
+  color: #1c1917;
+  padding: 12px 12px 0;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 12px 32px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  transform: rotate(var(--tilt, 0deg));
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease;
+  will-change: transform;
+}
+
+.polaroid:hover {
+  transform: rotate(0deg) translateY(-8px) scale(1.02);
+  box-shadow:
+    0 0 0 2px rgba(245, 158, 11, 0.55),
+    0 20px 48px rgba(0, 0, 0, 0.55);
+}
+
+.polaroid-photo {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  background: #262220;
+}
+
+/* Film-frame placeholder for photos the user hasn't supplied yet. */
+.film-placeholder {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 90% at 20% 10%, rgba(245, 158, 11, 0.22), transparent 55%),
+    radial-gradient(100% 100% at 85% 90%, rgba(239, 68, 68, 0.16), transparent 60%),
+    linear-gradient(165deg, #221b13 0%, #191410 55%, #120e0a 100%);
+}
+
+/* Paper variant — poems set as type instead of a photo. */
+.polaroid-photo.polaroid-paper {
+  background: #fbf8f1;
+  aspect-ratio: auto;
+  min-height: 240px;
+}
+
+.polaroid-caption {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 10px 4px 14px;
+  color: #44403c;
+}
+
+/* ——— Skill physics balls ——— */
+.skill-ball {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: grab;
+  user-select: none;
+  will-change: transform;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.12) 34%, transparent 58%),
+    radial-gradient(circle at 70% 85%, color-mix(in srgb, var(--ball-tint, #888) 45%, transparent), transparent 55%),
+    linear-gradient(145deg, #3a3f47 0%, #1b1f26 55%, #2c313a 100%);
+  box-shadow:
+    inset 0 -8px 14px rgba(0, 0, 0, 0.55),
+    inset 0 6px 10px rgba(255, 255, 255, 0.18),
+    0 10px 24px rgba(0, 0, 0, 0.5);
+}
+
+.skill-ball:active {
+  cursor: grabbing;
+}
+
+.skill-ball img {
+  width: 52%;
+  height: 52%;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
+}
+
+.skill-ball[data-fallback]::after {
+  content: attr(data-fallback);
+  font-family: var(--font-antonio), sans-serif;
+  font-size: 1rem;
+  color: #f5f5f0;
+  letter-spacing: 0.05em;
+}
+
+/* ——— Hero seam line ——— */
+.hero-seam {
+  background: linear-gradient(to bottom, transparent, rgba(245, 245, 240, 0.35), transparent);
+}
+
+/* ——— The Creator: wrinkled-diary / scrapbook theme (spec v2) ——— */
+@utility type-hand {
+  font-family: var(--font-caveat), "Segoe Script", cursive;
+}
+
+.creator-paper {
+  /* Light kraft/cream token overrides — cascades over the dark base. */
+  --bg: #eee6d6;
+  --surface: #f7f1e3;
+  --surface-2: #e5dac4;
+  --border: #d3c5a8;
+  --text: #2b2118;
+  --text-muted: #71634f;
+  --accent: #b4540a;
+  --accent-glow: #d97706;
+  --accent-subtle: rgba(180, 84, 10, 0.08);
+  background-color: var(--bg);
+  color: var(--text);
+  background-image:
+    radial-gradient(ellipse 120% 60% at 15% 8%, rgba(255, 252, 240, 0.7), transparent 55%),
+    radial-gradient(ellipse 90% 70% at 88% 92%, rgba(160, 130, 90, 0.14), transparent 60%),
+    repeating-linear-gradient(2deg, transparent 0 42px, rgba(120, 95, 60, 0.03) 42px 44px);
+}
+
+/* Torn/deckled divider between creator sections. */
+.torn-edge {
+  height: 22px;
+  background: var(--surface-2);
+  clip-path: polygon(0 40%, 3% 65%, 7% 35%, 12% 70%, 17% 30%, 23% 60%, 28% 25%, 34% 72%,
+    40% 38%, 46% 66%, 52% 28%, 58% 62%, 64% 34%, 70% 70%, 76% 30%, 82% 64%, 88% 36%,
+    93% 68%, 97% 40%, 100% 55%, 100% 100%, 0 100%);
+  opacity: 0.7;
+}
+
+/* Diary page — aged paper for poems. */
+.diary-page {
+  position: relative;
+  background:
+    radial-gradient(ellipse 60% 40% at 78% 12%, rgba(170, 130, 70, 0.13), transparent 60%),
+    radial-gradient(ellipse 50% 35% at 12% 88%, rgba(150, 110, 60, 0.11), transparent 65%),
+    linear-gradient(168deg, #f6efdc 0%, #efe4c9 55%, #e9dcbc 100%);
+  clip-path: polygon(1% 0.5%, 12% 0%, 25% 1%, 40% 0.3%, 57% 1.2%, 73% 0%, 88% 0.8%, 99% 0.2%,
+    100% 14%, 99.2% 30%, 100% 47%, 99% 63%, 100% 80%, 99.3% 93%, 98% 100%,
+    84% 99.2%, 68% 100%, 51% 99%, 35% 100%, 19% 99.3%, 6% 100%, 0.5% 98%,
+    1% 84%, 0% 68%, 0.8% 51%, 0% 34%, 1% 18%);
+  box-shadow: 0 14px 30px rgba(80, 60, 30, 0.28);
+  transform: rotate(var(--tilt, 0deg));
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease;
+}
+
+.diary-page:hover {
+  transform: rotate(0deg) translateY(-6px);
+  box-shadow: 0 22px 44px rgba(80, 60, 30, 0.34);
+}
+
+/* Coffee ring stain */
+.coffee-ring {
+  position: absolute;
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  border: 7px solid rgba(130, 85, 35, 0.16);
+  filter: blur(0.4px);
+  pointer-events: none;
+}
+
+/* Ink blot */
+.ink-blot {
+  position: absolute;
+  width: 14px;
+  height: 18px;
+  border-radius: 60% 40% 55% 45% / 55% 60% 40% 45%;
+  background: rgba(45, 35, 60, 0.18);
+  pointer-events: none;
+}
+
+/* Washi-tape accent for scrapbook cards. */
+.tape {
+  position: absolute;
+  width: 86px;
+  height: 26px;
+  background: rgba(233, 214, 160, 0.75);
+  border-left: 1px dashed rgba(120, 95, 50, 0.25);
+  border-right: 1px dashed rgba(120, 95, 50, 0.25);
+  box-shadow: 0 2px 4px rgba(80, 60, 30, 0.18);
+  pointer-events: none;
+}
+
+/* Polaroids on paper get warmer shadows. */
+.creator-paper .polaroid {
+  box-shadow: 0 2px 4px rgba(80, 60, 30, 0.25), 0 14px 30px rgba(80, 60, 30, 0.3);
+}
+
+/* ——— Swipe hint (mobile, first load) ——— */
+@keyframes swipe-hint {
+  0%, 100% { transform: translateX(-10px); opacity: 0.4; }
+  50% { transform: translateX(10px); opacity: 1; }
+}
+
+.swipe-hint-arrow {
+  animation: swipe-hint 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swipe-hint-arrow { animation: none; }
 }

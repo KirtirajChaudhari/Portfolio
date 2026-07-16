@@ -16,7 +16,7 @@ export const avatarSet: AvatarSet = {
 export const siteMeta: SiteMeta = {
   fullName: "Kirtiraj Nitin Chaudhari",
   role: "AI/ML Engineer",
-  location: "Remote",
+  location: "Pune, India (IST)",
   email: "mrkirtirajchaudhari@gmail.com",
   resumeUrl: "https://drive.google.com/uc?export=download&id=1b3u4cVlTh15P98zMX_uKlaHce-XZvx0t",
   socials: {
@@ -24,7 +24,7 @@ export const siteMeta: SiteMeta = {
     linkedin: "https://linkedin.com/in/kirtirajchaudhari",
     instagram: "",
     other: [
-      { label: "Youtube", url: "" },
+      { label: "Youtube", url: "https://www.youtube.com/@MusicalKirtiraj" },
       { label: "Phone", url: "tel:+919730100346" },
     ],
   },

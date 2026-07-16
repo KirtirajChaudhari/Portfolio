@@ -1,89 +1,69 @@
-import Image from "next/image";
-import {
-  professionalHeadline,
-  professionalValueProposition,
-} from "@/content/professional";
-import { siteMeta } from "@/content/shared";
-import { ArrowDown, FileDown } from "lucide-react";
-import { AnimeReveal } from "@/components/ui/AnimeReveal";
+"use client";
+
+import { motion, useReducedMotion, type Target } from "motion/react";
+import { professionalHero } from "@/content/professional";
+import { useMounted } from "@/hooks/useMounted";
+
+// Spec: left enters from x:+150, right from x:-150 — both spring inward to center.
+const ENTER = { type: "spring" as const, bounce: 0, duration: 1, delay: 0.3 };
 
 export function Hero() {
+  const mounted = useMounted();
+  const reduce = useReducedMotion();
+
+  // Presence-safe entrance: hidden until the post-hydration mount flip, then
+  // springs in. `initial` is skipped inside ViewTransition's AnimatePresence.
+  const column = (from: number): Target =>
+    reduce || mounted ? { x: 0, opacity: 1 } : { x: from, opacity: 0 };
+
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-      {/* Dot grid background */}
-      <div className="absolute inset-0 dot-grid opacity-30" aria-hidden="true" />
-
-      {/* Radial gradient overlay */}
-      <div
-        className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,var(--bg)_70%)]"
-        aria-hidden="true"
-      />
-
-      {/* Accent glow orb */}
-      <div
-        className="absolute top-1/4 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-accent-glow/10 blur-[120px]"
-        aria-hidden="true"
-      />
-
-      <AnimeReveal staggerChildren staggerDelay={150} className="relative z-10 mx-auto max-w-4xl px-6 text-center">
-        {/* Avatar */}
-        <div className="mb-8 flex justify-center">
-          <div className="relative h-28 w-28 overflow-hidden rounded-full ring-2 ring-accent/30 ring-offset-4 ring-offset-bg">
-            <Image
-              src="/avatars/professional-full.png"
-              alt={siteMeta.fullName}
-              fill
-              sizes="112px"
-              priority
-              className="object-cover"
-            />
+    <section
+      id="hero"
+      className="relative flex h-dvh w-full items-center justify-center overflow-hidden"
+    >
+      {/* Container: max-width 1200px, large gap between columns */}
+      <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center gap-10 px-6 tablet:flex-row tablet:items-center tablet:justify-center tablet:gap-[6vw] desktop:gap-[370px]">
+        {/* ——— Left column: right-aligned, ending in the big word ——— */}
+        <motion.div
+          initial={false}
+          animate={column(150)}
+          transition={reduce ? { duration: 0 } : ENTER}
+          className="flex w-full flex-col items-center text-center tablet:w-1/2 tablet:max-w-[50%] tablet:items-end tablet:text-right"
+        >
+          <div className="relative pr-2.5">
+            {/* Name label — absolutely pinned above the big word */}
+            <span className="type-heading absolute -top-8 left-1 text-[24px] font-normal leading-none text-text tablet:-top-11 tablet:text-[32px]">
+              {professionalHero.label}
+            </span>
+            {/* Big word: Heading 1 — 120/96/56px responsive */}
+            <span className="type-heading -ml-2.5 block text-[56px] font-bold leading-[1.1] tracking-[-0.03em] text-text tablet:text-[96px] desktop:text-[120px]">
+              {professionalHero.bigWordLeft}
+            </span>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Overline */}
-        <div className="mb-4 flex items-center justify-center gap-2">
-          <span className="h-px w-8 bg-accent/50" aria-hidden="true" />
-          <span className="text-xs font-medium uppercase tracking-[0.25em] text-accent">
-            {professionalHeadline}
-          </span>
-          <span className="h-px w-8 bg-accent/50" aria-hidden="true" />
-        </div>
-
-        {/* Name */}
-        <h1 className="font-display text-5xl font-bold leading-[1.05] tracking-tight text-text sm:text-6xl lg:text-7xl">
-          {siteMeta.fullName}
-        </h1>
-
-        {/* Value prop */}
-        <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-text-muted">
-          {professionalValueProposition}
-        </p>
-
-        {/* CTAs */}
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <a
-            href="#projects"
-            className="group inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3 text-sm font-semibold text-bg shadow-[0_0_24px_rgba(88,166,255,0.3)] transition-all duration-300 hover:shadow-[0_0_40px_rgba(88,166,255,0.5)] hover:scale-[1.02] motion-reduce:transition-none motion-reduce:hover:scale-100"
-          >
-            View Projects
-            <ArrowDown className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5 motion-reduce:transition-none" />
-          </a>
-          <a
-            href={siteMeta.resumeUrl}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-7 py-3 text-sm font-semibold text-text transition-all duration-300 hover:border-accent/40 hover:bg-surface-2 motion-reduce:transition-none"
-          >
-            <FileDown className="h-4 w-4" />
-            Resume
-          </a>
-        </div>
-      </AnimeReveal>
-
-      {/* Scroll indicator */}
-      <AnimeReveal delay={800} className="absolute bottom-8 left-1/2 -translate-x-1/2">
-        <div className="flex h-8 w-5 items-start justify-center rounded-full border border-border p-1" aria-hidden="true">
-          <div className="h-1.5 w-1 animate-bounce rounded-full bg-accent" />
-        </div>
-      </AnimeReveal>
+        {/* ——— Right column: left-aligned, starting with the big word ——— */}
+        <motion.div
+          initial={false}
+          animate={column(-150)}
+          transition={reduce ? { duration: 0 } : ENTER}
+          className="flex w-full flex-col items-center text-center tablet:w-1/2 tablet:max-w-[50%] tablet:items-start tablet:text-left"
+        >
+          <div className="relative">
+            {/* Big word: Heading 1 — same responsive scale */}
+            <span className="type-heading block text-[56px] font-bold leading-[1.1] tracking-[-0.03em] text-text tablet:text-[96px] desktop:text-[120px]">
+              {professionalHero.bigWordRight}
+            </span>
+            {/* Tagline — pinned under the big word on tablet+, in-flow on phone */}
+            <p
+              className="mt-5 max-w-[90%] text-[16px] font-light leading-[1.5] text-text-muted tablet:absolute tablet:right-0 tablet:-bottom-[65px] tablet:mt-0 tablet:text-right desktop:text-[18px]"
+              style={{ fontFamily: "var(--font-inter), sans-serif" }}
+            >
+              {professionalHero.tagline}
+            </p>
+          </div>
+        </motion.div>
+      </div>
     </section>
   );
 }
