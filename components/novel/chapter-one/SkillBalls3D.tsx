@@ -147,27 +147,31 @@ function SkillSphere({
       >
         <meshPhysicalMaterial
           color="#ffffff"
-          emissive="#222222"
+          emissive="#ffffff"
+          emissiveIntensity={0.05}
           metalness={0.1}
           roughness={0.05}
           clearcoat={1.0}
           clearcoatRoughness={0.05}
-          transmission={0.2}
+          transmission={0.95}
           thickness={1.5}
           ior={1.5}
+          envMapIntensity={2.0}
         />
         <Decal
           position={[0, 0, 1]}
           rotation={[0, 0, 0]}
           scale={[decalScaleX, decalScaleY, 1.2]}
-          map={texture}
-        />
+        >
+          <meshBasicMaterial map={texture} transparent polygonOffset polygonOffsetFactor={-1} depthWrite={false} />
+        </Decal>
         <Decal
           position={[0, 0, -1]}
           rotation={[0, Math.PI, 0]}
           scale={[decalScaleX, decalScaleY, 1.2]}
-          map={texture}
-        />
+        >
+          <meshBasicMaterial map={texture} transparent polygonOffset polygonOffsetFactor={-1} depthWrite={false} />
+        </Decal>
       </mesh>
     </RigidBody>
   );
