@@ -247,7 +247,6 @@ export function HeroCover() {
         0
       );
       tl.to("[data-hero-title]", { yPercent: -22, ease: "none", duration: 1 }, 0);
-      tl.to("[data-hero-scrim]", { opacity: 0.55, ease: "none", duration: 1 }, 0);
       tl.to(".hero-fade-out", { opacity: 0, ease: "none", duration: 0.35 }, 0.5);
     }, section);
 
@@ -263,13 +262,13 @@ export function HeroCover() {
       ref={sectionRef}
       id="cover"
       aria-label="Kirtiraj Chaudhari — cinematic hero"
-      className="relative h-screen overflow-hidden bg-bg"
+      className="relative h-svh overflow-hidden bg-bg"
       onTouchStart={() => setHintDismissed(true)}
     >
       {/* Pulse placeholder until the first frame is decoded */}
       {!firstFrameReady && (
-        <div className="absolute inset-0 animate-pulse bg-zinc-800">
-          <span className="absolute bottom-6 right-6 rounded border border-zinc-600 px-3 py-1 font-mono text-[10px] tracking-[0.25em] text-zinc-400">
+        <div className="absolute inset-0 animate-pulse bg-surface-2">
+          <span className="absolute bottom-6 right-6 rounded border border-border px-3 py-1 font-mono text-[10px] tracking-[0.25em] text-text-muted">
             LOADING FRAMES · HIGGSFIELD
           </span>
         </div>
@@ -285,25 +284,14 @@ export function HeroCover() {
       />
       {/* Whisper-light global veil — the avatar stays bright */}
       <div className="absolute inset-0 bg-black/10" />
-      {/* Lower-third scrim for type readability */}
+      {/* Lower-third scrim for type readability & smooth transition into next section */}
       <div
         data-hero-scrim
-        className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-black/75 via-black/30 to-transparent"
+        className="absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-t from-bg via-bg/60 to-transparent"
       />
 
       {/* Phase captions */}
-      <div className="pointer-events-none absolute left-6 top-6 z-20 md:left-10 md:top-10">
-        {novelHero.phases.map((phase, i) => (
-          <span
-            key={phase.id}
-            data-phase-caption
-            className="type-heading absolute left-0 top-0 whitespace-nowrap text-[11px] tracking-[0.35em] text-white/60 md:text-xs"
-            style={i > 0 ? { opacity: 0, visibility: "hidden" } : undefined}
-          >
-            {String(i + 1).padStart(2, "0")} — {phase.label}
-          </span>
-        ))}
-      </div>
+
 
       {/* Lower-third: name left, subtitle right — the face stays clear */}
       <div
@@ -311,15 +299,15 @@ export function HeroCover() {
         className="pointer-events-none absolute inset-x-0 bottom-24 z-20 px-6 md:bottom-28 md:px-12"
       >
         <div className="mx-auto flex max-w-7xl flex-col gap-5 md:flex-row md:items-end md:justify-between md:gap-12">
-          <h1 aria-label={`${novelHero.name} ${novelHero.surname}`} className="type-heading leading-[0.9] text-[#F5F5F0]">
-            <span aria-hidden className="block overflow-hidden text-[clamp(2.75rem,8vw,6.5rem)]">
+          <h1 aria-label={`${novelHero.name} ${novelHero.surname}`} className="type-heading leading-[0.9] text-text">
+            <span aria-hidden className="block overflow-hidden text-[clamp(2.75rem,8vw,6rem)]">
               {letters.map((ch, i) => (
                 <span key={i} data-hero-letter className="inline-block will-change-transform">
                   {ch}
                 </span>
               ))}
             </span>
-            <span aria-hidden className="block text-[clamp(1.1rem,3vw,2.2rem)] tracking-[0.42em] text-[#F5F5F0]/75">
+            <span aria-hidden className="block text-[clamp(1.1rem,3vw,2.2rem)] tracking-[0.42em] text-text/75">
               {novelHero.surname}
             </span>
           </h1>
@@ -340,13 +328,7 @@ export function HeroCover() {
             onClick={() => scrollToTarget("#chapter-one")}
             className="group flex items-center gap-2 rounded-full px-4 py-2 text-xs tracking-widest text-white/80 transition-colors hover:bg-white/10 hover:text-white"
           >
-            <Image
-              src={avatarSet.professional.icon}
-              alt=""
-              width={22}
-              height={22}
-              className="rounded-full transition-transform duration-300 group-hover:scale-110"
-            />
+            <span className="h-2 w-2 rounded-full bg-accent transition-transform duration-300 group-hover:scale-125" />
             <span className="type-heading whitespace-nowrap">CH. 1</span>
           </button>
           <span className="h-4 w-px bg-white/20" />
@@ -356,13 +338,7 @@ export function HeroCover() {
             className="group flex items-center gap-2 rounded-full px-4 py-2 text-xs tracking-widest text-white/80 transition-colors hover:bg-white/10 hover:text-white"
           >
             <span className="type-serif italic whitespace-nowrap">Ch. 2</span>
-            <Image
-              src={avatarSet.artistic.icon}
-              alt=""
-              width={22}
-              height={22}
-              className="rounded-full transition-transform duration-300 group-hover:scale-110"
-            />
+            <span className="h-2 w-2 rounded-full bg-white/40 transition-transform duration-300 group-hover:scale-125" />
           </button>
         </div>
       </div>

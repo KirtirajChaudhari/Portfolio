@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { workJourney, educationJourney, JourneyEntry } from "@/content/journey";
-import { ExternalLink } from "lucide-react";
-import Link from "next/link";
 import Image from "next/image";
-import { gsap } from "@/lib/gsap";
+import { workJourney, educationJourney, JourneyEntry } from "@/content/journey";
 import { Reveal } from "@/components/novel/Reveal";
 
-/* ——— Monogram badge fallback for missing logos ——— */
+/*
+ * Experience & Education — full restructure (DESIGN.md):
+ * numbered role blocks (karolinahess mechanics: NN over a hairline rule,
+ * title / org / dates / one description / small chips) followed by
+ * credential badges (yaros mechanics: glass card, logo + two-line label).
+ * The scroll-drawn spine and dot rail are retired.
+ */
+
 function MonogramBadge({ name }: { name: string }) {
   const initials = name
     .split(/[\s,]+/)
@@ -17,157 +20,105 @@ function MonogramBadge({ name }: { name: string }) {
     .map((w) => w[0])
     .join("");
   return (
-    <div className="flex h-full w-full items-center justify-center rounded-lg bg-white/10 text-xs font-bold text-white shadow-inner">
+    <div className="flex h-full w-full items-center justify-center rounded-lg bg-surface-2 text-xs font-semibold text-text">
       {initials || "?"}
     </div>
   );
 }
 
-function TimelineItem({ item }: { item: JourneyEntry }) {
+function Logo({ item, size }: { item: JourneyEntry; size: number }) {
   return (
-    <div data-journey-item className="relative pl-12 pb-12 last:pb-0">
-      {/* Logo / Node */}
-      <div 
-        className={`absolute -left-1 top-1 z-10 flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg border border-white/20 backdrop-blur-md shadow-sm ${
-          item.logo ? "bg-white/95" : "bg-white/10"
-        }`}
-      >
-        {item.logo ? (
-          <Image
-            src={item.logo}
-            alt={item.organization}
-            width={48}
-            height={48}
-            className="h-full w-full object-contain p-1"
-          />
-        ) : (
-          <MonogramBadge name={item.organization} />
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="flex flex-col gap-1">
-        <span className="text-sm font-medium text-text-muted/80">{item.dateRange}</span>
-        <h4 className="text-lg font-bold text-text">{item.heading}</h4>
-        <Link
-          href={item.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group flex w-fit items-center gap-1.5 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors mb-2"
-        >
-          <span className="underline decoration-blue-400/30 underline-offset-4 group-hover:decoration-blue-300">
-            {item.organization}
-          </span>
-          <ExternalLink className="h-3.5 w-3.5 opacity-70" />
-        </Link>
-        <p className="mt-2 max-w-lg text-base leading-relaxed text-text-muted">
-          {item.description}
-        </p>
-
-        {/* Skills/Tags if they exist */}
-        {item.skills && item.skills.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {item.skills.map((skill) => (
-              <span
-                key={skill}
-                className="rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-text-muted"
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
+    <div
+      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border ${
+        item.logo ? "bg-white/95" : "bg-surface-2"
+      }`}
+      style={{ width: size, height: size }}
+    >
+      {item.logo ? (
+        <Image
+          src={item.logo}
+          alt={item.organization}
+          width={size}
+          height={size}
+          className="h-full w-full object-contain p-1"
+        />
+      ) : (
+        <MonogramBadge name={item.organization} />
+      )}
     </div>
   );
 }
 
-/*
- * One track = heading + vertical dot-line timeline. The accent spine draws
- * itself with scroll (same scrub grammar as the rest of Chapter One) and
- * each entry slides in staggered as it enters the viewport.
- */
-function TimelineTrack({ label, entries }: { label: string; entries: JourneyEntry[] }) {
-  const trackRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = trackRef.current;
-    if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const ctx = gsap.context(() => {
-      // Spine draws from top to bottom as the track scrolls through.
-      gsap.fromTo(
-        "[data-journey-spine]",
-        { scaleY: 0 },
-        {
-          scaleY: 1,
-          ease: "none",
-          transformOrigin: "top center",
-          scrollTrigger: {
-            trigger: el,
-            start: "top 75%",
-            end: "bottom 65%",
-            scrub: 0.5,
-          },
-        }
-      );
-
-      // Entries settle in one after another: card slides up, logo pops.
-      gsap.utils.toArray<HTMLElement>("[data-journey-item]").forEach((item, i) => {
-        gsap.from(item, {
-          opacity: 0,
-          y: 36,
-          x: -12,
-          duration: 0.8,
-          delay: (i % 2) * 0.08,
-          ease: "power3.out",
-          scrollTrigger: { trigger: item, start: "top 85%", once: true },
-        });
-      });
-    }, el);
-
-    return () => ctx.revert();
-  }, []);
-
+function RoleBlock({ item, index }: { item: JourneyEntry; index: number }) {
   return (
-    <div ref={trackRef}>
-      <Reveal>
-        <h3 className="mb-10 text-xl font-bold text-text">{label}</h3>
-      </Reveal>
-      <div className="relative">
-        {/* Static rail + scroll-drawn accent spine */}
-        <div className="absolute left-[19px] top-2 bottom-2 w-px bg-white/10" />
-        <div
-          data-journey-spine
-          className="absolute left-[19px] top-2 bottom-2 w-px bg-accent"
-        />
-        <div className="flex flex-col">
-          {entries.map((item) => (
-            <TimelineItem key={item.id} item={item} />
-          ))}
+    <Reveal>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-[80px_1fr] md:gap-10">
+        <span className="text-sm text-text-muted">{String(index + 1).padStart(2, "0")}</span>
+        <div className="border-t border-border pt-6">
+          <div className="flex flex-wrap items-start justify-between gap-x-8 gap-y-2">
+            <div className="flex items-center gap-4">
+              <Logo item={item} size={44} />
+              <div>
+                <h3 className="text-xl font-medium text-text">{item.heading}</h3>
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-accent underline decoration-accent/30 underline-offset-4 transition-colors hover:text-text hover:decoration-text/40"
+                >
+                  {item.organization} ↗
+                </a>
+              </div>
+            </div>
+            <span className="text-sm text-text-muted">{item.dateRange}</span>
+          </div>
+          <p className="mt-5 max-w-2xl text-base leading-relaxed text-text-muted">
+            {item.description}
+          </p>
+          {item.skills.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {item.skills.map((skill) => (
+                <span
+                  key={skill}
+                  className="rounded-full border border-border px-3 py-1 text-xs text-text-muted"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-    </div>
+    </Reveal>
   );
 }
+
+
 
 export function JourneyTimeline() {
   return (
-    <section id="timeline" className="mx-auto w-full max-w-6xl px-6 py-24">
-      <Reveal className="mb-16">
-        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-blue-500">
-          EXPERIENCE & EDUCATION
+    <section id="timeline" className="mx-auto w-full max-w-6xl px-6 py-24 md:py-32">
+      <Reveal className="mb-16 md:mb-20">
+        <h2 className="type-heading text-4xl uppercase text-text md:text-5xl">
+          Experience &amp; Education
         </h2>
-        <h3 className="type-heading text-4xl font-bold text-text md:text-5xl">
-          The journey so far
-        </h3>
       </Reveal>
 
-      {/* Vertically stacked tracks — Work first, Education below */}
-      <div className="flex flex-col gap-24">
-        <TimelineTrack label="Work Experience" entries={workJourney} />
-        <TimelineTrack label="Education" entries={educationJourney} />
+      {/* Roles — numbered blocks over hairline rules */}
+      <div className="flex flex-col gap-14 md:gap-16">
+        {workJourney.map((item, i) => (
+          <RoleBlock key={item.id} item={item} index={i} />
+        ))}
+      </div>
+
+      {/* Education — styled same as Experience */}
+      <Reveal className="mt-24 mb-14 md:mt-28 md:mb-16">
+        <h3 className="text-lg font-medium text-text">Education</h3>
+      </Reveal>
+      <div className="flex flex-col gap-14 md:gap-16">
+        {educationJourney.map((item, i) => (
+          <RoleBlock key={item.id} item={item} index={i} />
+        ))}
       </div>
     </section>
   );

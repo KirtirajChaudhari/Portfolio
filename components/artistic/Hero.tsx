@@ -36,19 +36,19 @@ const ORNAMENTS: Ornament[] = [
     icon: Music,
     position: "left-[10%] top-[18%]",
     rotate: -10,
-    gradient: "from-amber-500/90 to-orange-600/90",
+    gradient: "from-white/10 to-white/5",
   },
   {
     icon: Camera,
     position: "right-[12%] top-[26%]",
     rotate: 8,
-    gradient: "from-orange-500/90 to-red-500/90",
+    gradient: "from-white/10 to-white/5",
   },
   {
     icon: Feather,
     position: "left-[16%] bottom-[16%]",
     rotate: -6,
-    gradient: "from-amber-400/90 to-amber-600/90",
+    gradient: "from-white/10 to-white/5",
   },
 ];
 
@@ -75,13 +75,13 @@ export function Hero() {
 
   return (
     <div className="relative overflow-hidden">
-      {/* Warm gradient background */}
+      {/* Neutral background layer */}
       <div
-        className="absolute inset-0 bg-gradient-to-br from-amber-950/20 via-bg to-orange-950/10"
+        className="absolute inset-0 bg-bg"
         aria-hidden="true"
       />
       <div
-        className="absolute top-[10%] left-1/4 h-[400px] w-[400px] rounded-full bg-amber-500/8 blur-[100px]"
+        className="absolute top-[10%] left-1/4 h-[400px] w-[400px] rounded-full bg-white/5 blur-[100px]"
         aria-hidden="true"
       />
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { NovelShell } from "@/components/novel/NovelShell";
+import { ChapterScope } from "@/components/novel/ChapterScope";
 import { CreatorHero } from "@/components/novel/chapter-two/CreatorHero";
 import { CreatorIntro } from "@/components/novel/chapter-two/CreatorIntro";
 import { PhotographyWall } from "@/components/novel/chapter-two/PhotographyWall";
@@ -15,38 +16,37 @@ export const metadata: Metadata = {
 };
 
 /*
- * Chapter Two lives on its own route with its own scroll context (spec v2 §6),
- * reskinned as a wrinkled-diary / Polaroid moodboard (§7). Same motion
- * timing and easing as Chapter One — only the material changes.
+ * Chapter Two — vibrant paper-white creative portfolio (DESIGN.md).
+ * Same type and motion grammar as Chapter One; deliberately different
+ * color world. ChapterScope lifts the token scope to <html> for the
+ * scrollbar, selection, and overscroll background.
  */
 export default function CreatorPage() {
   return (
     <NovelShell>
-      <main data-mode="artistic" className="creator-paper min-h-screen">
+      <ChapterScope chapter="two" />
+      <main data-chapter="two" className="min-h-dvh bg-bg text-text">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 pt-8">
           <Link
             href="/"
-            className="text-xs tracking-[0.3em] text-text-muted transition-colors hover:text-accent"
+            className="text-xs tracking-[0.3em] text-text-muted transition-colors hover:text-text"
           >
             ← CHAPTER ONE
           </Link>
-          <span className="type-hand text-xl text-text-muted">the scrapbook</span>
+          <span className="type-hand text-xl text-text-muted">the notebook</span>
         </div>
 
         <CreatorHero />
         <CreatorIntro />
-        <div className="torn-edge" />
         <PhotographyWall />
-        <div className="torn-edge" />
         <PoetryWall />
-        <div className="torn-edge" />
         <MusicSection />
 
         <footer className="border-t border-border">
           <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-10 md:flex-row">
             <Link
               href="/"
-              className="type-serif text-lg italic text-text transition-colors hover:text-accent"
+              className="type-serif text-lg italic text-text transition-colors hover:text-text-muted"
             >
               ← Back to The Engineer
             </Link>

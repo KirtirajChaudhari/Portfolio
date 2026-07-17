@@ -1,21 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import {
-  motion,
-  useMotionValue,
-  animate,
-  PanInfo,
-} from "motion/react";
 import Image from "next/image";
-import { AnimeReveal } from "@/components/ui/AnimeReveal";
+import { workJourney, educationJourney, JourneyEntry } from "@/content/journey";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { workJourney, educationJourney } from "@/content/journey";
-import type { JourneyEntry } from "@/content/journey";
-import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
-import "./JourneyCarousel.css";
+import { AnimeReveal } from "@/components/ui/AnimeReveal";
+// Removed invalid import
 
-/* ——— Monogram badge fallback for missing logos ——— */
 function MonogramBadge({ name }: { name: string }) {
   const initials = name
     .split(/[\s,]+/)
@@ -24,227 +14,115 @@ function MonogramBadge({ name }: { name: string }) {
     .map((w) => w[0])
     .join("");
   return (
-    <div className="journey-card__monogram" aria-hidden="true">
+    <div className="flex h-full w-full items-center justify-center rounded bg-surface-2 text-[10px] font-bold text-text-muted">
       {initials || "?"}
     </div>
   );
 }
 
-/* ——— Single Carousel Track ——— */
-interface CarouselTrackProps {
-  entries: JourneyEntry[];
-  label: string;
-}
-
-function CarouselTrack({ entries, label }: CarouselTrackProps) {
-  const [active, setActive] = useState(0);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const autoRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const pausedRef = useRef(false);
-  const cardWidth = 340;
-  const gap = 24;
-  const step = cardWidth + gap;
-
-  const goTo = useCallback(
-    (idx: number) => {
-      const clamped = Math.max(0, Math.min(entries.length - 1, idx));
-      setActive(clamped);
-      animate(x, -clamped * step, {
-        type: "spring",
-        stiffness: 300,
-        damping: 30,
-      });
-    },
-    [entries.length, step, x]
-  );
-
-  const next = useCallback(
-    () => goTo(active < entries.length - 1 ? active + 1 : 0),
-    [active, entries.length, goTo]
-  );
-  const prev = useCallback(
-    () => goTo(active > 0 ? active - 1 : entries.length - 1),
-    [active, entries.length, goTo]
-  );
-
-  /* Auto-advance every 6s, pause on hover/focus */
-  useEffect(() => {
-    const start = () => {
-      autoRef.current = setInterval(() => {
-        if (!pausedRef.current) next();
-      }, 6000);
-    };
-    start();
-    return () => {
-      if (autoRef.current) clearInterval(autoRef.current);
-    };
-  }, [next]);
-
-  const pause = () => {
-    pausedRef.current = true;
-  };
-  const resume = () => {
-    pausedRef.current = false;
-  };
-
-  /* Drag end snap */
-  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const swipe = info.offset.x;
-    if (Math.abs(swipe) > 60) {
-      if (swipe < 0) next();
-      else prev();
-    } else {
-      goTo(active);
-    }
-  };
-
+function CredentialBadge({ item }: { item: JourneyEntry }) {
   return (
-    <div
-      className="journey-track"
-      onMouseEnter={pause}
-      onMouseLeave={resume}
-      onFocus={pause}
-      onBlur={resume}
-    >
-      <h3 className="journey-track__heading">{label}</h3>
-
-      {/* Dot timeline (secondary index) */}
-      <div className="journey-track__dots">
-        <div className="journey-track__dots-line" />
-        {entries.map((entry, i) => (
-          <button
-            key={entry.id}
-            className={`journey-track__dot ${
-              i === active ? "journey-track__dot--active" : ""
-            }`}
-            onClick={() => goTo(i)}
-            aria-label={`Go to ${entry.heading}`}
+    <div className="flex items-center gap-4 rounded-xl border border-white/5 bg-surface/40 p-4 backdrop-blur-md transition-all hover:bg-surface-2/60">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded bg-white/5 p-1">
+        {item.logo ? (
+          <Image
+            src={item.logo}
+            alt={item.organization}
+            width={32}
+            height={32}
+            className="h-full w-full object-contain"
           />
-        ))}
+        ) : (
+          <MonogramBadge name={item.organization} />
+        )}
       </div>
-
-      {/* Cards viewport */}
-      <div className="journey-track__viewport" ref={trackRef}>
-        <motion.div
-          className="journey-track__strip"
-          style={{ x }}
-          drag="x"
-          dragConstraints={{
-            left: -(entries.length - 1) * step,
-            right: 0,
-          }}
-          dragElastic={0.15}
-          onDragEnd={handleDragEnd}
-        >
-          {entries.map((entry, i) => {
-            const distance = Math.abs(i - active);
-            const isActive = i === active;
-            return (
-              <motion.div
-                key={entry.id}
-                className="journey-card"
-                animate={{
-                  scale: isActive ? 1 : 0.88,
-                  opacity: isActive ? 1 : 0.5,
-                  rotateY: i < active ? 12 : i > active ? -12 : 0,
-                  z: isActive ? 0 : -80,
-                }}
-                transition={{ type: "spring", stiffness: 260, damping: 24 }}
-                style={{
-                  width: cardWidth,
-                  zIndex: entries.length - distance,
-                  perspective: 800,
-                }}
-              >
-                {/* Logo or Monogram */}
-                <div className="journey-card__logo-wrap">
-                  {entry.logo ? (
-                    <Image
-                      src={entry.logo}
-                      alt={entry.organization}
-                      width={48}
-                      height={48}
-                      className="journey-card__logo"
-                    />
-                  ) : (
-                    <MonogramBadge name={entry.organization} />
-                  )}
-                </div>
-
-                {/* Role / Degree */}
-                <h4 className="journey-card__role">{entry.heading}</h4>
-
-                {/* Organization link */}
-                <a
-                  href={entry.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="journey-card__org"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {entry.organization}
-                  <ExternalLink className="inline ml-1 h-3 w-3 opacity-50" />
-                </a>
-
-                {/* Date pill */}
-                <span className="journey-card__date">{entry.dateRange}</span>
-
-                {/* Description */}
-                <p className="journey-card__desc">{entry.description}</p>
-
-                {/* Skill pills */}
-                <div className="journey-card__skills">
-                  {entry.skills.map((skill) => (
-                    <span key={skill} className="journey-card__skill-pill">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </motion.div>
-            );
-          })}
-        </motion.div>
-      </div>
-
-      {/* Nav arrows */}
-      <div className="journey-track__nav">
-        <button
-          className="journey-track__arrow"
-          onClick={prev}
-          aria-label="Previous"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-        <button
-          className="journey-track__arrow"
-          onClick={next}
-          aria-label="Next"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </button>
+      <div className="flex flex-col min-w-0">
+        <h4 className="truncate text-[14px] font-bold text-text" title={item.heading}>
+          {item.heading}
+        </h4>
+        <span className="truncate text-[12px] text-text-muted" title={item.organization}>
+          {item.organization}
+        </span>
       </div>
     </div>
   );
 }
 
-/* ——— Main Section ——— */
+function RoleBlock({ item, index }: { item: JourneyEntry; index: number }) {
+  const num = (index + 1).toString().padStart(2, "0");
+  return (
+    <div className="group flex flex-col gap-4 border-t border-border py-8 sm:flex-row sm:gap-8 hover:border-accent/40 transition-colors">
+      <div className="flex shrink-0 items-start pt-1 sm:w-20">
+        <span className="type-heading text-sm text-text-muted group-hover:text-accent transition-colors">
+          {num}
+        </span>
+      </div>
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <h4 className="font-sans text-lg font-bold text-text">
+            {item.heading}
+          </h4>
+          <span className="font-sans text-sm text-text-muted">
+            {item.dateRange}
+          </span>
+        </div>
+        <a
+          href={item.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-fit text-sm font-medium text-accent hover:text-accent-deep transition-colors"
+        >
+          {item.organization} ↗
+        </a>
+        <p className="font-sans text-base text-text-muted max-w-[64ch] leading-relaxed">
+          {item.description}
+        </p>
+        {item.skills && item.skills.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {item.skills.map((skill) => (
+              <span
+                key={skill}
+                className="rounded bg-surface-2 px-2 py-1 text-[11px] font-medium uppercase tracking-wider text-text-muted"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function JourneyCarousel() {
   return (
-    <section id="timeline" className="mx-auto max-w-6xl px-6 pt-12 pb-24">
+    <section id="timeline" className="mx-auto max-w-6xl px-6 py-24">
       <AnimeReveal>
-        <SectionHeading
-          overline="Experience & Education"
-          title="The journey so far"
-        />
+        <SectionHeading title="Experience & Education" />
       </AnimeReveal>
 
+      {/* Part 1: Credential Badges (Education) */}
       <AnimeReveal delay={100}>
-        <div className="journey-grid">
-          <CarouselTrack entries={workJourney} label="Work Experience" />
-          <CarouselTrack entries={educationJourney} label="Education" />
+        <div className="mb-20">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {educationJourney.map((entry) => (
+              <CredentialBadge key={entry.id} item={entry} />
+            ))}
+          </div>
         </div>
       </AnimeReveal>
+
+      {/* Part 2: Numbered Role Blocks (Experience) */}
+      <div className="flex flex-col">
+        {workJourney.map((entry, idx) => (
+          <AnimeReveal key={entry.id} delay={200 + idx * 50}>
+            <RoleBlock item={entry} index={idx} />
+          </AnimeReveal>
+        ))}
+        <AnimeReveal delay={200 + workJourney.length * 50}>
+          <div className="border-t border-border" />
+        </AnimeReveal>
+      </div>
     </section>
   );
 }

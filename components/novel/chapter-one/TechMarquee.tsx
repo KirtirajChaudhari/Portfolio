@@ -10,7 +10,7 @@ export function TechMarquee() {
       {techMarquee.map((tech) => (
         <span
           key={tech}
-          className="type-heading whitespace-nowrap px-8 text-3xl uppercase text-[#F5F5F0]/90 md:text-5xl"
+          className="type-heading whitespace-nowrap px-8 text-3xl uppercase text-text/90 md:text-5xl"
         >
           {tech}
           <span className="ml-16 inline-block h-2 w-2 rounded-full bg-accent align-middle" />

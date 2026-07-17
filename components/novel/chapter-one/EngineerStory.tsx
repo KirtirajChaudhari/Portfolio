@@ -1,40 +1,64 @@
 "use client";
 
-import { engineerBeats } from "@/content/novel";
+import Image from "next/image";
+import { Reveal } from "../Reveal";
+import { professionalAbout, professionalPrinciples } from "@/content/professional";
+import { avatarSet } from "@/content/shared";
 
-/**
- * About Me static section.
- * The Education and Experience panels have been moved to their own dedicated timeline section.
+/*
+ * About Me — karolinahess.com mechanics (extraction spec):
+ * one type family at one weight doing the hierarchy through size alone
+ * (statement ≈ 2.7× support), portrait anchored beside the statement,
+ * then a numbered 01–03 principles row with hairline rules.
+ * Copy comes verbatim from content/professional.ts.
  */
 export function EngineerStory() {
-  const about = engineerBeats[0];
-
   return (
-    <section
-      id="about"
-      aria-label="About Me"
-      className="relative flex min-h-[50vh] items-center overflow-hidden py-24"
-    >
-      <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-10 px-6 md:grid-cols-[220px_1fr] md:gap-20">
-        {/* Title column */}
-        <div className="flex flex-col gap-8">
-          <div className="flex items-baseline gap-4">
-            <span className="type-heading text-3xl text-accent">01</span>
-            <span className="text-xs uppercase tracking-[0.25em] text-text-muted">
-              {about.heading}
-            </span>
-          </div>
+    <section id="about" aria-label="About Me" className="mx-auto max-w-6xl px-6 py-24 md:py-32">
+      <Reveal>
+        <h2 className="type-heading text-4xl uppercase text-text md:text-5xl">About Me</h2>
+      </Reveal>
+
+      {/* Statement + portrait — statement leads, portrait grounds it */}
+      <div className="mt-14 grid grid-cols-1 gap-12 md:mt-20 md:grid-cols-[minmax(0,1fr)_320px] md:gap-16">
+        <div>
+          <Reveal>
+            <p className="max-w-[24ch] text-[clamp(1.75rem,3.5vw,3rem)] leading-[1.15] tracking-[-0.01em] text-text">
+              {professionalAbout.lede}
+            </p>
+          </Reveal>
+          <Reveal delay={0.15}>
+            <p className="mt-10 max-w-md text-base leading-relaxed text-text-muted md:ml-[38%]">
+              {professionalAbout.detail}
+            </p>
+          </Reveal>
         </div>
 
-        {/* Text panel */}
-        <div className="relative">
-          <h3 className="type-heading text-4xl uppercase text-text md:text-6xl">
-            {about.heading}
-          </h3>
-          <p className="mt-8 max-w-2xl text-base leading-relaxed text-text-muted md:text-lg">
-            {about.body}
-          </p>
-        </div>
+        <Reveal className="md:pt-2">
+          {/* Portrait slot — stands in with the site's identity render until a real photo is supplied */}
+          <div className="relative aspect-[4/5] w-64 overflow-hidden rounded-lg border border-border md:w-full">
+            <Image
+              src={avatarSet.professional.hero}
+              alt={avatarSet.professional.alt}
+              fill
+              sizes="(min-width: 768px) 320px, 256px"
+              className="object-cover"
+            />
+          </div>
+        </Reveal>
+      </div>
+
+      {/* Principles — numbered blocks over hairline rules */}
+      <div className="mt-24 grid grid-cols-1 gap-10 md:mt-28 md:grid-cols-3 md:gap-10">
+        {professionalPrinciples.map((p, i) => (
+          <Reveal key={p.num} delay={i * 0.08}>
+            <span className="text-sm text-text-muted">{p.num}</span>
+            <div className="mt-2 border-t border-border pt-5">
+              <h3 className="text-lg font-medium text-text">{p.title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-text-muted">{p.text}</p>
+            </div>
+          </Reveal>
+        ))}
       </div>
     </section>
   );

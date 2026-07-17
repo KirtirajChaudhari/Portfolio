@@ -94,18 +94,18 @@ export default async function ProjectPage({
         {/* Problem / Approach */}
         <div className="mt-20 flex flex-col gap-16">
           <Reveal>
-            <span className="type-heading text-xs tracking-[0.35em] text-accent">THE PROBLEM</span>
+            <h2 className="type-heading text-2xl uppercase text-text md:text-3xl">The Problem</h2>
             <p className="mt-4 leading-relaxed text-text-muted md:text-lg">{project.problem}</p>
           </Reveal>
           <Reveal>
-            <span className="type-heading text-xs tracking-[0.35em] text-accent">THE APPROACH</span>
+            <h2 className="type-heading text-2xl uppercase text-text md:text-3xl">The Approach</h2>
             <p className="mt-4 leading-relaxed text-text-muted md:text-lg">{project.approach}</p>
           </Reveal>
         </div>
 
         {/* Stack breakdown */}
         <Reveal className="mt-20">
-          <span className="type-heading text-xs tracking-[0.35em] text-accent">TECH STACK</span>
+          <h2 className="type-heading text-2xl uppercase text-text md:text-3xl">Tech Stack</h2>
           <ul className="mt-6 divide-y divide-border border-y border-border">
             {project.stack.map((item) => (
               <li key={item.name} className="grid grid-cols-1 gap-1 py-4 md:grid-cols-[180px_1fr] md:gap-6">
@@ -120,7 +120,7 @@ export default async function ProjectPage({
 
         {/* Key decisions */}
         <Reveal className="mt-20">
-          <span className="type-heading text-xs tracking-[0.35em] text-accent">KEY DECISIONS</span>
+          <h2 className="type-heading text-2xl uppercase text-text md:text-3xl">Key Decisions</h2>
           <ul className="mt-6 flex flex-col gap-4">
             {project.decisions.map((d, i) => (
               <li key={i} className="flex gap-4 text-sm leading-relaxed text-text-muted md:text-base">

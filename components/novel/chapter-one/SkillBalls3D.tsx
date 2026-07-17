@@ -328,8 +328,8 @@ export function SkillBalls3D() {
     return (
       <section aria-label="Skills" className="mx-auto max-w-6xl px-6 py-28 md:py-36">
         <Reveal className="mb-12">
-          <span className="type-heading text-sm tracking-[0.4em] text-accent">THE TOOLKIT</span>
-          <h3 className="type-heading mt-3 text-4xl uppercase text-text md:text-5xl">Skills</h3>
+          <h3 className="type-heading text-4xl uppercase text-text md:text-5xl">Skills</h3>
+          <p className="type-serif mt-3 text-lg italic text-text-muted">The toolkit.</p>
         </Reveal>
         <div className="relative h-[65vh] min-h-[400px] overflow-hidden rounded-xl border border-border bg-surface/40">
           <StaticFallback />
@@ -341,9 +341,10 @@ export function SkillBalls3D() {
   return (
     <section aria-label="Skills" className="mx-auto max-w-6xl px-6 py-28 md:py-36">
       <Reveal className="mb-12">
-        <span className="type-heading text-sm tracking-[0.4em] text-accent">THE TOOLKIT</span>
-        <h3 className="type-heading mt-3 text-4xl uppercase text-text md:text-5xl">Skills</h3>
-        <p className="mt-3 text-sm text-text-muted">Hover to push them away. They swarm.</p>
+        <h3 className="type-heading text-4xl uppercase text-text md:text-5xl">Skills</h3>
+        <p className="type-serif mt-3 text-lg italic text-text-muted">
+          The toolkit — hover to push them away.
+        </p>
       </Reveal>
 
       <div 

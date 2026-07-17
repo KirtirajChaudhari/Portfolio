@@ -16,9 +16,8 @@ const SkillBalls3D = dynamic(
     loading: () => (
       <section aria-label="Skills" className="mx-auto max-w-6xl px-6 py-28 md:py-36">
         <Reveal className="mb-12">
-          <span className="type-heading text-sm tracking-[0.4em] text-accent">THE TOOLKIT</span>
-          <h3 className="type-heading mt-3 text-4xl uppercase text-text md:text-5xl">Skills</h3>
-          <p className="mt-3 text-sm text-text-muted">Grab one. They bounce.</p>
+          <h3 className="type-heading text-4xl uppercase text-text md:text-5xl">Skills</h3>
+          <p className="type-serif mt-3 text-lg italic text-text-muted">The toolkit.</p>
         </Reveal>
         <div className="relative h-[55vh] min-h-[380px] overflow-hidden rounded-xl border border-border bg-surface/40 md:h-[65vh] flex items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />

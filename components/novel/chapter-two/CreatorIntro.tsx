@@ -12,7 +12,7 @@ export function CreatorIntro() {
         className="type-serif text-2xl font-light italic leading-relaxed text-text md:text-[2.4rem] md:leading-relaxed"
       />
       <Reveal delay={0.2} className="mt-8 flex items-center gap-4">
-        <span className="inline-block h-px w-24 bg-accent" />
+        <span className="inline-block h-1 w-24 rounded-full bg-crayon-pink" />
         <span className="type-hand text-xl text-text-muted">— the off-hours chapter</span>
       </Reveal>
     </section>

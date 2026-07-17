@@ -1,36 +1,24 @@
 import type { Metadata } from "next";
-import { Antonio, Caveat, Fraunces, Inter, Space_Grotesk } from "next/font/google";
+import { Antonio, Caveat, Spectral } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  display: "swap",
-});
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-// Editorial display face for Professional-mode headings (spec: uppercase, wght 100–700)
+// Film-title condensed display face — headings in both chapters.
 const antonio = Antonio({
   variable: "--font-antonio",
   subsets: ["latin"],
   display: "swap",
 });
 
-// Editorial serif for The Creator chapter — the "mood shift" face.
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+// Literary serif — the body voice of the novel (DESIGN.md).
+const spectral = Spectral({
+  variable: "--font-spectral",
   subsets: ["latin"],
+  weight: ["400", "500"],
   style: ["normal", "italic"],
   display: "swap",
 });
 
-// Handwritten face for diary notes and captions on /creator.
+// Handwritten face for grease-pencil captions and margin notes on /creator.
 const caveat = Caveat({
   variable: "--font-caveat",
   subsets: ["latin"],
@@ -65,8 +53,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      data-mode="professional"
-      className={`${inter.variable} ${spaceGrotesk.variable} ${antonio.variable} ${fraunces.variable} ${caveat.variable}`}
+      className={`${antonio.variable} ${spectral.variable} ${caveat.variable}`}
       suppressHydrationWarning
     >
       <body className="noise-overlay" suppressHydrationWarning>

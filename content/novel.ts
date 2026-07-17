@@ -91,6 +91,7 @@ export const photographyWall: Polaroid[] = [
   { id: "photo-8", src: "", caption: "frame 08", href: "https://www.instagram.com/p/C9QQx8uokiv/?igsh=amJrY295MG1tcXJp", rotate: 2.2 },
   { id: "photo-9", src: "", caption: "frame 09", href: "https://www.instagram.com/p/C9rUfgvoZ80/?igsh=MTR2aDZwYTRtbmlrYQ==", rotate: -1.2 },
   { id: "photo-10", src: "", caption: "frame 10", href: "https://www.instagram.com/p/CpzHlDEpyax/?igsh=NjBiYjJ5cmlweXQw", rotate: 3.8 },
+  { id: "photo-11", src: "", caption: "frame 11", href: "https://www.instagram.com/p/C3cLvgpo6lu/?igsh=MWZkOHN2N3o0dXVobA==", rotate: -2.0 },
 ];
 
 export const photographyMeta = {

@@ -33,8 +33,7 @@ export function Certifications() {
     <section id="certifications" className="mx-auto max-w-6xl px-6 py-24">
       <AnimeReveal>
         <SectionHeading
-          overline="Credentials"
-          title="Certifications & Programs"
+          title="Certifications"
         />
       </AnimeReveal>
 

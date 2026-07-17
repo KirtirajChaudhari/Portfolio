@@ -1,12 +1,10 @@
 interface SectionHeadingProps {
-  overline?: string;
   title: string;
   description?: string;
   align?: "left" | "center";
 }
 
 export function SectionHeading({
-  overline,
   title,
   description,
   align = "left",
@@ -15,11 +13,6 @@ export function SectionHeading({
 
   return (
     <div className={`mb-12 ${alignClass}`}>
-      {overline && (
-        <span className="mb-3 inline-block text-xs font-medium uppercase tracking-[0.2em] text-accent">
-          {overline}
-        </span>
-      )}
       <h2 className="font-display text-3xl font-bold tracking-tight text-text sm:text-4xl lg:text-5xl">
         {title}
       </h2>

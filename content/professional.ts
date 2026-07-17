@@ -25,6 +25,24 @@ export const professionalAbout = {
     "Everything I ship is explainable and auditable — models that show their reasoning to the doctors, reviewers, and operators who rely on them. Four internships across Python, Django, MERN, and cybersecurity have taught me that production code is never just about the model.",
 };
 
+export const professionalPrinciples = [
+  {
+    num: "01",
+    title: "Explainable by Default",
+    text: "Models that show their reasoning to the doctors, reviewers, and operators who rely on them."
+  },
+  {
+    num: "02",
+    title: "Production Reality",
+    text: "Building for production, not for the notebook. Focus on role-based access, audit logging, and data layers."
+  },
+  {
+    num: "03",
+    title: "Accountable Engineering",
+    text: "Building ML systems for domains where a wrong answer has a cost. Accuracy matters, but safety is paramount."
+  }
+];
+
 export const professionalFacts: {
   label: string;
   value: string;
@@ -130,6 +148,7 @@ export const professionalProjects: Project[] = [
     description: "A HIPAA-aligned clinical platform generating Prakriti-aware Ayurvedic diet prescriptions. A knowledge graph of 700 herbs, 741 recipes, and 25K+ triples — with classical Rasa/Guna/Virya/Vipaka properties — powers condition-aware diet generation across 10 clinical conditions at 89.1% overall clinical accuracy. Doctors review, prescribe, and version diet charts through a dedicated portal; patients access and download prescribed plans as PDF — all behind audit logging, role-based access, and encrypted transit.",
     role: "Full-Stack AI Developer",
     techStack: ["React", "Django", "MongoDB"],
+    metrics: ["89.1% clinical accuracy", "25K+ graph nodes", "10 clinical conditions", "SIH 2025"],
     outcome: "5th place, hackathon finals · live at rasacare.app",
     links: { live: "https://rasacare.app", github: "https://github.com/KirtirajChaudhari/rasacare" },
     thumbnail: "", // Placeholder - uses lucide-react icon gradient if missing
@@ -142,6 +161,7 @@ export const professionalProjects: Project[] = [
     description: "An AI-driven screening platform for fundus images. A DenseNet121 multi-label classifier (8 conditions, 0.81 weighted F1 on ~7,530 test images) pairs with Grad-CAM overlays that highlight which image region drove each prediction, giving clinicians an explainable basis to confirm or override the call. Role-based workflows separate technician (upload, QC), doctor (review, sign-off), and admin (audit, model versioning) responsibilities across a Dockerized React + FastAPI + PostgreSQL platform.",
     role: "AI Developer",
     techStack: ["PyTorch", "DenseNet121", "FastAPI", "React", "PostgreSQL"],
+    metrics: ["0.81 weighted F1", "7,530 test images", "8 conditions"],
     outcome: "0.81 weighted F1 · platform shipped",
     links: { github: "https://github.com/KirtirajChaudhari/drishtimanas" },
     thumbnail: "", // Placeholder
@@ -154,6 +174,7 @@ export const professionalProjects: Project[] = [
     description: "A two-model railway safety pipeline: a YOLO11s obstacle detector trained on a custom-annotated set across 6 classes (Animal, Debris, Human, Object, Stone, Tree) as a proof-of-concept dataset → training → deployable-weights workflow, paired with a YOLOv8-nano rail-surface defect detection module in a Streamlit app. Both deploy as lightweight local inference rather than cloud services.",
     role: "ML Engineer",
     techStack: ["Python", "YOLO11s", "Ultralytics", "OpenCV"],
+    metrics: ["81% mAP", "28 FPS inference", "6 obstacle classes"],
     outcome: "Working two-model safety prototype",
     links: { github: "https://github.com/KirtirajChaudhari/pravaas" },
     thumbnail: "", // Placeholder
@@ -166,6 +187,7 @@ export const professionalProjects: Project[] = [
     description: "A ticketing system tracking lab-equipment complaints across 3 labs and 4 user roles. Staff raise tickets, admins move them through open → in-progress → resolved. Deployed and in active use — 200+ tickets processed across 8 complaint categories since launch.",
     role: "Backend Developer",
     techStack: ["Django", "MySQL", "REST APIs"],
+    metrics: ["200+ tickets processed", "8 complaint categories", "4 user roles"],
     outcome: "200+ tickets processed",
     links: { github: "https://github.com/KirtirajChaudhari/lab-complaint" },
     thumbnail: "", // Placeholder

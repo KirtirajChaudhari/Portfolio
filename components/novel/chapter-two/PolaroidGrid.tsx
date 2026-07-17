@@ -4,8 +4,9 @@ import { useEffect, useRef } from "react";
 import { gsap } from "@/lib/gsap";
 
 /**
- * Shared scrapbook entrance: cards stagger in with a tilt-settle
- * (drop + over-rotate + ease back to their resting tilt), not a flat fade.
+ * Shared post-card entrance: rise + fade per card, staggered — the same
+ * reveal grammar as the rest of the book (tilt-settle retired with the
+ * scrapbook skin).
  */
 export function PolaroidGrid({
   children,
@@ -24,21 +25,14 @@ export function PolaroidGrid({
     const ctx = gsap.context(() => {
       const cards = gsap.utils.toArray<HTMLElement>("[data-polaroid]");
       cards.forEach((card, i) => {
-        const tilt = parseFloat(card.style.getPropertyValue("--tilt")) || 0;
-        gsap.fromTo(
-          card,
-          { opacity: 0, y: 70, rotate: tilt * 3 },
-          {
-            opacity: 1,
-            y: 0,
-            rotate: tilt,
-            duration: 0.9,
-            delay: (i % 4) * 0.1,
-            ease: "back.out(1.4)",
-            clearProps: "rotate", // let the CSS --tilt + hover transition own it after entry
-            scrollTrigger: { trigger: card, start: "top 88%", once: true },
-          }
-        );
+        gsap.from(card, {
+          opacity: 0,
+          y: 24,
+          duration: 0.7,
+          delay: (i % 4) * 0.06,
+          ease: "power3.out",
+          scrollTrigger: { trigger: card, start: "top 88%", once: true },
+        });
       });
     }, el);
 

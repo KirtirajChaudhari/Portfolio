@@ -45,6 +45,7 @@ export interface Project {
   description: string;
   role: string;
   techStack: string[];
+  metrics?: string[];
   outcome?: string;
   links: { github?: string; live?: string; demo?: string };
   thumbnail: string;

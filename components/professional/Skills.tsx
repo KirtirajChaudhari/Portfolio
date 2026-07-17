@@ -27,9 +27,7 @@ export function Skills() {
     <section id="skills" className="mx-auto max-w-6xl px-6 py-24">
       <AnimeReveal>
         <SectionHeading
-          overline="Skills"
-          title="What I work with"
-          description="Grouped by domain, no self-rated percentages. Highlighted tags carry the number of projects above that use them — hover for which."
+          title="Skills"
         />
       </AnimeReveal>
 

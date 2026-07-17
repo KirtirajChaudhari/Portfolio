@@ -1,30 +1,88 @@
-import {
-  Brain,
-  Eye,
-  Train,
-  Wrench,
-  Car,
-  Landmark,
-  BarChart3,
-  Code2,
-  ExternalLink,
-} from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { GithubIcon } from "@/components/ui/Icons";
 import { AnimeReveal } from "@/components/ui/AnimeReveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { GlassCard } from "@/components/ui/GlassCard";
-import type { LucideIcon } from "lucide-react";
 import { professionalProjects } from "@/content/professional";
+import { Project } from "@/content/types";
 
-const ICON_MAP: Record<string, LucideIcon> = {
-  rasacare: Brain,
-  drishtimanas: Eye,
-  pravaas: Train,
-  "lab-complaint": Wrench,
-  "autonomous-driving": Car,
-  "preserving-heritage": Landmark,
-  "sales-forecasting": BarChart3,
-};
+function ProjectBlock({ project, index }: { project: Project; index: number }) {
+  const isEven = index % 2 === 0;
+
+  return (
+    <div className="group flex flex-col gap-6 py-16 border-t border-border hover:border-accent/40 transition-colors">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex w-full flex-col gap-4 lg:w-5/12">
+          {/* Meta line */}
+          <div className="flex items-center justify-between">
+            <h3 className="font-display text-3xl font-bold text-text sm:text-4xl">
+              {project.title}
+            </h3>
+            {project.badge && (
+              <span className="rounded-full border border-accent/20 bg-accent/5 px-3 py-1 text-xs font-medium uppercase tracking-wider text-accent">
+                {project.badge}
+              </span>
+            )}
+          </div>
+
+          {/* Outcome-driven subtitle line */}
+          <p className="text-lg font-medium text-text-muted">
+            {project.oneLiner}
+          </p>
+
+          <p className="font-sans text-base leading-relaxed text-text-muted/80">
+            {project.description}
+          </p>
+
+          {/* Quantified metric chips */}
+          {project.metrics && project.metrics.length > 0 && (
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              {project.metrics.map((metric, idx) => (
+                <span key={metric} className="flex items-center text-sm font-semibold text-text">
+                  {idx > 0 && <span className="mx-2 text-border">•</span>}
+                  {metric}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Action Links */}
+          <div className="mt-6 flex items-center gap-4">
+            {project.links?.live && (
+              <a
+                href={project.links.live}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-surface-2 px-6 py-2.5 text-sm font-semibold text-text transition-colors hover:bg-accent hover:text-bg"
+              >
+                View case study <ArrowUpRight className="h-4 w-4" />
+              </a>
+            )}
+            {project.links?.github && (
+              <a
+                href={project.links.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-2.5 text-sm font-medium text-text transition-colors hover:border-text-muted"
+              >
+                <GithubIcon className="h-4 w-4" /> Source
+              </a>
+            )}
+          </div>
+        </div>
+
+        {/* Mosaic / Preview Strip */}
+        <div className="mt-8 flex w-full flex-col lg:mt-0 lg:w-6/12">
+          <div className="group/mosaic relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-surface-2 ring-1 ring-border transition-all group-hover:ring-accent/30">
+            {/* Real placeholder for the mosaic strip until images are provided */}
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-surface to-bg">
+              <span className="type-heading text-xl text-text-muted/50">Mosaic Strip / UI Preview</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function Projects() {
   const featured = professionalProjects.filter((p) => p.featured);
@@ -33,184 +91,47 @@ export function Projects() {
   return (
     <section id="projects-all" className="mx-auto max-w-6xl px-6 py-24">
       <AnimeReveal>
-        <SectionHeading
-          overline="Projects"
-          title="Built to ship, not just to learn"
-          description="Case studies from applied ML, full-stack platforms, and real-time systems."
-        />
+        <SectionHeading title="Projects" />
       </AnimeReveal>
 
-      {/* Featured projects — large cards */}
-      <AnimeReveal staggerChildren staggerDelay={100} delay={100} className="grid gap-6 lg:grid-cols-2">
-        {featured.map((project) => {
-          const Icon = ICON_MAP[project.id] || Code2;
-          return (
-              <GlassCard key={project.id} className="group flex flex-col overflow-hidden !p-0">
-                {/* Visual header */}
-                <div className="flex h-48 items-center justify-center bg-gradient-to-br from-surface-2 to-surface transition-colors duration-500 group-hover:from-accent/5 group-hover:to-surface">
-                  <Icon
-                    className="h-12 w-12 text-accent/30 transition-all duration-500 group-hover:scale-110 group-hover:text-accent/70"
-                    strokeWidth={1.5}
-                  />
-                </div>
+      <div className="flex flex-col mt-12">
+        {featured.map((project, index) => (
+          <AnimeReveal key={project.id} delay={100 + index * 50}>
+            <ProjectBlock project={project} index={index} />
+          </AnimeReveal>
+        ))}
+      </div>
 
-                <div className="flex flex-1 flex-col p-6">
-                  {/* Title + badges */}
-                  <div className="flex flex-wrap items-start gap-2">
-                    <h3 className="font-display text-lg font-semibold text-text">
-                      {project.title}
-                      <span className="mt-1 block text-sm font-normal text-text-muted">
-                        {project.oneLiner}
-                      </span>
-                    </h3>
-                  </div>
-
-                  {/* Status badges */}
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {project.badge && (
-                      <span className="rounded-full bg-accent-subtle px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-accent">
-                        {project.badge}
-                      </span>
-                    )}
-                    {project.links?.live && (
-                      <a
-                        href={project.links.live}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-emerald-400 transition-colors hover:bg-emerald-500/20"
-                      >
-                        Live <ExternalLink className="h-2.5 w-2.5" />
-                      </a>
-                    )}
-                    {project.outcome === "In Development" && (
-                      <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-amber-400">
-                        In Development
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Tech stack */}
-                  <div className="mt-4 flex flex-wrap gap-1.5">
-                    {project.techStack.map((tech) => (
-                      <span
-                        key={tech}
-                        className="rounded-full bg-surface-2 px-2.5 py-1 text-[11px] text-text-muted"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Description */}
-                  <p className="mt-4 flex-1 text-sm leading-relaxed text-text-muted">
-                    {project.description}
-                  </p>
-
-                  {/* Outcome */}
-                  {project.outcome && project.outcome !== "In Development" && (
-                    <div className="mt-4 rounded-lg bg-accent-subtle px-4 py-2.5">
-                      <span className="text-xs font-medium uppercase tracking-wider text-accent">
-                        Outcome
-                      </span>
-                      <p className="mt-0.5 text-sm font-semibold text-text">
-                        {project.outcome}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Links */}
-                  <div className="mt-4 flex gap-3">
-                    {project.links?.github && (
-                      <a
-                        href={project.links.github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-xs text-text-muted transition-colors hover:text-accent"
-                      >
-                        <GithubIcon className="h-3.5 w-3.5" />
-                        Source
-                      </a>
-                    )}
-                    {project.links?.demo && (
-                      <a
-                        href={project.links.demo}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-xs text-text-muted transition-colors hover:text-accent"
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" />
-                        Demo
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </GlassCard>
-          );
-        })}
-      </AnimeReveal>
-
-      {/* Other projects — compact list */}
       {other.length > 0 && (
-        <AnimeReveal staggerChildren staggerDelay={80} delay={150} className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {other.map((project) => {
-            const Icon = ICON_MAP[project.id] || Code2;
-            return (
-                <GlassCard key={project.id} className="flex flex-col !p-5">
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-2">
-                      <Icon className="h-5 w-5 text-accent/50" strokeWidth={1.5} />
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="font-display text-sm font-semibold text-text">
-                        {project.title}
-                      </h3>
-                      <p className="mt-0.5 text-xs text-text-muted">
-                        {project.oneLiner}
-                      </p>
-                      {project.badge && (
-                        <span className="mt-2 inline-block rounded-full bg-accent-subtle px-2 py-0.5 text-[9px] font-medium uppercase tracking-wider text-accent">
-                          {project.badge}
-                        </span>
-                      )}
-                    </div>
+        <div className="mt-16 border-t border-border pt-16">
+          <AnimeReveal>
+            <h3 className="mb-8 font-display text-2xl font-bold text-text">More Projects</h3>
+          </AnimeReveal>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {other.map((project, index) => (
+              <AnimeReveal key={project.id} delay={100 + index * 50}>
+                <div className="flex h-full flex-col gap-4 rounded-xl border border-border bg-surface/30 p-6 transition-colors hover:border-accent/30">
+                  <div className="flex items-start justify-between">
+                    <h4 className="font-sans text-lg font-bold text-text">{project.title}</h4>
+                    {project.links?.github && (
+                      <a href={project.links.github} target="_blank" rel="noopener noreferrer" className="text-text-muted hover:text-accent">
+                        <GithubIcon className="h-4 w-4" />
+                      </a>
+                    )}
                   </div>
-
-                  <p className="mt-3 flex-1 text-xs leading-relaxed text-text-muted">
-                    {project.description}
-                  </p>
-
-                  {project.outcome && (
-                    <p className="mt-3 text-xs font-semibold text-accent">
-                      {project.outcome}
-                    </p>
-                  )}
-
-                  <div className="mt-3 flex flex-wrap gap-1">
-                    {project.techStack.map((tech) => (
-                      <span
-                        key={tech}
-                        className="rounded-full bg-surface-2 px-2 py-0.5 text-[10px] text-text-muted"
-                      >
+                  <p className="text-sm leading-relaxed text-text-muted flex-1">{project.description}</p>
+                  <div className="flex flex-wrap gap-2 pt-4">
+                    {project.techStack.slice(0, 3).map((tech) => (
+                      <span key={tech} className="text-[11px] font-medium uppercase tracking-wider text-text-muted">
                         {tech}
                       </span>
                     ))}
                   </div>
-
-                  {project.links?.github && (
-                    <a
-                      href={project.links.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 inline-flex items-center gap-1.5 text-xs text-text-muted transition-colors hover:text-accent"
-                    >
-                      <GithubIcon className="h-3.5 w-3.5" />
-                      Source
-                    </a>
-                  )}
-                </GlassCard>
-            );
-          })}
-        </AnimeReveal>
+                </div>
+              </AnimeReveal>
+            ))}
+          </div>
+        </div>
       )}
     </section>
   );

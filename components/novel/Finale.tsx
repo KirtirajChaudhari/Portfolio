@@ -10,8 +10,8 @@ export function Finale() {
     <footer aria-label="Contact" className="border-t border-border">
       <div className="mx-auto max-w-5xl px-6 py-28 text-center md:py-40">
         <Reveal>
-          <span className="type-heading text-sm tracking-[0.4em] text-accent">
-            {finale.kicker.toUpperCase()}
+          <span className="type-serif text-lg italic text-accent md:text-xl">
+            {finale.kicker}
           </span>
         </Reveal>
         <KineticText
