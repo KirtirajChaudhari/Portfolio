@@ -21,7 +21,7 @@ export function TechMarquee() {
 
   return (
     <section aria-label="Tech stack" className="overflow-hidden border-y border-border py-10 md:py-14">
-      <div className="marquee-track">
+      <div className="glass-panel marquee-track rounded-xl border border-border">
         {row(false)}
         {row(true)}
       </div>

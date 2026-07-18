@@ -22,7 +22,7 @@ function MonogramBadge({ name }: { name: string }) {
 
 function CredentialBadge({ item }: { item: JourneyEntry }) {
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-white/5 bg-surface/40 p-4 backdrop-blur-md transition-all hover:bg-surface-2/60">
+    <div className="glass-panel flex items-center gap-4 rounded-xl p-4">
       <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded bg-white/5 p-1">
         {item.logo ? (
           <Image

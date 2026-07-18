@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { Reveal } from "../Reveal";
 import type { ProjectCase } from "@/content/projects";
+import { PremiumShaderButton } from "@/components/ui/PremiumShaderButton";
 
 interface Ripple {
   x: number;
@@ -145,13 +146,21 @@ function ProjectBlock({
               </p>
             )}
           </div>
-          <a
-            href={`/projects/${project.slug}`}
-            onClick={(e) => open(e, project.slug)}
-            className="shrink-0 rounded-full bg-text px-6 py-3.5 text-sm font-medium text-bg transition-transform duration-[var(--dur-fast)] hover:scale-[1.03] active:scale-[0.98]"
-          >
-            View case study →
-          </a>
+          
+          <div className="h-[42px] w-[210px] shrink-0">
+            <PremiumShaderButton
+              onClick={(e) => open(e, project.slug)}
+              baseColor="#0a0a0a"
+              glassColor="#3b82f6"
+              hoverSpeed={0.8}
+              padding="0px"
+              borderRadius={999}
+            >
+              <span className="flex items-center gap-2 type-heading text-[11px] md:text-xs tracking-[0.18em] uppercase text-white whitespace-nowrap">
+                View case study <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+              </span>
+            </PremiumShaderButton>
+          </div>
         </div>
 
         <a
@@ -203,13 +212,20 @@ export function ProjectsGrid({ projects }: { projects: ProjectCase[] }) {
 
       {projects.length > 4 && (
         <Reveal className="mt-16 flex justify-center">
-          <button
-            type="button"
-            onClick={() => setShowAll(!showAll)}
-            className="rounded-full border border-border px-8 py-3.5 text-sm text-text transition-colors duration-[var(--dur-ui)] hover:border-accent hover:text-accent active:scale-[0.98]"
-          >
-            {showAll ? "Show fewer projects ↑" : `View all ${projects.length} projects ↓`}
-          </button>
+          <div className="h-12 w-[280px]">
+            <PremiumShaderButton
+              onClick={() => setShowAll(!showAll)}
+              baseColor="#0a0a0a"
+              glassColor="#3b82f6"
+              hoverSpeed={0.8}
+              padding="0px"
+              borderRadius={999}
+            >
+              <span className="type-heading text-[11px] md:text-xs tracking-[0.18em] uppercase text-white whitespace-nowrap">
+                {showAll ? "Show fewer projects ↑" : `View all ${projects.length} projects ↓`}
+              </span>
+            </PremiumShaderButton>
+          </div>
         </Reveal>
       )}
 

@@ -1,8 +1,8 @@
 "use client";
 
 import { Reveal } from "../Reveal";
-import { PolaroidGrid } from "./PolaroidGrid";
-import { InstagramEmbed } from "./InstagramEmbed";
+import { LuminaRotatingGallery } from "./LuminaRotatingGallery";
+
 import { SectionBand } from "./SectionBand";
 import { photographyWall, photographyMeta } from "@/content/novel";
 
@@ -23,21 +23,11 @@ export function PhotographyWall() {
         handleHref={photographyMeta.profileUrl}
       />
 
-      <div className="mx-auto max-w-6xl px-6 pt-14 md:pt-20">
-        <PolaroidGrid className="columns-1 gap-8 md:columns-2 md:gap-12 [&>*]:mb-8 md:[&>*]:mb-12">
-          {photographyWall.map((photo) => (
-            <div
-              key={photo.id}
-              data-polaroid
-              className="relative block break-inside-avoid overflow-hidden rounded-lg border border-border bg-surface shadow-[0_10px_24px_var(--shadow-tint)]"
-            >
-              <InstagramEmbed url={photo.href} />
-            </div>
-          ))}
-        </PolaroidGrid>
+      <div className="mx-auto w-full pt-4 md:pt-10">
+        <LuminaRotatingGallery items={photographyWall} />
       </div>
 
-      <Reveal className="mx-auto mt-10 max-w-6xl px-6 text-center">
+      <Reveal className="mx-auto mt-4 max-w-6xl px-6 text-center">
         <a
           href={photographyMeta.profileUrl}
           target="_blank"

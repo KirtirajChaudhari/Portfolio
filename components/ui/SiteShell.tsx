@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import Image from "next/image";
 import { useViewMode } from "@/store/useViewMode";
 import { useSwipe } from "@/hooks/useSwipe";
@@ -28,12 +28,27 @@ export function SiteShell({ professional, artistic }: SiteShellProps) {
     onSwipeRight: () => setMode("professional"),
   });
 
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Dissolve after ~150px of scroll
+      if (window.scrollY > 150) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <LenisProvider>
       <div ref={swipeRef} className="min-h-screen">
         {/* ——— Floating nav header ——— */}
-        <header className="fixed top-0 right-0 left-0 z-50">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <header className={`fixed top-0 right-0 left-0 z-50 transition-opacity duration-700 ${isScrolled ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
             {/* Logo / Name */}
             <a
               href="#"

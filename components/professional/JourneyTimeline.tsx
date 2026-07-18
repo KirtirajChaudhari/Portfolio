@@ -52,9 +52,15 @@ function Logo({ item, size }: { item: JourneyEntry; size: number }) {
 function RoleBlock({ item, index }: { item: JourneyEntry; index: number }) {
   return (
     <Reveal>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-[80px_1fr] md:gap-10">
-        <span className="text-sm text-text-muted">{String(index + 1).padStart(2, "0")}</span>
-        <div className="border-t border-border pt-6">
+      <div className="glass-panel group relative grid grid-cols-1 gap-4 overflow-hidden rounded-xl border border-border p-6 transition-all duration-500 hover:-translate-y-2 hover:border-accent/40 hover:shadow-[0_0_40px_rgba(var(--color-accent),0.15)] md:grid-cols-[80px_1fr] md:gap-10">
+        
+        {/* Changing Animation Motion Background */}
+        <div className="pointer-events-none absolute -inset-[100%] z-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100">
+          <div className="absolute top-1/2 left-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 animate-[spin_6s_linear_infinite] rounded-full bg-gradient-to-r from-transparent via-accent/15 to-transparent blur-3xl"></div>
+        </div>
+
+        <span className="relative z-10 text-sm text-text-muted transition-colors duration-500 group-hover:text-accent">{String(index + 1).padStart(2, "0")}</span>
+        <div className="relative z-10 border-t border-border pt-6 transition-colors duration-500 group-hover:border-accent/30">
           <div className="flex flex-wrap items-start justify-between gap-x-8 gap-y-2">
             <div className="flex items-center gap-4">
               <Logo item={item} size={44} />

@@ -8,6 +8,7 @@ import { scrollToTarget } from "@/lib/scroll";
 import { useSwipe } from "@/hooks/useSwipe";
 import { novelHero } from "@/content/novel";
 import { avatarSet } from "@/content/shared";
+import { ModeToggle } from "@/components/ui/ModeToggle";
 
 /*
  * Chapter One hero — a pinned four-phase identity sequence scrubbed by
@@ -18,27 +19,58 @@ import { avatarSet } from "@/content/shared";
  * the closer.
  */
 
-const STRIDE = 2; // every 2nd source frame — visually continuous at half the bytes
+/*
+ * Per-phase frame selection table.
+ * getSourceFrame maps a logical frame index to the physical source frame.
+ * count is the total number of logical frames.
+ */
+type PhaseConfig = {
+  suffix: string;
+  count: number;
+  getSourceFrame: (i: number) => number;
+};
 
-/* Canvas filter settings for frames — adjust to taste. */
+const PHASE_CONFIG: Record<string, PhaseConfig> = {
+  // boot: all 240 src, stride 4 = 60 frames
+  boot: { 
+    suffix: "", 
+    count: 60, 
+    getSourceFrame: (i) => i * 4 
+  },
+  // builder: skip intro (src 40-239), stride 5 = 40 frames
+  builder: { 
+    suffix: "_out", 
+    count: 40, 
+    getSourceFrame: (i) => 40 + i * 5 
+  },
+  // explainer: frames 0-48 (stride 4) then morph to 192-239 (stride 4) -> 25 frames total
+  // 0-48 (13 frames: 0, 4, ... 48) | 192-236 (12 frames: 192, 196, ... 236)
+  explainer: { 
+    suffix: "_out", 
+    count: 25, 
+    getSourceFrame: (i) => (i < 13 ? i * 4 : 192 + (i - 13) * 4)
+  },
+  // closer: reduced frames, src 0-239, stride 8 = 30 frames
+  closer: { 
+    suffix: "_out", 
+    count: 30, 
+    getSourceFrame: (i) => i * 8 
+  },
+};
+
+/** Resolve the actual source filename for logical frame i in a given phase. */
+const frameSrc = (dir: string, phaseId: string, i: number) => {
+  const cfg = PHASE_CONFIG[phaseId] ?? PHASE_CONFIG.boot;
+  const src = cfg.getSourceFrame(i);
+  return `${dir}/frame_${String(src).padStart(4, "0")}${cfg.suffix}.webp`;
+};
+
+/* Canvas filter settings — enhance rendered frames. */
 const FRAME_FILTERS = {
-  contrast: 1.25, // 1 = unchanged; > 1 = higher contrast (aids perceived sharpness)
-  saturation: 1.2, // 1 = unchanged; > 1 = more vivid
-  brightness: 1.05, // slight boost adds clarity without washing out
-  sharpness: 1.1, // via filter-brightness (> 1 creates definition)
+  contrast: 1.25,
+  saturation: 1.2,
+  brightness: 1.05,
 };
-
-/* Loaded-frame count per phase (source frames / STRIDE).
- * explainer: trimmed at source frame 44 — the hand gesture starts ~48. */
-const PHASE_FRAME_COUNTS: Record<string, number> = {
-  boot: 120,
-  builder: 120,
-  explainer: 22,
-  closer: 120,
-};
-
-const frameSrc = (dir: string, i: number) =>
-  `${dir}/frame_${String(i * STRIDE).padStart(4, "0")}.webp`;
 
 export function HeroCover() {
   const router = useRouter();
@@ -47,12 +79,12 @@ export function HeroCover() {
   });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const progressRef = useRef(0);
-  const imagesRef = useRef<HTMLImageElement[][]>([]);
+  const imagesRef = useRef<(HTMLImageElement | ImageBitmap)[][]>([]);
   const [firstFrameReady, setFirstFrameReady] = useState(false);
   const [hintDismissed, setHintDismissed] = useState(false);
 
   const phaseCount = novelHero.phases.length;
-  const counts = novelHero.phases.map((p) => PHASE_FRAME_COUNTS[p.id] ?? 120);
+  const counts = novelHero.phases.map((p) => PHASE_CONFIG[p.id]?.count ?? 60);
   // Cumulative frame offsets: phase i spans [offsets[i], offsets[i+1]).
   const offsets = counts.reduce<number[]>((acc, c) => [...acc, acc[acc.length - 1] + c], [0]);
   const totalFrames = offsets[phaseCount];
@@ -71,10 +103,14 @@ export function HeroCover() {
         queue.push([p, i]);
       }
     };
+    // ─── 3-tier load priority ───────────────────────────────────────────
+    // Tier 1: first frame of phase 0 → paint something immediately.
     push(0, 0);
+    // Tier 2: every 10th frame of every phase → skeleton skeleton in < 1 s.
     for (let p = 0; p < phaseCount; p++) {
-      for (let i = 0; i < counts[p]; i += 8) push(p, i);
+      for (let i = 0; i < counts[p]; i += 10) push(p, i);
     }
+    // Tier 3: remaining frames — fill gaps for silky scrub.
     for (let p = 0; p < phaseCount; p++) {
       for (let i = 0; i < counts[p]; i++) push(p, i);
     }
@@ -84,22 +120,37 @@ export function HeroCover() {
       const next = queue.shift();
       if (!next) return;
       const [p, i] = next;
-      const img = new window.Image();
-      img.src = frameSrc(novelHero.phases[p].frames, i);
+      const src = frameSrc(novelHero.phases[p].frames, novelHero.phases[p].id, i);
       const done = () => {
         if (cancelled) return;
         loadNext();
       };
-      img.onload = () => {
-        if (cancelled) return;
-        imagesRef.current[p][i] = img;
-        if (p === 0 && i === 0) setFirstFrameReady(true);
-        done();
-      };
-      img.onerror = done;
+      
+      // Use createImageBitmap for truly off-thread decoding (bypasses main-thread DOM jank completely)
+      fetch(src)
+        .then(r => r.blob())
+        .then(blob => createImageBitmap(blob))
+        .then(bitmap => {
+          if (cancelled) return;
+          imagesRef.current[p][i] = bitmap;
+          if (p === 0 && i === 0) setFirstFrameReady(true);
+          done();
+        })
+        .catch(e => {
+          // Fallback: if browser lacks support or network fails, try classic Image
+          const img = new window.Image();
+          img.src = src;
+          img.onload = () => {
+            if (cancelled) return;
+            imagesRef.current[p][i] = img;
+            done();
+          };
+          img.onerror = done;
+        });
     };
 
-    for (let c = 0; c < 6; c++) loadNext();
+    // 20 concurrent loaders — fills frames rapidly
+    for (let c = 0; c < 20; c++) loadNext();
 
     return () => {
       cancelled = true;
@@ -126,7 +177,7 @@ export function HeroCover() {
     resize();
     window.addEventListener("resize", resize);
 
-    const nearestLoaded = (phase: number, idx: number): HTMLImageElement | null => {
+    const nearestLoaded = (phase: number, idx: number): HTMLImageElement | ImageBitmap | null => {
       const store = imagesRef.current[phase] ?? [];
       for (let d = 0; d < counts[phase]; d++) {
         if (store[idx - d]) return store[idx - d];
@@ -137,7 +188,8 @@ export function HeroCover() {
 
     const draw = () => {
       const target = progressRef.current * (totalFrames - 1);
-      smooth += (target - smooth) * 0.14;
+      // Lerp factor 0.05 → extremely silky easing between frames, removes all stutter
+      smooth += (target - smooth) * 0.05;
       const global = Math.round(smooth);
       if (global === lastDrawn) return;
 
@@ -247,7 +299,8 @@ export function HeroCover() {
         0
       );
       tl.to("[data-hero-title]", { yPercent: -22, ease: "none", duration: 1 }, 0);
-      tl.to(".hero-fade-out", { opacity: 0, ease: "none", duration: 0.35 }, 0.5);
+      tl.to(".hero-fade-out", { autoAlpha: 0, ease: "none", duration: 0.35 }, 0.5);
+      tl.to(".chapter-toggle-globes", { autoAlpha: 0, ease: "none", duration: 0.15 }, offsets[1] / totalFrames);
     }, section);
 
     return () => ctx.revert();
@@ -320,27 +373,15 @@ export function HeroCover() {
         </div>
       </div>
 
-      {/* Chapter toggle pill */}
-      <div className="hero-fade-out absolute bottom-8 left-1/2 z-30 -translate-x-1/2 md:bottom-9">
-        <div className="flex items-center gap-1 rounded-full border border-white/15 bg-black/40 p-1 backdrop-blur-md">
-          <button
-            type="button"
-            onClick={() => scrollToTarget("#chapter-one")}
-            className="group flex items-center gap-2 rounded-full px-4 py-2 text-xs tracking-widest text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-          >
-            <span className="h-2 w-2 rounded-full bg-accent transition-transform duration-300 group-hover:scale-125" />
-            <span className="type-heading whitespace-nowrap">CH. 1</span>
-          </button>
-          <span className="h-4 w-px bg-white/20" />
-          <button
-            type="button"
-            onClick={() => router.push("/creator")}
-            className="group flex items-center gap-2 rounded-full px-4 py-2 text-xs tracking-widest text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-          >
-            <span className="type-serif italic whitespace-nowrap">Ch. 2</span>
-            <span className="h-2 w-2 rounded-full bg-white/40 transition-transform duration-300 group-hover:scale-125" />
-          </button>
-        </div>
+      {/* Chapter toggle globes */}
+      <div className="chapter-toggle-globes absolute bottom-8 md:bottom-12 left-1/2 z-30 -translate-x-1/2 transform scale-75 md:scale-90 lg:scale-100 origin-bottom">
+        <ModeToggle onModeChange={(newMode) => {
+          if (newMode === "professional") {
+            scrollToTarget("#chapter-one");
+          } else {
+            router.push("/creator");
+          }
+        }} />
       </div>
 
       {/* Swipe hint — touch only, first load */}
@@ -351,9 +392,6 @@ export function HeroCover() {
         </div>
       )}
 
-      <div className="hero-fade-out pointer-events-none absolute right-6 top-6 z-20 hidden text-[10px] tracking-[0.4em] text-white/40 md:right-10 md:top-10 md:block">
-        SCROLL TO OPEN
-      </div>
     </section>
   );
 }

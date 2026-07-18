@@ -2,6 +2,7 @@ import { NovelShell } from "./NovelShell";
 import { HeroCover } from "./HeroCover";
 import { ChapterTitle } from "./ChapterTitle";
 import { ChapterCTA } from "./ChapterCTA";
+import { HeroChapterTransition } from "./HeroChapterTransition";
 import { EngineerStory } from "./chapter-one/EngineerStory";
 import { ProjectsGrid } from "./chapter-one/ProjectsGrid";
 import { SkillBalls } from "./chapter-one/SkillBalls";
@@ -22,6 +23,7 @@ export function NovelPage() {
     <NovelShell>
       <main>
         <HeroCover />
+        <HeroChapterTransition />
 
         <section id="chapter-one" aria-label="Chapter One — The Engineer">
           <ChapterTitle

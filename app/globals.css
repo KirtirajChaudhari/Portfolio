@@ -20,6 +20,13 @@
   --accent-glass: oklch(0.72 0.13 252 / 0.12);
   --shadow-tint: oklch(0.08 0.01 260 / 0.6);
 
+  /* Glass tokens */
+  --glass-surface: oklch(0.18 0.008 260 / 0.55);
+  --glass-border: oklch(0.95 0.005 260 / 0.10);
+  --glass-highlight: oklch(0.72 0.13 252 / 0.15);
+  --glass-blur: 8px; /* yaros measures blur(3px) on badges; 8px is our ceiling */
+  --glass-shadow: 0 8px 32px oklch(0.10 0.02 260 / 0.4);
+
   /* Motion — the one grammar both chapters share */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
@@ -175,11 +182,82 @@ body {
 }
 
 /* ——— Glass card utility (Yaros style) ——— */
+/* Standard property only: authoring the -webkit- pair made LightningCSS
+   collapse the pair and emit ONLY the prefixed declaration, which some
+   engines (incl. our verification browser) don't honor. */
 .glass {
   background: color-mix(in oklab, var(--surface) 65%, transparent);
   border: 1px solid color-mix(in oklab, var(--text) 10%, transparent);
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ——— Glass panel utility (Chapter One) ——— */
+/* Directional light: brighter top/left edge, dimmer bottom/right, plus a
+   soft top-left specular fade — the cue that reads as glass rather than
+   frosted plastic. */
+.glass-panel {
+  background-color: var(--glass-surface);
+  background-image: linear-gradient(
+    135deg,
+    oklch(0.95 0.005 260 / 0.1) 0%,
+    oklch(0.95 0.005 260 / 0.03) 30%,
+    transparent 55%
+  );
+  backdrop-filter: blur(var(--glass-blur));
+  border-width: 1px;
+  border-style: solid;
+  border-top-color: var(--glass-highlight);
+  border-left-color: color-mix(in oklab, var(--glass-highlight) 60%, var(--glass-border));
+  border-right-color: color-mix(in oklab, var(--glass-border) 55%, transparent);
+  border-bottom-color: color-mix(in oklab, var(--glass-border) 55%, transparent);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Liquid-glass overlay (Chapter One): an organic light streak distorted by
+ * the SVG turbulence filter defined in LiquidGlassDefs. Separate layer on
+ * top of the blur — never combined with backdrop-filter on one element.
+ * Static by design: the "liquid" is the displaced shape, not animation,
+ * so it costs one rasterization, not frames. */
+.glass-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-panel::after {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(115deg, transparent 32%, oklch(0.95 0.005 260 / 0.07) 44%, transparent 58%),
+    linear-gradient(295deg, transparent 60%, var(--accent-glass) 82%, transparent 96%);
+  filter: url(#liquid-glass);
+}
+
+@supports not (filter: url(#liquid-glass)) {
+  .glass-panel::after {
+    filter: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-panel::after {
+    content: none;
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-panel {
+    background: oklch(0.18 0.008 260 / 0.95);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-panel {
+    backdrop-filter: none;
+    background: oklch(0.18 0.008 260 / 0.95);
+  }
 }
 
 /* ——— Hero split panes ——— */
@@ -298,4 +376,12 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .swipe-hint-arrow { animation: none; }
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

@@ -52,10 +52,17 @@ export function EngineerStory() {
       <div className="mt-24 grid grid-cols-1 gap-10 md:mt-28 md:grid-cols-3 md:gap-10">
         {professionalPrinciples.map((p, i) => (
           <Reveal key={p.num} delay={i * 0.08}>
-            <span className="text-sm text-text-muted">{p.num}</span>
-            <div className="mt-2 border-t border-border pt-5">
-              <h3 className="text-lg font-medium text-text">{p.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-text-muted">{p.text}</p>
+            <span className="text-sm text-text-muted transition-colors duration-500">{p.num}</span>
+            <div className="glass-panel group relative mt-2 overflow-hidden rounded-xl border border-border p-5 transition-all duration-500 hover:-translate-y-2 hover:border-accent/40 hover:shadow-[0_0_40px_rgba(var(--color-accent),0.15)]">
+              {/* Changing Animation Motion Background */}
+              <div className="pointer-events-none absolute -inset-[100%] z-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100">
+                <div className="absolute top-1/2 left-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 animate-[spin_6s_linear_infinite] rounded-full bg-gradient-to-r from-transparent via-accent/15 to-transparent blur-3xl"></div>
+              </div>
+
+              <div className="relative z-10">
+                <h3 className="text-lg font-medium text-text">{p.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-text-muted">{p.text}</p>
+              </div>
             </div>
           </Reveal>
         ))}

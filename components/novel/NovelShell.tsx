@@ -5,6 +5,13 @@ import Lenis from "lenis";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { setLenis } from "@/lib/scroll";
 
+/* Late layout shifts (image decode, 3D canvas mount, grid expansion) can
+ * strand once-only reveal triggers past the reachable scroll range —
+ * re-measure once everything has actually loaded. */
+const refreshOnLoad = () => ScrollTrigger.refresh();
+
+import { LiquidGlassDefs } from "./LiquidGlassDefs";
+
 /**
  * One scroll system for the whole novel: Lenis drives the scroll,
  * GSAP ScrollTrigger reads it. Both chapters inherit this — the motion
@@ -43,12 +50,16 @@ export function NovelShell({ children }: { children: React.ReactNode }) {
       });
     };
 
-    // Defer initialization to let Next.js complete its route-change scroll 
+    // Defer initialization to let Next.js complete its route-change scroll
     // to top or history scroll restoration before Lenis locks it in.
     const timeoutId = setTimeout(initLenis, 50);
 
+    if (document.readyState === "complete") refreshOnLoad();
+    else window.addEventListener("load", refreshOnLoad);
+
     return () => {
       clearTimeout(timeoutId);
+      window.removeEventListener("load", refreshOnLoad);
       if (frame) cancelAnimationFrame(frame);
       if (lenis) lenis.destroy();
       setLenis(null);
@@ -57,6 +68,7 @@ export function NovelShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div ref={shellRef} className="relative">
+      <LiquidGlassDefs />
       {children}
     </div>
   );
