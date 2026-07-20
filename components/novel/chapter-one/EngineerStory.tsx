@@ -41,6 +41,7 @@ export function EngineerStory() {
               src={avatarSet.professional.hero}
               alt={avatarSet.professional.alt}
               fill
+              priority
               sizes="(min-width: 768px) 320px, 256px"
               className="object-cover"
             />

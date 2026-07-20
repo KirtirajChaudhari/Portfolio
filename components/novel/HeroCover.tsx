@@ -31,30 +31,29 @@ type PhaseConfig = {
 };
 
 const PHASE_CONFIG: Record<string, PhaseConfig> = {
-  // boot: all 240 src, stride 4 = 60 frames
-  boot: { 
-    suffix: "", 
-    count: 60, 
-    getSourceFrame: (i) => i * 4 
+  // boot: frame_0000_out to frame_0059_out
+  boot: {
+    suffix: "_out",
+    count: 60,
+    getSourceFrame: (i) => i,
   },
-  // builder: skip intro (src 40-239), stride 5 = 40 frames
-  builder: { 
-    suffix: "_out", 
-    count: 40, 
-    getSourceFrame: (i) => 40 + i * 5 
+  // builder: frame_0000_out to frame_0059_out
+  builder: {
+    suffix: "_out",
+    count: 60,
+    getSourceFrame: (i) => i,
   },
-  // explainer: frames 0-48 (stride 4) then morph to 192-239 (stride 4) -> 25 frames total
-  // 0-48 (13 frames: 0, 4, ... 48) | 192-236 (12 frames: 192, 196, ... 236)
-  explainer: { 
-    suffix: "_out", 
-    count: 25, 
-    getSourceFrame: (i) => (i < 13 ? i * 4 : 192 + (i - 13) * 4)
+  // explainer: frame_0000_out to frame_0049_out + frame_0194_out to frame_0204_out
+  explainer: {
+    suffix: "_out",
+    count: 61,
+    getSourceFrame: (i) => (i <= 49 ? i : 194 + (i - 50)),
   },
-  // closer: reduced frames, src 0-239, stride 8 = 30 frames
-  closer: { 
-    suffix: "_out", 
-    count: 30, 
-    getSourceFrame: (i) => i * 8 
+  // closer: frame_0144_out to frame_0203_out
+  closer: {
+    suffix: "_out",
+    count: 60,
+    getSourceFrame: (i) => 144 + i,
   },
 };
 
@@ -106,11 +105,11 @@ export function HeroCover() {
     // ─── 3-tier load priority ───────────────────────────────────────────
     // Tier 1: first frame of phase 0 → paint something immediately.
     push(0, 0);
-    // Tier 2: every 10th frame of every phase → skeleton skeleton in < 1 s.
+    // Tier 2: every 5th frame of every phase → usable skeleton fast.
     for (let p = 0; p < phaseCount; p++) {
-      for (let i = 0; i < counts[p]; i += 10) push(p, i);
+      for (let i = 0; i < counts[p]; i += 5) push(p, i);
     }
-    // Tier 3: remaining frames — fill gaps for silky scrub.
+    // Tier 3: remaining frames — fill gaps for smooth scrub.
     for (let p = 0; p < phaseCount; p++) {
       for (let i = 0; i < counts[p]; i++) push(p, i);
     }
@@ -125,8 +124,8 @@ export function HeroCover() {
         if (cancelled) return;
         loadNext();
       };
-      
-      // Use createImageBitmap for truly off-thread decoding (bypasses main-thread DOM jank completely)
+
+      // Off-thread decode at native resolution (1280×720)
       fetch(src)
         .then(r => r.blob())
         .then(blob => createImageBitmap(blob))
@@ -136,21 +135,22 @@ export function HeroCover() {
           if (p === 0 && i === 0) setFirstFrameReady(true);
           done();
         })
-        .catch(e => {
-          // Fallback: if browser lacks support or network fails, try classic Image
+        .catch(() => {
+          // Fallback: classic Image element
           const img = new window.Image();
           img.src = src;
           img.onload = () => {
             if (cancelled) return;
             imagesRef.current[p][i] = img;
+            if (p === 0 && i === 0) setFirstFrameReady(true);
             done();
           };
           img.onerror = done;
         });
     };
 
-    // 20 concurrent loaders — fills frames rapidly
-    for (let c = 0; c < 20; c++) loadNext();
+    // 8 concurrent loaders — enough throughput without overwhelming GC
+    for (let c = 0; c < 8; c++) loadNext();
 
     return () => {
       cancelled = true;
@@ -165,7 +165,6 @@ export function HeroCover() {
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
 
-    let smooth = 0;
     let lastDrawn = -1;
 
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -175,7 +174,12 @@ export function HeroCover() {
       lastDrawn = -1; // force redraw at new size
     };
     resize();
-    window.addEventListener("resize", resize);
+    let resizeRAF: number;
+    const onResize = () => {
+      cancelAnimationFrame(resizeRAF);
+      resizeRAF = requestAnimationFrame(resize);
+    };
+    window.addEventListener("resize", onResize);
 
     const nearestLoaded = (phase: number, idx: number): HTMLImageElement | ImageBitmap | null => {
       const store = imagesRef.current[phase] ?? [];
@@ -188,9 +192,7 @@ export function HeroCover() {
 
     const draw = () => {
       const target = progressRef.current * (totalFrames - 1);
-      // Lerp factor 0.05 → extremely silky easing between frames, removes all stutter
-      smooth += (target - smooth) * 0.05;
-      const global = Math.round(smooth);
+      const global = Math.round(target);
       if (global === lastDrawn) return;
 
       let phase = phaseCount - 1;
@@ -211,9 +213,7 @@ export function HeroCover() {
       const dw = img.width * scale;
       const dh = img.height * scale;
 
-      ctx.filter = `contrast(${FRAME_FILTERS.contrast}) saturate(${FRAME_FILTERS.saturation}) brightness(${FRAME_FILTERS.brightness})`;
       ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
-      ctx.filter = "none";
 
       // Blink-cut between clips: brief dark dip near interior phase boundaries.
       let toBoundary = Infinity;
@@ -229,7 +229,8 @@ export function HeroCover() {
     gsap.ticker.add(draw);
     return () => {
       gsap.ticker.remove(draw);
-      window.removeEventListener("resize", resize);
+      window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(resizeRAF);
     };
     // offsets/counts derive from static content — stable across renders.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -247,9 +248,9 @@ export function HeroCover() {
         scrollTrigger: {
           trigger: section,
           start: "top top",
-          end: "+=300%",
+          end: "+=250%",
           pin: true,
-          scrub: 0.6,
+          scrub: 0.15,
           onUpdate: (self) => {
             progressRef.current = self.progress;
           },
@@ -334,6 +335,9 @@ export function HeroCover() {
         className={`absolute inset-0 h-full w-full transition-opacity duration-700 ${
           firstFrameReady ? "opacity-100" : "opacity-0"
         }`}
+        style={{
+          filter: `contrast(${FRAME_FILTERS.contrast}) saturate(${FRAME_FILTERS.saturation}) brightness(${FRAME_FILTERS.brightness})`,
+        }}
       />
       {/* Whisper-light global veil — the avatar stays bright */}
       <div className="absolute inset-0 bg-black/10" />

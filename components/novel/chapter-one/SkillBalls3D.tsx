@@ -352,7 +352,6 @@ export function SkillBalls3D() {
         className="relative h-[65vh] min-h-[400px] overflow-hidden rounded-xl border border-border bg-surface/40 cursor-crosshair"
       >
         <Canvas
-          shadows
           gl={{ antialias: true, alpha: true, stencil: false, depth: false }}
           camera={{ position: [0, 0, 25], fov: 32.5, near: 1, far: 100 }}
           onCreated={({ gl }) => {
