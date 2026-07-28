@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# raw video source assets (not deployed, too large for git)
+/assets-src
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

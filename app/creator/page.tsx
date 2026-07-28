@@ -25,7 +25,7 @@ export default function CreatorPage() {
   return (
     <NovelShell>
       <ChapterScope chapter="two" />
-      <main data-chapter="two" className="min-h-dvh bg-bg text-text">
+      <main data-chapter="two" className="paper-board min-h-dvh bg-bg text-text">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 pt-8">
           <Link
             href="/"

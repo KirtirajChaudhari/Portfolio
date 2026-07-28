@@ -1,70 +1,30 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { gsap } from "@/lib/gsap";
 import { scrollToTarget } from "@/lib/scroll";
 import { useSwipe } from "@/hooks/useSwipe";
 import { novelHero } from "@/content/novel";
-import { avatarSet } from "@/content/shared";
 import { ModeToggle } from "@/components/ui/ModeToggle";
 
 /*
  * Chapter One hero — a pinned four-phase identity sequence scrubbed by
- * scroll, drawn from pre-split WebP frames on a <canvas> (video.currentTime
- * seeking stutters; decoded-frame swaps don't). The name sits in an
- * animated lower-third so the identity clips own the screen, and the
- * explainer phase is trimmed before the hand gesture, blink-cutting into
- * the closer.
+ * scroll via <video> currentTime on /videos/hero-scrub.mp4. The video is
+ * pre-baked from the trimmed frame edit (boot 0-59 + builder 0-59 +
+ * explainer 0-49,194-204 + closer 144-203) with a 6-frame GOP so seeks
+ * stay cheap — no runtime frame mapping needed.
  */
 
-/*
- * Per-phase frame selection table.
- * getSourceFrame maps a logical frame index to the physical source frame.
- * count is the total number of logical frames.
- */
-type PhaseConfig = {
-  suffix: string;
-  count: number;
-  getSourceFrame: (i: number) => number;
+/* Logical frame counts per phase — must match the baked hero-scrub.mp4 edit. */
+const PHASE_COUNTS: Record<string, number> = {
+  boot: 60,
+  builder: 60,
+  explainer: 61,
+  closer: 60,
 };
 
-const PHASE_CONFIG: Record<string, PhaseConfig> = {
-  // boot: frame_0000_out to frame_0059_out
-  boot: {
-    suffix: "_out",
-    count: 60,
-    getSourceFrame: (i) => i,
-  },
-  // builder: frame_0000_out to frame_0059_out
-  builder: {
-    suffix: "_out",
-    count: 60,
-    getSourceFrame: (i) => i,
-  },
-  // explainer: frame_0000_out to frame_0049_out + frame_0194_out to frame_0204_out
-  explainer: {
-    suffix: "_out",
-    count: 61,
-    getSourceFrame: (i) => (i <= 49 ? i : 194 + (i - 50)),
-  },
-  // closer: frame_0144_out to frame_0203_out
-  closer: {
-    suffix: "_out",
-    count: 60,
-    getSourceFrame: (i) => 144 + i,
-  },
-};
-
-/** Resolve the actual source filename for logical frame i in a given phase. */
-const frameSrc = (dir: string, phaseId: string, i: number) => {
-  const cfg = PHASE_CONFIG[phaseId] ?? PHASE_CONFIG.boot;
-  const src = cfg.getSourceFrame(i);
-  return `${dir}/frame_${String(src).padStart(4, "0")}${cfg.suffix}.webp`;
-};
-
-/* Canvas filter settings — enhance rendered frames. */
+/* Video filter settings — enhance rendered frames. */
 const FRAME_FILTERS = {
   contrast: 1.25,
   saturation: 1.2,
@@ -76,163 +36,68 @@ export function HeroCover() {
   const sectionRef = useSwipe<HTMLElement>({
     onSwipeLeft: () => router.push("/creator"),
   });
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const blinkRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef(0);
-  const imagesRef = useRef<(HTMLImageElement | ImageBitmap)[][]>([]);
   const [firstFrameReady, setFirstFrameReady] = useState(false);
   const [hintDismissed, setHintDismissed] = useState(false);
 
   const phaseCount = novelHero.phases.length;
-  const counts = novelHero.phases.map((p) => PHASE_CONFIG[p.id]?.count ?? 60);
+  const counts = novelHero.phases.map((p) => PHASE_COUNTS[p.id] ?? 60);
   // Cumulative frame offsets: phase i spans [offsets[i], offsets[i+1]).
   const offsets = counts.reduce<number[]>((acc, c) => [...acc, acc[acc.length - 1] + c], [0]);
   const totalFrames = offsets[phaseCount];
 
-  /* ——— Frame loading: concurrency-limited, coarse-to-fine ——— */
+  /* ——— Video scrub: currentTime driven by scroll progress, boundary dip ——— */
   useEffect(() => {
-    let cancelled = false;
-    imagesRef.current = novelHero.phases.map(() => []);
+    const video = videoRef.current;
+    if (!video) return;
 
-    const queue: [number, number][] = [];
-    const queued = new Set<string>();
-    const push = (p: number, i: number) => {
-      const key = `${p}:${i}`;
-      if (!queued.has(key)) {
-        queued.add(key);
-        queue.push([p, i]);
-      }
+    // iOS blocks programmatic seeking until the video has played once;
+    // play() -> pause() unlocks it before any frame paints.
+    const onLoaded = () => {
+      setFirstFrameReady(true);
+      video
+        .play()
+        .then(() => video.pause())
+        .catch(() => {});
     };
-    // ─── 3-tier load priority ───────────────────────────────────────────
-    // Tier 1: first frame of phase 0 → paint something immediately.
-    push(0, 0);
-    // Tier 2: every 5th frame of every phase → usable skeleton fast.
-    for (let p = 0; p < phaseCount; p++) {
-      for (let i = 0; i < counts[p]; i += 5) push(p, i);
-    }
-    // Tier 3: remaining frames — fill gaps for smooth scrub.
-    for (let p = 0; p < phaseCount; p++) {
-      for (let i = 0; i < counts[p]; i++) push(p, i);
+    if (video.readyState >= 2) {
+      onLoaded();
+    } else {
+      video.addEventListener("loadeddata", onLoaded);
     }
 
-    const loadNext = () => {
-      if (cancelled) return;
-      const next = queue.shift();
-      if (!next) return;
-      const [p, i] = next;
-      const src = frameSrc(novelHero.phases[p].frames, novelHero.phases[p].id, i);
-      const done = () => {
-        if (cancelled) return;
-        loadNext();
-      };
+    let lastTime = -1;
 
-      // Off-thread decode at native resolution (1280×720)
-      fetch(src)
-        .then(r => r.blob())
-        .then(blob => createImageBitmap(blob))
-        .then(bitmap => {
-          if (cancelled) return;
-          imagesRef.current[p][i] = bitmap;
-          if (p === 0 && i === 0) setFirstFrameReady(true);
-          done();
-        })
-        .catch(() => {
-          // Fallback: classic Image element
-          const img = new window.Image();
-          img.src = src;
-          img.onload = () => {
-            if (cancelled) return;
-            imagesRef.current[p][i] = img;
-            if (p === 0 && i === 0) setFirstFrameReady(true);
-            done();
-          };
-          img.onerror = done;
-        });
-    };
+    const scrub = () => {
+      const duration = video.duration;
+      if (!duration) return;
 
-    // 8 concurrent loaders — enough throughput without overwhelming GC
-    for (let c = 0; c < 8; c++) loadNext();
-
-    return () => {
-      cancelled = true;
-    };
-    // counts derive from static content — stable across renders.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phaseCount]);
-
-  /* ——— Canvas draw loop: lerped frame index, cover-fit, boundary dip ——— */
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-    if (!canvas || !ctx) return;
-
-    let lastDrawn = -1;
-
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    const resize = () => {
-      canvas.width = canvas.clientWidth * dpr;
-      canvas.height = canvas.clientHeight * dpr;
-      lastDrawn = -1; // force redraw at new size
-    };
-    resize();
-    let resizeRAF: number;
-    const onResize = () => {
-      cancelAnimationFrame(resizeRAF);
-      resizeRAF = requestAnimationFrame(resize);
-    };
-    window.addEventListener("resize", onResize);
-
-    const nearestLoaded = (phase: number, idx: number): HTMLImageElement | ImageBitmap | null => {
-      const store = imagesRef.current[phase] ?? [];
-      for (let d = 0; d < counts[phase]; d++) {
-        if (store[idx - d]) return store[idx - d];
-        if (store[idx + d]) return store[idx + d];
+      const t = progressRef.current * duration;
+      if (Math.abs(t - lastTime) > 0.02) {
+        video.currentTime = t;
+        lastTime = t;
       }
-      return null;
-    };
-
-    const draw = () => {
-      const target = progressRef.current * (totalFrames - 1);
-      const global = Math.round(target);
-      if (global === lastDrawn) return;
-
-      let phase = phaseCount - 1;
-      for (let p = 0; p < phaseCount; p++) {
-        if (global < offsets[p + 1]) {
-          phase = p;
-          break;
-        }
-      }
-      const local = Math.min(global - offsets[phase], counts[phase] - 1);
-      const img = nearestLoaded(phase, local);
-      if (!img) return;
-
-      lastDrawn = global;
-      const cw = canvas.width;
-      const ch = canvas.height;
-      const scale = Math.max(cw / img.width, ch / img.height);
-      const dw = img.width * scale;
-      const dh = img.height * scale;
-
-      ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
 
       // Blink-cut between clips: brief dark dip near interior phase boundaries.
+      const global = progressRef.current * (totalFrames - 1);
       let toBoundary = Infinity;
       for (let k = 1; k < phaseCount; k++) {
         toBoundary = Math.min(toBoundary, Math.abs(global - offsets[k]));
       }
-      if (toBoundary < 4) {
-        ctx.fillStyle = `rgba(4, 6, 10, ${(1 - toBoundary / 4) * 0.7})`;
-        ctx.fillRect(0, 0, cw, ch);
+      if (blinkRef.current) {
+        blinkRef.current.style.opacity =
+          toBoundary < 4 ? String((1 - toBoundary / 4) * 0.7) : "0";
       }
     };
 
-    gsap.ticker.add(draw);
+    gsap.ticker.add(scrub);
     return () => {
-      gsap.ticker.remove(draw);
-      window.removeEventListener("resize", onResize);
-      cancelAnimationFrame(resizeRAF);
+      gsap.ticker.remove(scrub);
+      video.removeEventListener("loadeddata", onLoaded);
     };
-    // offsets/counts derive from static content — stable across renders.
+    // offsets derive from static content — stable across renders.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phaseCount, totalFrames]);
 
@@ -328,16 +193,26 @@ export function HeroCover() {
         </div>
       )}
 
-      {/* Frame-scrub canvas — the star of the frame */}
-      <canvas
-        ref={canvasRef}
+      {/* Scroll-scrubbed video — the star of the frame */}
+      <video
+        ref={videoRef}
         aria-hidden
-        className={`absolute inset-0 h-full w-full transition-opacity duration-700 ${
+        muted
+        playsInline
+        preload="auto"
+        src="/videos/hero-scrub.mp4"
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
           firstFrameReady ? "opacity-100" : "opacity-0"
         }`}
         style={{
           filter: `contrast(${FRAME_FILTERS.contrast}) saturate(${FRAME_FILTERS.saturation}) brightness(${FRAME_FILTERS.brightness})`,
         }}
+      />
+      {/* Blink-cut dip overlay, driven imperatively from the scrub ticker */}
+      <div
+        ref={blinkRef}
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[#04060a] opacity-0"
       />
       {/* Whisper-light global veil — the avatar stays bright */}
       <div className="absolute inset-0 bg-black/10" />

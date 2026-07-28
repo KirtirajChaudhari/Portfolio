@@ -100,59 +100,16 @@ export const photographyMeta = {
 };
 
 /*
- * Poetry — set as type, polaroid-framed, each linking to @introvert.balak.
- * First piece is real (from artistic.ts); TODO(kirtiraj): replace the
- * remaining pieces with your own published lines + per-post URLs.
+ * Poetry — link-out only. The `poetryWall` array that used to sit here held
+ * three unattributed poems written to fill the layout, not by Kirtiraj; it
+ * was never rendered and has been deleted rather than carried forward.
+ * Real fragments go in content/poetry.ts when there are any.
  */
-export interface PoemCard {
-  id: string;
-  title: string;
-  lines: string[];
-  href: string;
-  rotate: number;
-}
-
-export const poetryWall: PoemCard[] = [
-  {
-    id: "poem-1",
-    title: "Between Words",
-    lines: [
-      "There is a quiet rhythm in the space between words,",
-      "Where logic ends and the abstract begins.",
-      "A subtle hum of creation,",
-      "Echoing through the pixels and the silence.",
-    ],
-    href: "https://instagram.com/introvert.balak",
-    rotate: -2,
-  },
-  {
-    id: "poem-2",
-    title: "Taal",
-    lines: [
-      "The tabla knows before I do —",
-      "which thoughts want structure,",
-      "which want to breathe.",
-    ],
-    href: "https://instagram.com/introvert.balak",
-    rotate: 3,
-  },
-  {
-    id: "poem-3",
-    title: "Draft",
-    lines: [
-      "Some lines never become poems.",
-      "They stay in the notebook,",
-      "holding the page open",
-      "for the ones that will.",
-    ],
-    href: "https://instagram.com/introvert.balak",
-    rotate: -3.5,
-  },
-];
-
 export const poetryMeta = {
   handle: "@introvert.balak",
   profileUrl: "https://instagram.com/introvert.balak",
+  /** Verbatim from creatorIntro — his own description of the writing. */
+  blurb: "Filling notebooks with lines that mostly stay in the notebook.",
 };
 
 const musicDiscipline = artisticDisciplines.find((d) => d.id === "music");

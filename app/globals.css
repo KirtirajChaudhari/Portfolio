@@ -59,7 +59,17 @@
   --crayon-blue: oklch(0.74 0.11 265);
   --crayon-peach: oklch(0.83 0.1 55);
   --crayon-sun: oklch(0.87 0.13 95);
-  
+  --crayon-leaf: oklch(0.78 0.13 150);
+
+  /* ——— Pinboard grammar ———
+     THE LIGHT SOURCE IS TOP-LEFT. Every shadow on Chapter Two derives from
+     these three tokens, so offsets are always positive-x / positive-y and
+     highlights always sit on an object's top-left. Do not hand-roll a
+     shadow here; if a new depth is needed, add a token beside these. */
+  --pin-shadow-flat: 2px 3px 5px -2px oklch(0.42 0.02 285 / 0.24);
+  --pin-shadow-rest: 5px 8px 16px -5px oklch(0.42 0.02 285 / 0.3);
+  --pin-shadow-lift: 11px 19px 34px -9px oklch(0.42 0.02 285 / 0.34);
+
   background-color: var(--bg);
   color: var(--text);
 }
@@ -81,6 +91,7 @@
   --color-crayon-blue: var(--crayon-blue);
   --color-crayon-peach: var(--crayon-peach);
   --color-crayon-sun: var(--crayon-sun);
+  --color-crayon-leaf: var(--crayon-leaf);
 
   --font-sans: var(--font-spectral);
   --font-heading: var(--font-antonio);
@@ -384,4 +395,185 @@ body {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Pinboard — Chapter Two's signature motif.
+   Physical objects pinned to the paper, not decorated cards.
+   Light source: TOP-LEFT, everywhere, no exceptions.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Faint ruling that reads as "board" without the retired cream/cork skin. */
+.paper-board {
+  background-image: radial-gradient(
+    color-mix(in oklab, var(--text) 8%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 24px 24px;
+}
+
+/* The pinned object itself. --tilt is set per instance, inline. */
+.pinned {
+  --tilt: 0deg;
+  position: relative;
+  transform: rotate(var(--tilt));
+  box-shadow: var(--pin-shadow-rest);
+  transition:
+    transform var(--dur-ui) var(--ease-out),
+    box-shadow var(--dur-ui) var(--ease-out);
+}
+
+/* Hover straightens and lifts — the "picked up off the board" cue.
+   Transform + shadow only; never layout properties. */
+@media (hover: hover) {
+  .pinned:hover,
+  .pinned:focus-within {
+    transform: rotate(0deg) translateY(-6px);
+    box-shadow: var(--pin-shadow-lift);
+    z-index: 5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pinned {
+    transition: box-shadow var(--dur-ui) var(--ease-out);
+  }
+  .pinned:hover,
+  .pinned:focus-within {
+    transform: rotate(var(--tilt));
+  }
+}
+
+/* Masking tape. Translucent so the card reads through it; multiply keeps
+   the hue honest over both white cards and paper. */
+.tape {
+  position: absolute;
+  z-index: 2;
+  width: 5.25rem;
+  height: 1.6rem;
+  background: color-mix(in oklab, var(--tape-hue, var(--crayon-sun)) 62%, transparent);
+  background-image: linear-gradient(
+    100deg,
+    oklch(1 0 0 / 0.32) 0%,
+    transparent 26%,
+    transparent 74%,
+    oklch(0.4 0.02 285 / 0.1) 100%
+  );
+  mix-blend-mode: multiply;
+  box-shadow: var(--pin-shadow-flat);
+  pointer-events: none;
+  /* Torn ends, cut on both sides. */
+  clip-path: polygon(
+    3% 0%, 97% 4%, 100% 22%, 97% 48%, 100% 74%, 96% 100%,
+    4% 96%, 0% 72%, 3% 50%, 0% 26%
+  );
+}
+
+/* Push-pin. Specular dot at 32%/28% = top-left light, same as every shadow. */
+.pin {
+  position: absolute;
+  z-index: 3;
+  width: 1.05rem;
+  height: 1.05rem;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle at 32% 28%,
+      oklch(1 0 0 / 0.95) 0%,
+      oklch(1 0 0 / 0.4) 14%,
+      var(--pin-hue, var(--crayon-pink)) 46%,
+      color-mix(in oklab, var(--pin-hue, var(--crayon-pink)) 62%, black) 100%
+    );
+  box-shadow: var(--pin-shadow-flat);
+  pointer-events: none;
+}
+
+/* Staple — the flatter fastener for secondary cards. */
+.staple {
+  position: absolute;
+  z-index: 3;
+  width: 1.5rem;
+  height: 0.3rem;
+  border-radius: 1px;
+  background: linear-gradient(
+    170deg,
+    oklch(0.86 0.005 285) 0%,
+    oklch(0.66 0.008 285) 55%,
+    oklch(0.5 0.01 285) 100%
+  );
+  box-shadow: var(--pin-shadow-flat);
+  pointer-events: none;
+}
+
+/* Highlighter stroke behind ONE word — never a section-width fill.
+   Slightly rotated and inset so it reads as a hand-drawn swipe. */
+.highlighter {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+}
+.highlighter::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: -0.12em;
+  right: -0.12em;
+  bottom: 0.04em;
+  height: 0.52em;
+  background: var(--stroke-hue, var(--crayon-sun));
+  opacity: 0.62;
+  transform: rotate(-1.2deg);
+  border-radius: 2px 6px 3px 5px;
+}
+
+/* Contact sheet — an ink-dark physical strip on the paper (an object, not
+   a dark theme). Sprocket holes are punched in the page colour. */
+.filmstrip {
+  background-color: var(--text);
+  box-shadow: var(--pin-shadow-rest);
+}
+
+.filmstrip::before,
+.filmstrip::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0.55rem;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--bg) 0 0.6rem,
+    transparent 0.6rem 1.5rem
+  );
+}
+
+.filmstrip::before { top: 0.4rem; }
+.filmstrip::after { bottom: 0.4rem; }
+
+/* Scroll hint — a slow opacity pulse. DESIGN.md retires the bounce. */
+@keyframes scroll-pulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+.scroll-pulse {
+  animation: scroll-pulse 3.2s var(--ease-in-out) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-pulse {
+    animation: none;
+    opacity: 0.75;
+  }
+}
+
+/* Offset color mat — a tilted crayon backing peeking out behind a card. */
+.color-mat::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--mat-hue, var(--crayon-blue));
+  border-radius: inherit;
+  transform: rotate(var(--mat-tilt, 2.5deg)) translate(6px, 8px);
 }

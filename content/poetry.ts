@@ -1,28 +1,23 @@
-export interface Poem {
+/*
+ * Poetry lives on Instagram (@introvert.balak), not in this repo.
+ *
+ * The three "Placeholder One/Two/Three" test poems that used to sit here
+ * were never Kirtiraj's writing — they shipped as filler, and are gone.
+ * The section links out to the real account instead.
+ *
+ * `poemFragments` is the slot for that to change: drop ONE short, real
+ * fragment in and PoetryWall renders it on the open page automatically.
+ * Leave it empty rather than inventing something to fill the space.
+ */
+
+export interface PoemFragment {
   id: string;
-  title: string;
-  body: string;
+  /** A few real lines — kept short; the notebook is not a reader. */
+  lines: string[];
+  /** Where this piece is published. */
+  href: string;
+  /** Optional place/date, e.g. "Nashik, 2026". */
   note?: string;
 }
 
-export const poetryCollectionTitle = "Collected Notebooks";
-
-export const poems: Poem[] = [
-  {
-    id: "poem-1",
-    title: "Placeholder One",
-    body: "This is a placeholder poem.\nIt has lines and breaks.\nJust to test the page flipping,\nAnd check the layout makes.",
-    note: "Nashik, 2026",
-  },
-  {
-    id: "poem-2",
-    title: "Placeholder Two",
-    body: "Another placeholder,\nfor the second page.\nTesting the layout,\non this digital stage.",
-  },
-  {
-    id: "poem-3",
-    title: "Placeholder Three",
-    body: "A third placeholder poem.\nTo ensure the dynamically sized array\nworks flawlessly without delay.",
-    note: "For the tests",
-  },
-];
+export const poemFragments: PoemFragment[] = [];
