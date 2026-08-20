@@ -33,7 +33,7 @@ Repo: `portfolio-vue` · audited 2026-08-20 · **no application code written thi
 
 **RESOLVED (decided after Loop 0, executes as Loop 1 step 1):** `npm i -D playwright @playwright/test`, and it **stays installed**. devDependencies are never bundled into the client by Vite, so it costs the shipped page nothing. The deciding argument is Loop 8, which re-runs the Loop 1 measurement for regression comparison: a one-off manual DevTools read that can't be reproduced is a worse outcome than a permanent devDependency.
 
-The harness is a real spec file, `scripts/mask-perf.spec.ts`, not a scratch page — `page.tracing.start()` around a scripted pointer-move sequence, then paint-rect area read out of the trace. That is the automatable form of "composited vs repainted," and Loop 8 item 10 calls the same script rather than re-deriving it.
+The harness is a real spec file, `scripts/mask-perf.spec.ts`, not a scratch page. One API correction from the plan as written: `page.tracing` is `context.tracing` in Playwright, and it produces a trace-viewer archive — snapshots and screenshots, no paint rects. Paint geometry only comes out of the DevTools protocol, so the harness opens a **CDP session** and traces `disabled-by-default-devtools.timeline` instead. Same intent, different door — and it is why the paint column and the CPU-throttle rows exist for Chromium only. Loop 8 item 10 calls the same script rather than re-deriving it.
 
 Installed 2026-08-20: `playwright` + `@playwright/test` **1.62.1**, with the chromium, firefox and webkit binaries pulled locally.
 
