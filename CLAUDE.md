@@ -55,3 +55,26 @@
   no full-bleed raster imagery, no `background-blend-mode`, no live filters.
 - `Emulation.setCPUThrottlingRate` barely moves this workload (~4% at 4x) because it
   is raster-bound, not JS-bound. Stress it with viewport area instead.
+- A lerp snap threshold too tight relative to the value range keeps the rAF loop
+  spinning on imperceptible deltas. The radius snap at 0.5px on a 0–280px range
+  produced ~10 extra frames of writes on an invisible circle, preventing the loop
+  from going idle. Raised to 2px (the feather's solid core at r=2 is 1.24px —
+  invisible). Also snap position when radius reaches 0 — no point lerping an
+  invisible center point.
+
+## Build log
+
+- **Loop 0** — `docs/xray-plan.md` written. Palette: Clean Room / Safelight.
+  Signature: Grad-CAM annotation, not the aperture.
+- **Loop 1** — Path B (SVG `<mask>`). Paint budget established. `playwright` 1.62.1
+  installed as permanent devDependency. Harness: `scripts/mask-perf.spec.ts`.
+- **Loop 2** — `71a0a22`. Registration template-guaranteed. Two bugs fixed (auto-height
+  row, scrollHeight measurement). CLS 0.0031 deferred to Loop 5.
+- **Loop 3** — `946b99d`. Lens functional: rAF loop, POS_LERP=0.18 / RAD_LERP=0.12,
+  dirty check with EPS=0.05px, half-pixel quantisation, `pointerrawupdate` preferred.
+  One bug found and fixed at close-out: radius snap threshold 0.5px too tight, loop
+  never went idle (delta=9–12 writes). Raised to 2px + position snap on close.
+  All 8 acceptance tests pass. `CustomCursor.vue` deleted (confirmed no orphaned CSS).
+  BootSequence bypass is dev-only (`import.meta.env.DEV`). Measured: 60fps @1×, 60fps
+  @4×, 57.2fps @2560×1440. Lens closes in 299ms. 0 idle writes. Deferred: Loop 3
+  seam screenshots in `docs/shots/loop3/` — visual review by human before Loop 5.
