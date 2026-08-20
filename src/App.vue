@@ -1,6 +1,5 @@
 <template>
   <BootSequence />
-  <CustomCursor />
   <ScrollIsland />
   <main>
     <RouterView />
@@ -12,7 +11,6 @@ import { watch } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
 import ScrollIsland from './components/layout/ScrollIsland.vue';
 import BootSequence from './components/layout/BootSequence.vue';
-import CustomCursor from './components/ui/CustomCursor.vue';
 import { useLenis } from './composables/useLenis';
 
 /* Initialise smooth scrolling — every component can inject the instance. */

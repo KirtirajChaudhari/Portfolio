@@ -51,22 +51,204 @@
       </div>
     </div>
 
-    <!-- Loop 3 mounts the cursor ring here. Empty and inert until then. -->
-    <div class="hero__lens-ui" aria-hidden="true"></div>
+    <div class="hero__lens-ui" aria-hidden="true">
+      <!-- The ring sits at the TRUE pointer position while the reveal below it
+           lerps behind. That lag is the whole feel: a lens being dragged, not a
+           CSS variable being assigned. -->
+      <div ref="ringRef" class="hero__ring"></div>
+    </div>
+
+    <!-- Path B from docs/xray-plan.md section 9. The circle's radial fill IS
+         the 3-stop feather; only cx/cy/r change per frame. -->
+    <svg class="hero__defs" aria-hidden="true" focusable="false">
+      <defs>
+        <radialGradient id="xray-feather">
+          <stop offset="0" stop-color="#fff" stop-opacity="1" />
+          <stop offset="0.62" stop-color="#fff" stop-opacity="1" />
+          <stop offset="0.82" stop-color="#fff" stop-opacity="0.4" />
+          <stop offset="1" stop-color="#fff" stop-opacity="0" />
+        </radialGradient>
+        <mask id="xray-lens" maskUnits="userSpaceOnUse">
+          <circle ref="circleRef" cx="-9999" cy="-9999" r="0" fill="url(#xray-feather)" />
+        </mask>
+      </defs>
+    </svg>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { RouterLink } from 'vue-router';
 import { heroPro, heroArt, heroTags } from '../../content/xray';
 
 const heroRef = ref<HTMLElement | null>(null);
+const circleRef = ref<SVGCircleElement | null>(null);
+const ringRef = ref<HTMLElement | null>(null);
 
 const layers = [
   { variant: 'pro' as const, copy: heroPro },
   { variant: 'art' as const, copy: heroArt },
 ];
+
+/* Tuning. POS_LERP is the reveal's lag behind the ring; RAD_LERP is slower so
+   the lens opens and closes with a little mass. Recorded in the plan doc. */
+const POS_LERP = 0.18;
+const RAD_LERP = 0.12;
+const EPS = 0.05;
+
+/* Pointer handlers write tx/ty (and tr, on enter/leave). Nothing else.
+   The rAF loop is the only code that touches the DOM. */
+const s = { px: 0, py: 0, tx: 0, ty: 0, r: 0, tr: 0 };
+
+/* Last-written values. -Infinity, NOT NaN: every comparison against NaN is
+   false, so a NaN sentinel silently disables the dirty check forever and the
+   loop spins without ever writing. -Infinity makes the first frame dirty. */
+let wx = -Infinity, wy = -Infinity, wr = -Infinity, wtx = -Infinity, wty = -Infinity;
+let ringOn = false;
+let raf = 0;
+let heroLeft = 0, heroTop = 0, restR = 0;
+let detach: (() => void) | null = null;
+
+/* Half-pixel quantisation: sub-pixel movement on a mask edge shimmers. */
+const q = (n: number) => Math.round(n * 2) / 2;
+
+/* No scroll listener. The hero's document-space origin is cached; the live
+   scroll offset is read per event, which is cheap and never goes stale. */
+function cacheViewport() {
+  const el = heroRef.value;
+  if (!el) return;
+  const rect = el.getBoundingClientRect();
+  heroLeft = rect.left + window.scrollX;
+  heroTop = rect.top + window.scrollY;
+  restR = Math.min(Math.max(160, 0.18 * Math.min(window.innerWidth, window.innerHeight)), 280);
+  if (s.tr > 0) s.tr = restR;
+}
+
+function frame() {
+  s.px += (s.tx - s.px) * POS_LERP;
+  s.py += (s.ty - s.py) * POS_LERP;
+  s.r += (s.tr - s.r) * RAD_LERP;
+  /* Snap the tail so the loop can actually reach a settled state. A 2px
+     threshold is invisible (the feather's solid core at r=2 is 1.24px) and
+     avoids ~10 extra frames of lerping an imperceptible circle. */
+  if (Math.abs(s.tr - s.r) < 2) s.r = s.tr;
+  /* When fully closed, snap position too — no point lerping an invisible
+     center, and the writes keep the loop from going idle. */
+  if (s.r === 0 && s.tr === 0) { s.px = s.tx; s.py = s.ty; }
+
+  let dirty = false;
+
+  if (Math.abs(s.px - wx) > EPS || Math.abs(s.py - wy) > EPS || Math.abs(s.r - wr) > EPS) {
+    const c = circleRef.value;
+    if (c) {
+      c.setAttribute('cx', String(q(s.px)));
+      c.setAttribute('cy', String(q(s.py)));
+      c.setAttribute('r', String(q(s.r)));
+    }
+    wx = s.px; wy = s.py; wr = s.r;
+    dirty = true;
+  }
+
+  if (Math.abs(s.tx - wtx) > EPS || Math.abs(s.ty - wty) > EPS) {
+    const ring = ringRef.value;
+    if (ring) ring.style.transform = 'translate3d(' + q(s.tx) + 'px,' + q(s.ty) + 'px,0)';
+    wtx = s.tx; wty = s.ty;
+    dirty = true;
+  }
+
+  const showRing = s.tr > 0;
+  if (showRing !== ringOn) {
+    if (ringRef.value) ringRef.value.style.opacity = showRing ? '1' : '0';
+    ringOn = showRing;
+    dirty = true;
+  }
+
+  /* Idle: nothing moved and the radius reached its target, so stop scheduling.
+     A pointer event kicks it back. */
+  raf = !dirty && s.r === s.tr ? 0 : requestAnimationFrame(frame);
+}
+
+function kick() {
+  if (!raf) raf = requestAnimationFrame(frame);
+}
+
+function setTarget(e: PointerEvent) {
+  s.tx = e.clientX + window.scrollX - heroLeft;
+  s.ty = e.clientY + window.scrollY - heroTop;
+}
+
+/* Opening is driven by enter AND move, not enter alone: if the page loads with
+   the cursor already inside a full-viewport hero, the pointer never crosses the
+   boundary and `pointerenter` never fires — the lens would stay shut until the
+   user left and came back. Idempotent, so a move costs nothing once open. */
+function activate() {
+  if (s.tr === restR) return;
+  /* Open where the cursor already is rather than sliding in from the origin. */
+  s.px = s.tx;
+  s.py = s.ty;
+  s.tr = restR;
+}
+
+function onEnter(e: PointerEvent) {
+  setTarget(e);
+  activate();
+  kick();
+}
+
+function onMove(e: PointerEvent) {
+  setTarget(e);
+  activate();
+  kick();
+}
+
+function onLeave() {
+  s.tr = 0;
+  kick();
+}
+
+onMounted(() => {
+  const el = heroRef.value;
+  if (!el) return;
+
+  /* Coarse pointers and reduced-motion get a complete, lens-free professional
+     layer. Loop 6 makes those first-class states with a real toggle; this is
+     only the guard that stops them getting a broken half-lens meanwhile. */
+  const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!fine || reduced) return;
+
+  cacheViewport();
+  el.dataset.lensMode = 'lens';
+
+  /* pointerrawupdate delivers moves at input rate rather than frame rate, so
+     tx/ty are fresher; the rAF loop still gates every DOM write. */
+  const moveEvent = 'onpointerrawupdate' in window ? 'pointerrawupdate' : 'pointermove';
+
+  el.addEventListener('pointerenter', onEnter as EventListener);
+  el.addEventListener('pointerleave', onLeave);
+  el.addEventListener(moveEvent, onMove as EventListener, { passive: true });
+
+  let t = 0;
+  const onResize = () => {
+    window.clearTimeout(t);
+    t = window.setTimeout(cacheViewport, 150);
+  };
+  window.addEventListener('resize', onResize, { passive: true });
+
+  detach = () => {
+    window.clearTimeout(t);
+    window.removeEventListener('resize', onResize);
+    el.removeEventListener('pointerenter', onEnter as EventListener);
+    el.removeEventListener('pointerleave', onLeave);
+    el.removeEventListener(moveEvent, onMove as EventListener);
+  };
+});
+
+onBeforeUnmount(() => {
+  if (raf) cancelAnimationFrame(raf);
+  raf = 0;
+  detach?.();
+});
 </script>
 
 <style scoped>
@@ -142,20 +324,53 @@ const layers = [
   color: var(--cr-ink);
 }
 
-/* Loop 2 ships this unmasked at .35 so misregistration is visible to the naked
-   eye. Loop 3 replaces the opacity with the SVG mask chosen in §9. */
+/* No lens (coarse pointer, reduced motion, no JS) means the artistic layer is
+   simply not there and the professional layer is complete on its own. */
 .hero__layer--art {
   z-index: 1;
   background: var(--sl-ground);
   color: var(--sl-print);
-  opacity: 0.35;
+  opacity: 0;
 }
+
+.hero[data-lens-mode='lens'] .hero__layer--art {
+  opacity: 1;
+  -webkit-mask-image: url(#xray-lens);
+  mask: url(#xray-lens);
+}
+
+/* The native cursor is hidden only inside the hero, and only while the lens is
+   actually running — never `html *`, which is what the deleted global cursor
+   did. Anything clickable keeps a pointer so you can still see what is. */
+.hero[data-lens-mode='lens'] { cursor: none; }
+.hero[data-lens-mode='lens'] :is(a, button, [role='button']) { cursor: pointer; }
+
+.hero__defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 
 .hero__lens-ui {
   position: absolute;
   inset: 0;
   z-index: 2;
   pointer-events: none;
+}
+
+/* Negative margin centres the ring on the point, so the rAF loop writes raw
+   coordinates and the transform stays a pure translate. */
+.hero__ring {
+  --ring: 34px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--ring);
+  height: var(--ring);
+  margin: calc(var(--ring) / -2);
+  border: 1.5px solid #fff;
+  border-radius: 50%;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms var(--ease-out);
+  will-change: transform;
 }
 
 /* ── The stack. Identical in both layers, by construction. ────────── */

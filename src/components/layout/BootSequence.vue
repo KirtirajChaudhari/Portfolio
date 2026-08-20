@@ -35,10 +35,19 @@ const counterRef = ref<HTMLElement | null>(null);
 const progress = ref(0);
 const padded = computed(() => String(Math.round(progress.value)).padStart(3, '0'));
 
-/* Reduced motion never mounts the overlay — nothing to skip past. */
+/* Reduced motion never mounts the overlay — nothing to skip past.
+   Dev-only bypass (`?noboot=1`, or localStorage `xray:noboot`) so the hero can be
+   photographed instead of the boot counter. Production is untouched; whether this
+   curtain should sit in front of the hero at all is Loop 7's decision. */
+const skipBoot =
+  import.meta.env.DEV &&
+  typeof window !== 'undefined' &&
+  (new URLSearchParams(location.search).has('noboot') ||
+    localStorage.getItem('xray:noboot') === '1');
+
 const mounted = ref(
   typeof window === 'undefined' ||
-  !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && !skipBoot),
 );
 
 const getLenis = useLenisInstance();

@@ -35,7 +35,23 @@
 
 ## Working style
 - Plan in a scratch file before editing source. Show me the plan, then implement.
-- After each loop, take screenshots and critique your own output before reporting
-  completion. No screenshot tooling is installed — see `docs/xray-plan.md` §2.
+- After each loop, take screenshots (Playwright) and critique your own output before
+  reporting completion.
 - If an acceptance criterion cannot be met, STOP and report the blocker. Do not
   silently substitute an easier implementation.
+
+## Learned constraints (append as discovered — do not delete once added)
+- A grid slot with auto-sized content (a tags row, a badge, a pill) sitting inside a
+  centered stack (`align-content: center` / `justify-content: center`) redistributes
+  its own height delta onto every sibling slot, including ones above it. Any claim of
+  "identical registration" that includes an auto-height row needs a fixed height or
+  padding-based alignment, not centering. This WILL recur in Loop 7's paired panels
+  and grid tiles — check it there before it becomes a repeat bug.
+- `scrollHeight` on a stretched grid/flex item measures the BOX, not the text. To
+  measure real text extent, use a `Range` over the element's contents. A fixed slot
+  fails in two directions: assert overflow AND under-fill.
+- Masks repaint their layer every frame in every engine (Loop 1: 56 paint events
+  unmasked vs ~900 masked). The masked layer's paint cost is therefore a hard budget:
+  no full-bleed raster imagery, no `background-blend-mode`, no live filters.
+- `Emulation.setCPUThrottlingRate` barely moves this workload (~4% at 4x) because it
+  is raster-bound, not JS-bound. Stress it with viewport area instead.
