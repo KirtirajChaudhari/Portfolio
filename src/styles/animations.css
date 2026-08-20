@@ -1,0 +1,102 @@
+/* ============================================================
+   ANIMATIONS & SCROLL-DRIVEN EFFECTS
+
+   DESIGN-apple documents default and pressed states only, and no
+   decorative motion at all. What survives here is the entrance reveal
+   (content arriving, not content performing) and two functional cues.
+   ============================================================ */
+
+/* --- Reveal (shared: opacity + 24px rise, 700ms) --- */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity var(--dur-reveal) var(--ease-out),
+              transform var(--dur-reveal) var(--ease-out);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger children */
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity var(--dur-reveal) var(--ease-out),
+              transform var(--dur-reveal) var(--ease-out);
+}
+.reveal-stagger.is-visible > *:nth-child(1) { transition-delay: 0ms; opacity: 1; transform: translateY(0); }
+.reveal-stagger.is-visible > *:nth-child(2) { transition-delay: 60ms; opacity: 1; transform: translateY(0); }
+.reveal-stagger.is-visible > *:nth-child(3) { transition-delay: 120ms; opacity: 1; transform: translateY(0); }
+.reveal-stagger.is-visible > *:nth-child(4) { transition-delay: 180ms; opacity: 1; transform: translateY(0); }
+.reveal-stagger.is-visible > *:nth-child(5) { transition-delay: 240ms; opacity: 1; transform: translateY(0); }
+.reveal-stagger.is-visible > *:nth-child(6) { transition-delay: 300ms; opacity: 1; transform: translateY(0); }
+.reveal-stagger.is-visible > *:nth-child(7) { transition-delay: 360ms; opacity: 1; transform: translateY(0); }
+.reveal-stagger.is-visible > *:nth-child(8) { transition-delay: 420ms; opacity: 1; transform: translateY(0); }
+.reveal-stagger.is-visible > *:nth-child(9) { transition-delay: 480ms; opacity: 1; transform: translateY(0); }
+
+/* --- Blur reveal (word-by-word) --- */
+.blur-word {
+  display: inline-block;
+  filter: blur(8px);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: filter 0.6s var(--ease-out),
+              opacity 0.6s var(--ease-out),
+              transform 0.6s var(--ease-out);
+}
+.blur-word.is-visible {
+  filter: blur(0);
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- Availability indicator ---
+   Functional status, not decoration: it says "reachable right now". */
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  position: relative;
+  flex-shrink: 0;
+}
+.pulse-dot::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  animation: pulse-ring 2.4s ease-out infinite;
+}
+@keyframes pulse-ring {
+  0% { transform: scale(0.4); opacity: 0.7; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* --- Scroll hint drift --- */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* --- GSAP initial state ---
+   Elements driven by GSAP timelines start invisible; GSAP sets them
+   visible when their animation begins. Keeps content from flashing
+   before the timeline fires. */
+.gsap-reveal {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* --- Reduced motion --- */
+@media (prefers-reduced-motion: reduce) {
+  .reveal { transition: opacity 0.3s ease; transform: none; }
+  .reveal-stagger > * { transition: opacity 0.3s ease; transform: none; }
+  .blur-word { filter: none; transition: opacity 0.3s ease; transform: none; }
+  .pulse-dot::after { animation: none; }
+  .float { animation: none; }
+}

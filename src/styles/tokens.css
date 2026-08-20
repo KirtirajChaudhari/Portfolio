@@ -1,0 +1,244 @@
+/* ============================================================
+   DESIGN TOKENS
+   Chapter One  → DESIGN-apple.md   (museum-gallery product tiles)
+   Chapter Two  → DESIGN-starbucks.md (warm-neutral pinboard)
+
+   Both chapters declare the SAME token names, so every component
+   flips ground by inheriting rather than by branching.
+   ============================================================ */
+
+/* --- Chapter One: The Engineer --------------------------------
+   Apple's system, verbatim where the doc names a value. Light is the
+   default canvas; dark is a tile mode (see .tile--dark below), not a
+   theme. There is exactly one accent and exactly one drop-shadow. */
+:root {
+  /* Surface — DESIGN-apple "Surface" */
+  --bg: #ffffff;                    /* canvas */
+  --bg-parchment: #f5f5f7;          /* canvas-parchment, the signature off-white */
+  --surface: rgba(255, 255, 255, 0.72);
+  --surface-solid: #ffffff;
+  --surface-2: #f5f5f7;
+  --surface-pearl: #fafafc;         /* ghost-button fill, lighter than parchment */
+
+  /* Hairlines. Apple has no card borders heavier than these. */
+  --border: rgba(0, 0, 0, 0.08);
+  --border-hair: #e0e0e0;
+  --border-accent: rgba(0, 102, 204, 0.35);
+
+  /* Text — one near-black for everything, hierarchy comes from size and
+     weight rather than from grey. Both greys clear AA on white. */
+  --text: #1d1d1f;                  /* ink */
+  --text-muted: #333333;            /* ink-muted-80 */
+  --text-faint: #7a7a7a;            /* ink-muted-48 — captions, fine print */
+
+  /* The ONE accent. Action Blue carries every interactive element. */
+  --accent: #0066cc;
+  --accent-deep: #0071e3;           /* focus blue; doubles as the hover tone */
+  --accent-focus: #0071e3;
+  --accent-glass: rgba(0, 102, 204, 0.08);
+  --accent-glow: rgba(0, 102, 204, 0.18);
+
+  /* Surface-relative card vocabulary. A tile mode redefines these, so a
+     card never has to know which ground it landed on. */
+  --wash: rgba(0, 0, 0, 0.022);     /* subtle card fill */
+  --wash-hover: rgba(0, 0, 0, 0.04);
+  --rim: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+  /* DESIGN-apple: elevation is surface change, never a card shadow. */
+  --elev: 0 0 #0000;
+  --elev-hover: 0 0 #0000;
+  /* The single drop-shadow in the entire system. Product imagery only. */
+  --product-shadow: 3px 5px 30px 0 rgba(0, 0, 0, 0.22);
+
+  /* Floating chrome — nav island, scrims. Frosted parchment over content;
+     backdrop-blur is the only "floating" treatment Apple documents. */
+  --chrome: rgba(245, 245, 247, 0.8);
+  --chrome-soft: rgba(245, 245, 247, 0.72);
+  --chrome-core: #f5f5f7;
+  --chrome-inset: rgba(255, 255, 255, 0.28);
+  --scrim: rgba(0, 0, 0, 0.42);
+  --track: rgba(0, 0, 0, 0.12);
+  --hover-wash: rgba(0, 0, 0, 0.045);
+  --caption-color: #ffffff;
+  --shadow-float: 0 4px 24px rgba(0, 0, 0, 0.1);
+  --shadow-lift: 0 8px 36px rgba(0, 0, 0, 0.14);
+  --shadow-card: 0 0 #0000;
+  --caption-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
+
+  /* Typography — SF Pro resolves natively on Apple platforms; Inter is the
+     documented open substitute everywhere else. */
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
+  --font-hand: 'Caveat', cursive;
+  --font-mono: ui-monospace, 'SFMono-Regular', 'Cascadia Code', Menlo, Consolas, monospace;
+
+  /* Spacing — DESIGN-apple's 8px base with its named steps. */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 17px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --sp-8: 64px;
+  --sp-9: 80px;
+  --sp-10: 120px;
+  --sp-section: 80px;               /* {spacing.section} — one tile's air */
+
+  /* Radius — the documented ladder, nothing in between. */
+  --r-xs: 5px;
+  --r-sm: 8px;
+  --r-md: 11px;
+  --r-lg: 18px;
+  --r-xl: 18px;                     /* aliased onto lg; Apple has no 24px */
+  --r-pill: 9999px;
+
+  /* Layout */
+  --maxw: 1040px;
+  --maxw-text: 980px;               /* text-heavy sections */
+  /* Apple locks content at 1440 and lets margins absorb the rest; at exactly
+     1440 that leaves the grid flush to the glass, so the track stops short. */
+  --maxw-grid: 1360px;              /* product / utility grids */
+  --maxw-prose: 68ch;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --dur-fast: 160ms;
+  --dur-ui: 240ms;
+  --dur-reveal: 700ms;
+  --dur-scene: 900ms;
+
+  /* Hero */
+  --hero-gradient: radial-gradient(
+    ellipse 80% 60% at 50% 40%,
+    rgba(0, 102, 204, 0.04) 0%,
+    transparent 70%
+  );
+
+  /* Cursor */
+  --cursor-size: 36px;
+  --cursor-dot: 6px;
+  --cursor-color: var(--accent);
+
+  /* Z-scale */
+  --z-bg: 0;
+  --z-content: 1;
+  --z-card: 10;
+  --z-nav: 40;
+  --z-transition: 50;
+  --z-modal: 60;
+  --z-boot: 70;
+}
+
+/* --- Tile modes ------------------------------------------------
+   Apple stacks edge-to-edge tiles and lets the colour change BE the
+   divider. A dark tile re-declares the surface tokens, so children
+   invert without a single component knowing about it. */
+/* Cards go white on parchment; --surface-2 stays parchment so a nested area
+   inside a white card still reads as a separate surface. */
+.tile--parchment {
+  --bg: #f5f5f7;
+  --surface-solid: #ffffff;
+  --wash: rgba(0, 0, 0, 0.03);
+  --chrome-core: #ffffff;
+}
+
+.tile--dark,
+.tile--dark-2,
+.tile--dark-3 {
+  --bg: #272729;                    /* surface-tile-1 */
+  --surface-solid: #2a2a2c;
+  --surface-2: #252527;
+  --surface-pearl: #2f2f31;
+
+  --border: rgba(255, 255, 255, 0.12);
+  --border-hair: rgba(255, 255, 255, 0.16);
+  --border-accent: rgba(41, 151, 255, 0.4);
+
+  --text: #ffffff;                  /* body-on-dark */
+  --text-muted: #cccccc;            /* body-muted */
+  --text-faint: #8e8e93;
+
+  /* Sky Link Blue — Action Blue disappears against a near-black tile. */
+  --accent: #2997ff;
+  --accent-deep: #57adff;
+  --accent-focus: #57adff;
+  --accent-glass: rgba(41, 151, 255, 0.12);
+  --accent-glow: rgba(41, 151, 255, 0.22);
+
+  --wash: rgba(255, 255, 255, 0.05);
+  --wash-hover: rgba(255, 255, 255, 0.08);
+  --rim: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  --hover-wash: rgba(255, 255, 255, 0.06);
+  --track: rgba(255, 255, 255, 0.16);
+  --product-shadow: 3px 5px 30px 0 rgba(0, 0, 0, 0.45);
+}
+
+/* Micro-steps, so two dark tiles in a row still separate. */
+.tile--dark-2 { --bg: #2a2a2c; --surface-solid: #2f2f31; }
+.tile--dark-3 { --bg: #252527; --surface-solid: #2a2a2c; }
+
+/* --- Chapter Two: The Creator (paper-white, crayon kit) ---
+   Surfaces follow DESIGN-starbucks' warm-neutral ladder (Neutral Warm canvas,
+   Ceramic separator, white cards) with its 87%/58% black text — warmer than a
+   true black. Hairlines follow DESIGN-apple's 8% soft border. Solid colour
+   blocks throughout; Starbucks documents no structural gradients. */
+[data-chapter="two"] {
+  --bg: #f2f0eb;
+  --surface: rgba(255, 255, 255, 0.85);
+  --surface-solid: #ffffff;
+  --surface-2: #edebe9;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-accent: rgba(180, 98, 47, 0.28);
+
+  --text: rgba(0, 0, 0, 0.87);
+  --text-muted: rgba(0, 0, 0, 0.58);
+  --text-faint: rgba(0, 0, 0, 0.38);
+
+  /* Terracotta ink — the one accent, matching the switch's creator side. */
+  --accent: #b4622f;
+  --accent-deep: #8f4c23;
+  --accent-glass: rgba(180, 98, 47, 0.1);
+  --accent-glow: rgba(180, 98, 47, 0.18);
+
+  --gradient-start: #b4622f;
+  --gradient-mid: #c8823f;
+  --gradient-end: #8f4c23;
+
+  --chrome: rgba(255, 255, 255, 0.9);
+  --chrome-soft: rgba(255, 255, 255, 0.8);
+  --chrome-core: #ffffff;
+  --chrome-inset: rgba(255, 255, 255, 0.35);
+  --scrim: rgba(40, 32, 26, 0.32);
+  --track: rgba(0, 0, 0, 0.1);
+  --hover-wash: rgba(0, 0, 0, 0.04);
+  --caption-color: #ffffff;
+  --shadow-float: 0 10px 34px rgba(60, 50, 40, 0.14);
+  --shadow-lift: 0 20px 56px rgba(60, 50, 40, 0.2);
+  --shadow-card: 0 10px 28px rgba(60, 50, 40, 0.16);
+  /* Captions sit over photography in both chapters, so they stay light-on-dark. */
+  --caption-shadow: 0 2px 12px rgba(0, 0, 0, 0.85);
+
+  /* Chapter Two keeps the condensed/serif voice and its own radii — Apple's
+     type stack and radius ladder are Chapter One's language, not this one's. */
+  --font-display: 'Antonio', system-ui, sans-serif;
+  --font-body: 'Spectral', 'Georgia', serif;
+  --r-sm: 6px;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --r-xl: 24px;
+
+  /* Pinboard shadows. One light source, top-left — objects on the board take
+     their depth from these three and nothing else. */
+  --pin-shadow-flat: 2px 3px 5px -2px oklch(0.42 0.02 285 / 0.24);
+  --pin-shadow-rest: 5px 8px 16px -5px oklch(0.42 0.02 285 / 0.3);
+  --pin-shadow-lift: 11px 19px 34px -9px oklch(0.42 0.02 285 / 0.34);
+
+  /* Crayon palette — multiple hues at small scale */
+  --crayon-pink: #e8788a;
+  --crayon-violet: #9b6dcc;
+  --crayon-blue: #6ba3d6;
+  --crayon-peach: #e8a87c;
+  --crayon-sun: #e8d06a;
+  --crayon-leaf: #6bc98a;
+}

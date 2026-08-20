@@ -1,0 +1,24 @@
+npx shadcn@latest add https://registry.watermelon.sh/r/expandable-profile-card.json :- for projects section
+npx shadcn@latest add https://registry.watermelon.sh/r/career-3.json :- for education
+npx shadcn@latest add https://registry.watermelon.sh/r/career-2.json :- for experience
+
+npx shadcn@latest add https://registry.watermelon.sh/r/split-button.json :- currently missellinious
+npx shadcn@latest add https://registry.watermelon.sh/r/switch-mode.json :- for switching back to professional from creator
+
+npx shadcn@latest add https://registry.watermelon.sh/r/radial-carousel.json :- for photos section in creator 
+
+npx shadcn@latest add https://registry.watermelon.sh/r/edit-profile.json :- similar design for contact me
+
+npx shadcn@latest add https://registry.watermelon.sh/r/scroll-island.json :- for nav bar
+pnpm dlx shadcn@latest add https://registry.watermelon.sh/r/button-21.json :- connect
+
+npx shadcn@latest add hero-42 :- for professional hero 
+
+npx shadcn@latest add https://registry.watermelon.sh/r/integrations-1.json :- skills section redesign
+
+npx shadcn@latest add landing-01 :- for basic architecture. use the pictures stacked architecture for projects section
+
+
+
+full read case study pages for respective projects not working.
+

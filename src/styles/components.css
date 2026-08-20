@@ -1,0 +1,323 @@
+/* ============================================================
+   COMPONENT STYLES
+   Chapter One follows DESIGN-apple. Chapter Two overrides live at the
+   bottom of this file and in the pinboard block.
+   ============================================================ */
+
+/* --- Container ---
+   Text-heavy sections lock near 980px; product and utility grids get the
+   wider 1440px track. Gutters 20–24px. */
+.container {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 var(--sp-5);
+}
+.container--text { max-width: var(--maxw-text); }
+.container--grid { max-width: var(--maxw-grid); }
+@media (max-width: 640px) { .container { padding: 0 var(--sp-4); } }
+
+/* --- Tile ---
+   Apple stacks edge-to-edge tiles with zero gap and lets the surface change
+   act as the divider. No borders, no rounding, no shadows between sections.
+   Colour comes from --bg, which the .tile--* modifiers in tokens.css swap. */
+.section {
+  position: relative;
+  padding: var(--sp-section) 0;
+  background: var(--bg);
+  color: var(--text);
+  /* Reveal transforms translate panels sideways; clip so they can't hand the
+     page a horizontal scrollbar mid-animation. `clip` (not `hidden`) keeps
+     position:sticky working. */
+  overflow-x: clip;
+}
+/* Legacy alias — .section--alt used to mean "the other surface". */
+.section--alt { background: var(--bg); }
+
+@media (max-width: 734px) { .section { padding: var(--sp-7) 0; } }
+
+/* --- Utility card (store-utility-card) ---
+   White, one hairline, 18px radius, 24px padding. No shadow: elevation in
+   this system is surface change, never a drop under a card. */
+.glass-card {
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5);
+  box-shadow: var(--elev);
+  transition: border-color var(--dur-ui) var(--ease-out),
+              background var(--dur-ui) var(--ease-out);
+}
+.glass-card:hover { border-color: var(--border-hair); }
+.glass-card--accent { border-color: var(--border-accent); }
+
+/* --- Buttons ---
+   Two grammars only: the blue pill that means "action", and the compact
+   8px utility rect. Press state is scale(0.95) everywhere — the one
+   system-wide micro-interaction. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.24;
+  letter-spacing: -0.022em;
+  text-transform: none;
+  padding: 11px 22px;
+  border-radius: var(--r-pill);
+  min-height: 44px;                 /* touch target */
+  transition: transform var(--dur-fast) var(--ease-out),
+              background var(--dur-ui),
+              color var(--dur-ui),
+              border-color var(--dur-ui);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.btn:active { transform: scale(0.95); }
+.btn:focus-visible { outline: 2px solid var(--accent-focus); outline-offset: 2px; }
+
+.btn--primary {
+  background: var(--accent);
+  color: #ffffff;
+  border: 1px solid var(--accent);
+}
+.btn--primary:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
+
+/* The ghost pill — second CTA when two sit together. */
+.btn--ghost {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+.btn--ghost:hover { background: var(--accent-glass); }
+
+/* Compact utility rect — nav actions, not page CTAs. */
+.btn--dark {
+  background: var(--text);
+  color: var(--bg);
+  border: 1px solid var(--text);
+  border-radius: var(--r-sm);
+  font-size: 14px;
+  letter-spacing: -0.016em;
+  padding: 8px 15px;
+  min-height: 0;
+}
+.btn--dark:hover { opacity: 0.85; }
+
+/* --- Eyebrow ---
+   Apple has no mono-caps label rule; the nearest documented thing is a
+   small emphasized caption in the accent. */
+.eyebrow-label {
+  display: inline-block;
+  margin-bottom: var(--sp-3);
+  color: var(--accent);
+}
+
+/* --- Section head --- */
+.section-head {
+  max-width: var(--maxw-prose);
+  margin-bottom: var(--sp-7);
+}
+.section-head h2 { margin-bottom: var(--sp-3); }
+.section-head p {
+  color: var(--text-muted);
+  font-size: 17px;
+  line-height: 1.47;
+  max-width: var(--maxw-prose);
+}
+
+/* --- Option chip (configurator-option-chip) --- */
+.skill-tag {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.29;
+  letter-spacing: -0.016em;
+  color: var(--text-muted);
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 6px 14px;
+  transition: border-color var(--dur-ui), color var(--dur-ui);
+  white-space: nowrap;
+}
+.skill-tag:hover { border-color: var(--accent); color: var(--accent); }
+
+/* --- Metric chip — sits over photography, so it keeps its own contrast. --- */
+.metric-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: var(--r-pill);
+  padding: 4px 12px;
+  white-space: nowrap;
+}
+
+/* --- Circular icon control (button-icon-circular) --- */
+.social-row {
+  display: flex;
+  gap: var(--sp-3);
+}
+.social-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  background: var(--wash);
+  transition: background var(--dur-ui), color var(--dur-ui), transform var(--dur-fast) var(--ease-out);
+}
+.social-icon:hover { background: var(--wash-hover); color: var(--accent); }
+.social-icon:active { transform: scale(0.95); }
+.social-icon svg { width: 18px; height: 18px; }
+
+/* --- Stat --- */
+.stat-card {
+  text-align: center;
+  padding: var(--sp-5) var(--sp-4);
+}
+.stat-card__value {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3.4vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  line-height: 1.1;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
+.stat-card__label {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.43;
+  letter-spacing: -0.016em;
+  color: var(--text-faint);
+  margin-top: var(--sp-2);
+}
+
+/* --- Product shadow ---
+   The only true shadow in the system. Product renders resting on a surface
+   get it; cards, buttons and text never do. */
+.product-shot {
+  box-shadow: var(--product-shadow);
+}
+
+/* ============================================================
+   PINBOARD — shared vocabulary for Chapter Two.
+   Two rules hold the illusion together:
+     1. The light source is top-left. Depth comes from the --pin-shadow-*
+        tokens and nowhere else.
+     2. Entrance motion animates the WRAPPER; the resting tilt and hover
+        lift live on the inner .pinned, so the two never fight.
+   ============================================================ */
+.pinned {
+  --tilt: 0deg;
+  position: relative;
+  /* Keeps the tape's mix-blend-mode: multiply blending against this card
+     only, rather than whatever else shares the stacking context. */
+  isolation: isolate;
+  transform: rotate(var(--tilt));
+  box-shadow: var(--pin-shadow-rest);
+  transition: transform var(--dur-ui) var(--ease-out),
+              box-shadow var(--dur-ui) var(--ease-out);
+}
+@media (hover: hover) {
+  .pinned:hover {
+    transform: rotate(0deg) translateY(-4px);
+    box-shadow: var(--pin-shadow-lift);
+    z-index: 5;
+  }
+}
+
+.tape {
+  position: absolute;
+  z-index: 2;
+  width: 5.25rem;
+  height: 1.6rem;
+  background: color-mix(in oklab, var(--tape-hue, var(--crayon-sun)) 62%, transparent);
+  background-image: linear-gradient(
+    100deg,
+    oklch(1 0 0 / 0.32) 0%,
+    transparent 26%,
+    transparent 74%,
+    oklch(0.4 0.02 285 / 0.1) 100%
+  );
+  mix-blend-mode: multiply;
+  box-shadow: var(--pin-shadow-flat);
+  pointer-events: none;
+  /* Torn ends, cut on both sides. */
+  clip-path: polygon(
+    3% 0%, 97% 4%, 100% 22%, 97% 48%, 100% 74%, 96% 100%,
+    4% 96%, 0% 72%, 3% 50%, 0% 26%
+  );
+}
+
+.pin {
+  position: absolute;
+  z-index: 3;
+  width: 1.05rem;
+  height: 1.05rem;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 32% 28%,
+    oklch(1 0 0 / 0.95) 0%,
+    oklch(1 0 0 / 0.4) 14%,
+    var(--pin-hue, var(--crayon-pink)) 46%,
+    color-mix(in oklab, var(--pin-hue, var(--crayon-pink)) 62%, black) 100%
+  );
+  box-shadow: var(--pin-shadow-flat);
+  pointer-events: none;
+}
+
+/* Objects settle onto the board rather than fading in: they drop, overshoot
+   their angle, then rest. The overshoot curve stands in for GSAP back.out. */
+[data-pinned] {
+  opacity: 0;
+  transform: translateY(34px) rotate(var(--settle-from, -5deg));
+}
+.pinned-group.is-in [data-pinned] {
+  opacity: 1;
+  transform: none;
+  transition: opacity 850ms var(--ease-out),
+              transform 850ms cubic-bezier(0.34, 1.46, 0.64, 1);
+  transition-delay: var(--settle-delay, 0ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-pinned] { opacity: 1; transform: none; }
+  .pinned-group.is-in [data-pinned] { transition: opacity 300ms ease; }
+  .pinned:hover { transform: rotate(var(--tilt)); }
+}
+
+/* --- Chapter Two specifics --- */
+[data-chapter="two"] .section { padding: var(--sp-section) 0; }
+[data-chapter="two"] .glass-card {
+  background: var(--surface-solid);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+[data-chapter="two"] .btn {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 12px 28px;
+  min-height: 0;
+}
+[data-chapter="two"] .btn--primary {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--bg);
+}
+[data-chapter="two"] .skill-tag {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  border-radius: var(--r-sm);
+}
