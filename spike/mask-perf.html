@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mask-perf spike — X-Ray Hero Loop 1</title>
+<!--
+  DISPOSABLE, but kept: Loop 8 item 10 re-runs this against the real build.
+  Subject under test only — the measurement harness is scripts/mask-perf.spec.ts.
+
+  ?mode=none      CONTROL. No mask. Identical layer, identical per-frame writes.
+  ?mode=css       Path A. Animated radial-gradient mask-image, heavy layer.
+  ?mode=lite      Path A with the layer at its real spec weight (no photo, no blend).
+  ?mode=svg       Path B. url(#lens); a <circle> whose cx/cy move. Heavy layer.
+  ?mode=svglite   Path B at real spec weight. THIS IS THE SHIPPING CONFIGURATION.
+
+  The control is what makes the rest legible: 56 paint events without a mask,
+  ~900 with one, in every masked mode. The mask repaints its layer every frame
+  and no available masking technology avoids that — so the variable that
+  actually decides the frame budget is how expensive the layer is to repaint,
+  which is what lite/svglite isolate. Numbers in docs/xray-plan.md §9.
+-->
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; background: #0b0b0e; }
+  body { font-family: system-ui, -apple-system, sans-serif; cursor: crosshair; }
+
+  .layer { position: absolute; inset: 0; }
+
+  /* ── BASE: solid colour + one heading (the "professional" stand-in) ── */
+  .base {
+    background: #F2F4F6;
+    color: #14161A;
+    display: grid;
+    place-items: center;
+  }
+  .base h1 {
+    font-size: clamp(40px, 9vw, 128px);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1;
+  }
+
+  /* ── ART: deliberately heavier than the real artistic layer will ever be.
+     1.8MB PNG scaled to cover + a tiled turbulence noise + a blend mode +
+     3 headings with a text-shadow. If this holds 60fps, the real one will. ── */
+  .art {
+    --x: 50%;
+    --y: 50%;
+    --r: 240px;
+
+    background-color: #140A0C;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-blend-mode: overlay;
+
+    color: #F0E4D9;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 2.5vh;
+    text-align: center;
+  }
+
+  .art__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.5;
+  }
+
+  .art h2 {
+    position: relative;
+    font-size: clamp(28px, 5.5vw, 76px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.75);
+  }
+  .art h2:nth-of-type(2) { color: #E4465A; }
+
+  /* Mode LITE — same CSS mask, but the layer stripped to what docs/xray-plan.md
+     §5 actually specifies: ground + grain + type. No full-bleed photo, no blend
+     mode. Isolates "is the mask expensive" from "is my busy layer expensive". */
+  body[data-mode="lite"] .art,
+  body[data-mode="svglite"] .art {
+    background-blend-mode: normal;
+  }
+  body[data-mode="lite"] .art__img,
+  body[data-mode="svglite"] .art__img { display: none; }
+
+  /* Mode A — animated CSS mask. Both prefixes, per the spec. */
+  body[data-mode="css"] .art,
+  body[data-mode="lite"] .art {
+    -webkit-mask-image: radial-gradient(circle var(--r) at var(--x) var(--y),
+                #000 0 62%, rgba(0,0,0,.4) 82%, transparent 100%);
+            mask-image: radial-gradient(circle var(--r) at var(--x) var(--y),
+                #000 0 62%, rgba(0,0,0,.4) 82%, transparent 100%);
+  }
+
+  /* Mode B — SVG mask reference. Safari has historically only honoured
+     -webkit-mask-image: url(#id) for HTML elements; both are declared so the
+     table records what each engine actually does with it. */
+  body[data-mode="svg"] .art,
+  body[data-mode="svglite"] .art {
+    -webkit-mask-image: url(#lens);
+            mask: url(#lens);
+  }
+
+  .defs { position: absolute; width: 0; height: 0; }
+
+  /* ── HUD ── */
+  .hud {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 10;
+    padding: 10px 14px;
+    background: rgba(10, 10, 12, 0.82);
+    color: #F0E4D9;
+    font: 12px/1.5 ui-monospace, Menlo, Consolas, monospace;
+    border-radius: 8px;
+    pointer-events: none;
+    white-space: pre;
+  }
+  .hud b { color: #E4465A; font-weight: 600; }
+</style>
+</head>
+<body data-mode="css">
+
+  <div class="layer base">
+    <h1>Kirtiraj Chaudhari</h1>
+  </div>
+
+  <div class="layer art" id="art">
+    <img class="art__img" src="../public/avatars/artistic-full.png" alt="">
+    <h2>tabla at 2am</h2>
+    <h2>a frame worth keeping</h2>
+    <h2>lines that stay in the notebook</h2>
+  </div>
+
+  <svg class="defs" aria-hidden="true">
+    <defs>
+      <radialGradient id="feather">
+        <stop offset="0"    stop-color="#fff" stop-opacity="1"/>
+        <stop offset="0.62" stop-color="#fff" stop-opacity="1"/>
+        <stop offset="0.82" stop-color="#fff" stop-opacity="0.4"/>
+        <stop offset="1"    stop-color="#fff" stop-opacity="0"/>
+      </radialGradient>
+      <mask id="lens" maskUnits="userSpaceOnUse">
+        <circle id="lensCircle" cx="640" cy="400" r="240" fill="url(#feather)"/>
+      </mask>
+    </defs>
+  </svg>
+
+  <div class="hud" id="hud">booting…</div>
+
+<script>
+(() => {
+  const q = new URLSearchParams(location.search).get('mode');
+  /* 'none' is the CONTROL: identical layers, identical per-frame DOM writes,
+     no mask declared. Without it, "100% of the viewport repainted" cannot be
+     attributed to the mask rather than to the busy layer itself. */
+  const mode = ['svg', 'none', 'lite', 'svglite'].includes(q) ? q : 'css';
+  document.body.dataset.mode = mode;
+
+  const art    = document.getElementById('art');
+  const circle = document.getElementById('lensCircle');
+  const hud    = document.getElementById('hud');
+
+  const LERP = 0.18;
+  const REST_R = 240;
+
+  /* Pointer handlers write here and nowhere else. */
+  const s = { px: innerWidth / 2, py: innerHeight / 2, tx: innerWidth / 2, ty: innerHeight / 2, r: REST_R };
+
+  addEventListener('pointermove', (e) => { s.tx = e.clientX; s.ty = e.clientY; }, { passive: true });
+
+  /* ── Stats. Samples are only collected while the lens is actually moving,
+     so idle frames can't flatter the average. ── */
+  let samples = [];
+  let last = performance.now();
+  let hudAcc = 0;
+
+  window.__perf = {
+    mode,
+    reset() { samples = []; last = performance.now(); },
+    stats() {
+      if (!samples.length) return null;
+      const sorted = [...samples].sort((a, b) => a - b);
+      const sum = samples.reduce((a, b) => a + b, 0);
+      const avg = sum / samples.length;
+      return {
+        mode,
+        frames: samples.length,
+        avgFps: +(1000 / avg).toFixed(1),
+        avgFrameMs: +avg.toFixed(2),
+        p95FrameMs: +sorted[Math.floor(sorted.length * 0.95)].toFixed(2),
+        worstFrameMs: +sorted[sorted.length - 1].toFixed(2),
+        longTasks50ms: samples.filter((d) => d > 50).length,
+      };
+    },
+  };
+
+  function frame(now) {
+    const dt = now - last;
+    last = now;
+
+    s.px += (s.tx - s.px) * LERP;
+    s.py += (s.ty - s.py) * LERP;
+
+    /* Dirty check — no DOM write when the pointer is at rest. */
+    const moving = Math.abs(s.tx - s.px) > 0.05 || Math.abs(s.ty - s.py) > 0.05;
+    if (moving) {
+      if (mode === 'svg' || mode === 'svglite') {
+        circle.setAttribute('cx', s.px);
+        circle.setAttribute('cy', s.py);
+      } else {
+        /* css, lite AND none all take this branch — the control must perform
+           the identical per-frame write, or it isn't a control. */
+        art.style.setProperty('--x', s.px + 'px');
+        art.style.setProperty('--y', s.py + 'px');
+      }
+      /* dt < 1000 discards the tab-hidden gap; > 0 discards duplicate rAF ticks. */
+      if (dt > 0 && dt < 1000) samples.push(dt);
+    }
+
+    hudAcc += dt;
+    if (hudAcc > 250) {
+      hudAcc = 0;
+      const st = window.__perf.stats();
+      hud.textContent = st
+        ? `mode  ${mode}\nfps   ${st.avgFps}\nframe ${st.avgFrameMs}ms  p95 ${st.p95FrameMs}ms\nworst ${st.worstFrameMs}ms\n>50ms ${st.longTasks50ms}  n=${st.frames}`
+        : `mode  ${mode}\nmove the pointer…`;
+      if (st && st.worstFrameMs > 50) hud.innerHTML = hud.textContent.replace(/worst .*/, (m) => `<b>${m}</b>`);
+    }
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

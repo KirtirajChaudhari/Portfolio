@@ -35,6 +35,10 @@ Repo: `portfolio-vue` · audited 2026-08-20 · **no application code written thi
 
 The harness is a real spec file, `scripts/mask-perf.spec.ts`, not a scratch page — `page.tracing.start()` around a scripted pointer-move sequence, then paint-rect area read out of the trace. That is the automatable form of "composited vs repainted," and Loop 8 item 10 calls the same script rather than re-deriving it.
 
+Installed 2026-08-20: `playwright` + `@playwright/test` **1.62.1**, with the chromium, firefox and webkit binaries pulled locally.
+
+**One caveat to book before Loop 1 fills its table:** Playwright's `webkit` is WebKit-the-engine, not Safari. This is a Windows machine, so there is no real Safari here at all — and the differences that matter to *this* pattern (the `-webkit-mask` path, `mix-blend-mode` on the ring, SVG-mask rasterisation, and above all the iOS compositor's handling of a mask on a promoted layer) are exactly the ones that live in the gap between the two. So: Loop 1's Safari row is a WebKit row and must be labelled as such, and **Loop 8 item 7 cannot be signed off from this machine.** It needs a real iPhone or Mac, or it stays an open risk in the Loop 9 TODO list. Do not let a green WebKit row read as Safari clearance.
+
 ## 3. What is generic about the current hero — blunt
 
 1. **Two competing CTAs**, which the parent config explicitly forbids: `<a>Learn more</a>` next to `SplitButton "Get in touch"`. The fix currently shipping is a hack — `.hero__cta.is-yielded { margin-left: -180px }` shoves one button offscreen so the row doesn't wrap.
@@ -135,7 +139,7 @@ The lens is the mechanism and is deliberately *not* the signature. The signature
 
 ## 8. Decisions this forces on later loops (flag now, don't discover later)
 
-- **Loop 1 decision gate is still open** — path A/B/C needs measured numbers. The measurement *route* is now settled (§2): Playwright spec, kept, re-run by Loop 8.
+- ~~Loop 1 decision gate is still open~~ — **answered in §9. Path B, with a paint budget.**
 - **Loop 2 content:** the artistic layer's copy must come from `novel.ts` (`creatorIntro`, `chapterTwoMeta.epigraph`) or be written fresh *about real things Kirtiraj does* (tabla, camera, notebooks). No invented poem lines — that is a standing repo rule, and it caps what Loop 5's payload can contain until he supplies a fragment.
 - **Non-negotiable #3 is already satisfiable for free:** `/creator` is a complete, non-masked, accessible route containing everything the artistic layer will show. The lens stays theatre; the toggle can simply be a real link to it.
 
@@ -158,3 +162,63 @@ Loop 3's mask spec is a 3-stop pure-alpha gradient (solid → 62%, 40% alpha →
 - **Is my SIGNATURE the lens itself?** No — stated explicitly in §7. The lens is the mechanism; the signature is the Grad-CAM annotation it uncovers, which is the author's own professional thesis applied to himself.
 
 **STOP.** Plan written. No implementation until Loop 1 is pasted.
+
+---
+
+# 9. LOOP 1 — FEASIBILITY SPIKE (measured)
+
+Subject: `spike/mask-perf.html`. Harness: `scripts/mask-perf.spec.ts`. Raw rows: `docs/xray-loop1-results.jsonl`.
+Viewport 1280×800, two laps of a 256px-radius circle at ~250Hz input, ~450 sampled frames per run. Medians of 2–3 runs.
+
+## The table
+
+| Engine | Mode | CPU | avg fps | p95 frame | worst frame | >50ms | paint events | paint area |
+|---|---|---|---|---|---|---|---|---|
+| Chromium 141 | none (control) | 1× | **60.1** | 16.8ms | 16.8ms | 0 | **56** | layer bounds |
+| Chromium | none (control) | 4× | **60.1** | 16.8ms | 16.8ms | 0 | 58 | layer bounds |
+| Chromium | css, heavy | 1× | 50.8 | 33.4ms | 50.1ms | 0–1 | 926 | layer bounds |
+| Chromium | css, heavy | 4× | 48.8 | 33.4ms | 66.7ms | 0–1 | 922 | layer bounds |
+| Chromium | css, **lite** | 1× | **60.0** | 16.7ms | 16.8ms | 0 | 883 | layer bounds |
+| Chromium | css, **lite** | 4× | 59.6 | 16.8ms | 33.4ms | 0 | 966 | layer bounds |
+| Chromium | svg, heavy | 1× | 58.6 | 16.8ms | 50.0ms | 0 | 915 | layer bounds |
+| Chromium | svg, heavy | 4× | 54.0–59.5 | 33.4ms | 33.4ms | 0 | 926 | layer bounds |
+| Chromium | **svg, lite** | 1× | **60.1** | 16.8ms | 16.8ms | **0** | 904 | layer bounds |
+| Chromium | **svg, lite** | 4× | **59.9** | 16.7ms | 33.4ms | **0** | 947 | layer bounds |
+| Firefox 145 | none (control) | 1× | **120.1** | 8.3ms | 14.7ms | 0 | n/a (no CDP) | — |
+| Firefox | css, heavy | 1× | 31.0 | 41.7ms | 58.3ms | 2–4 | n/a | — |
+| Firefox | css, **lite** | 1× | 43.4 | 33.3ms | 56.7ms | 0–1 | n/a | — |
+| Firefox | svg, heavy | 1× | 31.7 | 41.7ms | 62.7ms | 1 | n/a | — |
+| Firefox | **svg, lite** | 1× | **52.7** | 25.0ms | 45.5ms | **0** | n/a | — |
+| WebKit (Playwright, Windows) | none (control) | 1× | **8.4** | 175ms | 210ms | 299/300 | n/a | — |
+| WebKit | css / svg | 1× | 5.5–6.2 | 199–245ms | 274–458ms | 299/300 | n/a | — |
+
+## COMPOSITED or REPAINTED — the number that decides it
+
+**REPAINTED, every frame, in both masking technologies.** Chromium emits **56** paint events across a 7-second drive with no mask, and **~900** with one — about two per frame. CSS `mask-image` and SVG `<mask>` are indistinguishable on this: 926 vs 915. There is no masking path available that composites instead.
+
+Two honest caveats on that column:
+- The reported paint *area* is the layer's bounds, not the damage rect — the control's 56 paints also report "100%". So **the count is the evidence, not the area.** 16× more paints is the attribution; "100% of the viewport" is an upper bound.
+- CDP is Chromium-only, so Firefox and WebKit have no paint column. Their fps deltas against their own controls (120→31, 8.4→5.9) say the same thing indirectly.
+
+## What that reframes
+
+Because the repaint is structural, **the masking technique is not the decision — the cost of one repaint of the masked layer is.** The `lite` rows prove it: same mask, same ~900 paints, but the layer stripped to what §5 actually specifies (ground + grain + type; no full-bleed photo, no `background-blend-mode`) moves Chromium from 50.8 → 60.0 and Firefox from 31.0 → 43.4. **The paint count never changed. Only the cost per paint did.**
+
+**The 4× CPU throttle is measuring the wrong axis.** Chromium css: 50.8 @1× vs 48.8 @4×. Quadrupling CPU cost changes this workload by ~4%, because the work is raster/compositor, not main-thread JavaScript. The playbook's gate is a JS-latency gate applied to a fill-rate problem. The real risk axis is **viewport area × layer complexity × GPU**, so the meaningful stress test is a larger viewport or a weaker GPU, not `setCPUThrottlingRate`. Loop 8 item 10 should re-run this at 2560×1440 as well, or it will re-measure the wrong thing.
+
+**The WebKit rows are void.** The control renders at **8.4fps with no mask at all** — Playwright's WebKit on Windows has no GPU acceleration, so the platform dominates and the mask delta is unreadable. This says nothing about Safari, and per §2 Safari still cannot be cleared from this machine.
+
+## DECISION — Path B (SVG `<mask>`), with a paint budget
+
+Not because A failed and not as a contingency:
+
+1. **B beats A on the binding constraint.** Firefox is the worst mainstream engine here (120fps baseline, so it has the most to lose). At shipping weight: SVG **52.7fps** vs CSS **43.4fps**. In Chromium both reach 60, so Chromium does not discriminate; Firefox does.
+2. **B is where Loop 4 has to end up anyway.** The ink edge needs `feTurbulence` + `feDisplacementMap` applied once to a shape inside the mask. That is an SVG mask by construction. Choosing A now would mean rewriting the mask in Loop 4 and re-measuring everything after it.
+3. **C is not justified.** It costs accessibility, text selection and SEO on the artistic layer, and the measurements do not ask for it: the shipping configuration holds **60.1 / 59.9fps with zero long tasks** in Chromium at both throttle settings. Spending that much for nothing measurable would be the wrong trade.
+
+### The budget this decision creates — binding on Loops 2–5
+
+- The masked layer repaints in full every frame the lens moves. **Its paint cost is a hard budget, not an aesthetic preference.** What blew it in the heavy mode: a full-bleed raster image and `background-blend-mode`. Both are banned from the artistic layer.
+- Grain must be one pre-generated tile at low alpha with `background-blend-mode: normal`. No blend modes, no live filters, no full-viewport imagery.
+- Loop 5's three-device ceiling is now also a paint budget. Each device gets re-measured with this harness before it stays.
+- **Open, honest:** Firefox at ~52.7fps does not clear 60. It shows zero long tasks and a 45ms worst frame, so it degrades smoothly rather than stuttering — acceptable, not a pass. The lever if it needs recovering: mask a hero-sized element rather than a viewport-sized one, which cuts per-paint area directly. Re-measure before believing it.
