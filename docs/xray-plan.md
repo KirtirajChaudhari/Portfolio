@@ -222,3 +222,50 @@ Not because A failed and not as a contingency:
 - Grain must be one pre-generated tile at low alpha with `background-blend-mode: normal`. No blend modes, no live filters, no full-viewport imagery.
 - Loop 5's three-device ceiling is now also a paint budget. Each device gets re-measured with this harness before it stays.
 - **Open, honest:** Firefox at ~52.7fps does not clear 60. It shows zero long tasks and a 45ms worst frame, so it degrades smoothly rather than stuttering — acceptable, not a pass. The lever if it needs recovering: mask a hero-sized element rather than a viewport-sized one, which cuts per-paint area directly. Re-measure before believing it.
+
+---
+
+# 10. LOOP 2 — LAYER ARCHITECTURE (built)
+
+`src/components/hero/XRayHero.vue` + `src/content/xray.ts`. Gate: `scripts/hero-registration.spec.ts` (11 widths × registration + fill + overflow, CLS, axe). Shots: `docs/shots/loop2/`.
+
+## How registration is guaranteed rather than maintained
+
+1. **One template, two layers.** Both come out of a single `v-for`, so there is no second hand-written layer to drift when someone edits one side.
+2. **Every grid row is a fixed function of the shared properties** (`--hero-fs`, `--hero-lh`, `--hero-title-lines`, `--lead-lh`, `--lead-lines`, `--cta-h`, `--tags-h`). No slot is content-sized, so a longer headline on one side cannot push that side's lead, CTA or tags.
+3. **Colour only, per layer.** A rule that sets geometry on `.hero__layer--pro` or `--art` is a bug by definition.
+
+## Two failure modes the first run found
+
+- **2560px, all five slots Δtop = 10px.** `max-width: 1360px` + `padding-inline: 600px` under `border-box` leaves a **160px** text column, so both headlines wrapped differently and the `auto` tags row ended up 20px taller on one side — which `align-content: center` then halved and propagated to *every slot above it*. Fixed by sizing the column as `min(100% - 2 * var(--hero-x), var(--maxw-grid))` and making the tags row fixed too. **Lesson worth keeping: with centred content, an `auto` row at the bottom is a registration bug at the top.**
+- **The metric disagreed with the screenshot, and the screenshot was right.** `scrollHeight` on a grid item measures the *stretched box*, so it reported "3 lines in a 3-line slot" for a headline visibly using 2. Text extent now comes from a `Range` over the contents. The harness gained an under-fill assertion as well — a fixed slot fails in both directions, and only overflow was being checked.
+
+## Results
+
+| Gate | Result |
+|---|---|
+| Registration, 11 widths 320→2560 | **Δtop / Δleft / Δheight = 0.00px** at every width, every slot |
+| Headline face/size/tracking parity | identical computed values in both layers |
+| Slot fit | no overflow, no slot more than one line taller than its content |
+| Horizontal overflow | 0 at every width |
+| axe (hero, WCAG 2.0/2.1 A+AA) | **0 violations** |
+| CLS | **hero 0.000**; page total 0.0031 |
+
+## Honest gaps
+
+- **Page CLS is 0.0031, not 0.** Baseline before this loop was 0.0011, attributed to `div.boot__stage` and `span.island__pct`. The added ~0.002 reports **no source nodes at all**, so it is not attributable to an element; the most likely cause is that moving fonts from an `@import` to a `<link>` made first paint earlier and exposed a swap that was previously hidden behind a later paint. The real fix is metric-matched fallback faces (`size-adjust` / `ascent-override`), which should wait for Loop 5 when the face list is final — Antonio and Spectral may both be dropped. **Not fixed, deliberately: inventing font-metric numbers is worse than a 0.003 CLS.**
+- **Pre-existing, not mine:** page-wide axe reports `color-contrast`, serious, **17 nodes**, in `ExperienceTimeline.vue` (`.exp__pill`). Present before Loop 2. Reported, not fixed — Loop 7 owns that section.
+- **`BootSequence.vue` still paints a full-screen curtain over the new hero.** It is why the first screenshot run photographed the boot counter instead of the hero. §3 item 5 already flagged it; it is Loop 7's call.
+- **`HeroSection.vue` is now dead code** — `HomePage.vue` renders `XRayHero`. Left in the tree until Loop 7 decides whether the status rail and social row move across.
+
+## Rule 3 audit — what the artistic layer shows, and where it also lives accessibly
+
+| Art-layer content | Also in accessible DOM? |
+|---|---|
+| Tags + "Chapter Two — the other half" | **Yes** — byte-identical strings in the professional layer |
+| Eyebrow "Tabla — Lens — Ink" | **Yes** — `CreatorPage.vue` renders "TABLA · LENS · INK" |
+| Lead (tabla / lens / notebook / résumé) | **Yes** — substance is `creatorIntro` in `novel.ts`, rendered at `/creator` |
+| The `/creator` route itself | **Yes** — the professional layer carries a real `RouterLink` |
+| Headline "Nothing I make gets to stay quiet." | **No** — this phrasing exists only in the artistic layer |
+
+The single gap is register, not fact: every claim it makes is available elsewhere, but that sentence is not. Loop 6's toggle is what makes it reachable — the toggle swaps which layer is the accessible one, and that is the architecture the playbook already prescribes. No content is reachable *only* through the lens.

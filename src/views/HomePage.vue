@@ -1,5 +1,5 @@
 <template>
-  <HeroSection />
+  <XRayHero />
   <AboutSection />
   <ExperienceTimeline />
   <EducationSection />
@@ -12,7 +12,9 @@
 </template>
 
 <script setup lang="ts">
-import HeroSection from '../components/chapter-one/HeroSection.vue';
+/* HeroSection.vue is still in the tree — Loop 7 decides whether the status
+   rail and social row move across before it is deleted. */
+import XRayHero from '../components/hero/XRayHero.vue';
 import AboutSection from '../components/chapter-one/AboutSection.vue';
 import ExperienceTimeline from '../components/chapter-one/ExperienceTimeline.vue';
 import EducationSection from '../components/chapter-one/EducationSection.vue';

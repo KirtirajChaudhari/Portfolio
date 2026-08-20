@@ -10,6 +10,13 @@ export default defineConfig({
   reporter: [['list']],
   use: {
     viewport: { width: 1280, height: 800 },
+    baseURL: 'http://localhost:5173',
+  },
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:5173',
+    reuseExistingServer: true,
+    timeout: 120_000,
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 } } },
