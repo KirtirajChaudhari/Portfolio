@@ -198,6 +198,7 @@ export const HangingIdCard = forwardRef<HangingIdCardHandle, HangingIdCardProps>
   const [angle, setAngle] = useState(0);
   const [, setIsDragState] = useState(false);
   const dragStartX   = useRef(0);
+  const dragMoved    = useRef(false);
   const dragAngle0   = useRef(0);
 
   // ── Physics loop ────────────────────────────────────────────────────────────
@@ -250,6 +251,7 @@ export const HangingIdCard = forwardRef<HangingIdCardHandle, HangingIdCardProps>
     isDraggingRef.current = true;
     setIsDragState(true);
     dragStartX.current   = e.clientX;
+    dragMoved.current    = false;
     dragAngle0.current   = physRef.current.angle;
     prevAngleRef.current = physRef.current.angle;
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -260,6 +262,7 @@ export const HangingIdCard = forwardRef<HangingIdCardHandle, HangingIdCardProps>
   const onPointerMove = useCallback((e: React.PointerEvent) => {
     if (!isDraggingRef.current) return;
     const dx = e.clientX - dragStartX.current;
+    if (Math.abs(dx) > 4) dragMoved.current = true;
     const L = ropeLength + 100; 
     const newAngle = dragAngle0.current - dx / L;
     const clamped  = Math.max(-1.4, Math.min(1.4, newAngle));
@@ -275,6 +278,7 @@ export const HangingIdCard = forwardRef<HangingIdCardHandle, HangingIdCardProps>
 
   // ── Click impulse (tap) ─────────────────────────────────────────────────────
   const onCardClick = useCallback(() => {
+    if (dragMoved.current) return;   // the click that ends a drag is not a tap
     if (Math.abs(physRef.current.vel) < 0.1 && Math.abs(physRef.current.angle) < 0.05) {
       physRef.current.vel = 4.0; // Give it a satisfying push
       startPhysics();

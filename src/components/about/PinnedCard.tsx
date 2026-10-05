@@ -1,5 +1,4 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import type { HangingIdCardHandle } from '@/components/lightswind/hanging-id-card';
 import { siteMeta } from '../../content/shared';
 
 /* The physics card is its own chunk and is only fetched once this block is near the viewport. */
@@ -27,11 +26,10 @@ function CardFace() {
   );
 }
 
-/** The ID card, hung from the top of whatever contains it. On desktop with a mouse it swings with
- *  scroll speed as well as drag; with reduced motion or touch it hangs still. Same card either way. */
+/** The ID card, hung from the top of whatever contains it. It only moves when dragged or clicked;
+ *  with reduced motion or touch it hangs still. Same card either way. */
 export default function PinnedCard({ className = '' }: { className?: string }) {
   const host = useRef<HTMLDivElement>(null);
-  const card = useRef<HangingIdCardHandle>(null);
   const [near, setNear] = useState(false);
   const [still, setStill] = useState(true);
 
@@ -47,28 +45,11 @@ export default function PinnedCard({ className = '' }: { className?: string }) {
     return () => io.disconnect();
   }, []);
 
-  /* Scroll speed becomes angular velocity. Passive, no loop of its own: the card's own rAF does the swinging. */
-  useEffect(() => {
-    if (still) return;
-    let lastY = window.scrollY;
-    let lastT = performance.now();
-    const onScroll = () => {
-      const now = performance.now();
-      const dt = Math.max(8, now - lastT);
-      const v = ((window.scrollY - lastY) / dt) * 1000;      // px/s
-      lastY = window.scrollY;
-      lastT = now;
-      if (Math.abs(v) > 120) card.current?.nudge(Math.max(-1.6, Math.min(1.6, v * 0.00045)));
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [still]);
-
   return (
     <div ref={host} className={`relative h-[31rem] overflow-hidden ${className}`}>
       {near && (
         <Suspense fallback={null}>
-          <HangingIdCard ref={card} ropeLength={90} ropeColor="#18181b" accentColor="#b41d1c" interactive={!still}>
+          <HangingIdCard ropeLength={90} ropeColor="#18181b" accentColor="#b41d1c" interactive={!still}>
             <CardFace />
           </HangingIdCard>
         </Suspense>
