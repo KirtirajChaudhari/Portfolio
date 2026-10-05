@@ -147,3 +147,13 @@
   iframe and are filtered in `scripts/portfolio-v2.spec.ts`.
 - Lazy routes: a spec that scrolls to an id must wait for the element first.
 
+- **Portfolio v2.1** — Facts re-pulled from the GitHub repos (`gh api repos/KirtirajChaudhari/<repo>`).
+  RasaCare: Next.js 14 / FastAPI / PostgreSQL / Neo4j / XGBoost, 86.74% 5-fold CV (85.6% holdout),
+  23,756 nodes, 538 rules, 31 conditions. DrishtiManas was rebuilt 2026-09-25 as an OCT classifier with
+  a NumPy MLP (69.1% test acc, 67.9% macro-F1, 1,000 balanced OCTMNIST images); the earlier fundus /
+  DenseNet121 / 0.81 F1 claims are not in the repo and were removed. PRAVAAS: only a notebook exists
+  (YOLO11s, 40 epochs, 67.3% mAP50 on 26 val images); "81% mAP / 28 FPS", Jetson and "30% fewer false
+  negatives" have no source. Photo wall restored to the polaroid layout (`chapter-two/PhotographyWall`),
+  each frame embeds the real Instagram post via the official embed.js, armed by an IntersectionObserver.
+  Firefox-only console noise (Feature Policy `allow` warnings, WEBGL_debug_renderer_info) is not filtered;
+  the console spec is a chromium gate.
