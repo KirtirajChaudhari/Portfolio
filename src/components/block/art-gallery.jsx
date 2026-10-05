@@ -1,5 +1,13 @@
 "use client";
 
+/*
+ * Adapted from ObsidianUI "art-gallery" (registry item, installed unmodified in the commit
+ * "Install art-gallery"). Changes: demo items/images (and the remote cdn-new.obsidianui.dev URLs)
+ * removed, so `images` and `items` are required; the malformed default colour strings fixed and
+ * set to this site's darkroom palette; the render loop pauses off-screen and on hidden tabs;
+ * `year` is optional (an empty year draws nothing). The shader and drag behaviour are untouched.
+ */
+
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { WebGLSurface, useEffectReducedMotion } from "@/lib/effects/shared/webgl-surface";
@@ -10,67 +18,11 @@ const defaultConfig = {
   cellSize: 0.75,
   zoomLevel: 1.25,
   lerpFactor: 0.075,
-  borderColor: "rgba(255, 255, 0.15)",
-  backgroundColor: "rgba(0, 0, 1)",
-  textColor: "rgba(128, 128, 1)",
-  hoverColor: "rgba(255, 255, 0)",
+  borderColor: "rgba(255, 255, 255, 0.14)",
+  backgroundColor: "rgba(18, 9, 10, 1)",
+  textColor: "rgba(247, 236, 231, 0.8)",
+  hoverColor: "rgba(180, 29, 28, 0.45)",
 };
-
-const defaultItems = [
-  { title: "Motion Study", year: 2024 },
-  { title: "Idle Form", year: 2023 },
-  { title: "Blur Signal", year: 2024 },
-  { title: "Still Drift", year: 2023 },
-  { title: "Tidewalk", year: 2024 },
-  { title: "Core Motion", year: 2022 },
-  { title: "White Bloom", year: 2024 },
-  { title: "Backrun", year: 2023 },
-  { title: "Rushline", year: 2024 },
-  { title: "Afterimage", year: 2023 },
-  { title: "Shadowhead", year: 2022 },
-  { title: "Opal Lace", year: 2024 },
-  { title: "Glassprint", year: 2024 },
-  { title: "Redshift", year: 2023 },
-  { title: "White Noise", year: 2023 },
-  { title: "Twin Field", year: 2024 },
-  { title: "Petalloop", year: 2023 },
-  { title: "Ghostwalk", year: 2024 },
-  { title: "Heatwave", year: 2023 },
-  { title: "Sky Drift", year: 2024 },
-  { title: "Spindle", year: 2022 },
-  { title: "Pacer", year: 2023 },
-  { title: "Stride", year: 2024 },
-  { title: "Cryo Pulse", year: 2022 },
-  { title: "Velvet Blur", year: 2024 },
-];
-
-const defaultImages = [
-  "https://cdn-new.obsidianui.dev/imagess/1.png",
-  "https://cdn-new.obsidianui.dev/imagess/2.png",
-  "https://cdn-new.obsidianui.dev/imagess/3.png",
-  "https://cdn-new.obsidianui.dev/imagess/4.png",
-  "https://cdn-new.obsidianui.dev/imagess/5.png",
-  "https://cdn-new.obsidianui.dev/imagess/6.png",
-  "https://cdn-new.obsidianui.dev/imagess/7.png",
-  "https://cdn-new.obsidianui.dev/imagess/8.png",
-  "https://cdn-new.obsidianui.dev/imagess/9.png",
-  "https://cdn-new.obsidianui.dev/imagess/10.png",
-  "https://cdn-new.obsidianui.dev/imagess/11.png",
-  "https://cdn-new.obsidianui.dev/imagess/12.png",
-  "https://cdn-new.obsidianui.dev/imagess/13.png",
-  "https://cdn-new.obsidianui.dev/imagess/14.png",
-  "https://cdn-new.obsidianui.dev/imagess/15.png",
-  "https://cdn-new.obsidianui.dev/imagess/16.png",
-  "https://cdn-new.obsidianui.dev/imagess/17.png",
-  "https://cdn-new.obsidianui.dev/imagess/18.png",
-  "https://cdn-new.obsidianui.dev/imagess/19.png",
-  "https://cdn-new.obsidianui.dev/imagess/20.jpg",
-  "https://cdn-new.obsidianui.dev/imagess/21.jpg",
-  "https://cdn-new.obsidianui.dev/imagess/22.jpg",
-  "https://cdn-new.obsidianui.dev/imagess/23.jpg",
-  "https://cdn-new.obsidianui.dev/imagess/24.jpg",
-  "https://cdn-new.obsidianui.dev/imagess/25.jpg",
-];
 
 const vertexShader = `
   varying vec2 vUv;
@@ -193,7 +145,7 @@ function createTextTexture(title, year, textColor) {
     ctx.textAlign = "left";
     ctx.fillText(String(title).toUpperCase(), 30, 128);
     ctx.textAlign = "right";
-    ctx.fillText(String(year), 2048 - 30, 128);
+    if (year) ctx.fillText(String(year), 2048 - 30, 128);
   }
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.ClampToEdgeWrapping;
@@ -326,7 +278,10 @@ function ArtGalleryScene({ images, items, cellSize, zoomLevel, showHint, reduced
     const lerpFactor = reducedMotion ? 1 : defaultConfig.lerpFactor;
     const dragZoom = reducedMotion ? 1 : zoomLevel;
 
+    let visible = true;
     const animate = () => {
+      animFrameId = 0;
+      if (!visible || document.hidden) return;
       animFrameId = requestAnimationFrame(animate);
       state.offset.x += (state.targetOffset.x - state.offset.x) * lerpFactor;
       state.offset.y += (state.targetOffset.y - state.offset.y) * lerpFactor;
@@ -387,6 +342,8 @@ function ArtGalleryScene({ images, items, cellSize, zoomLevel, showHint, reduced
       plane?.material.uniforms.uMousePos.value.set(-1, -1);
       endDrag();
     };
+    let io;
+    const onVisibility = () => { if (!document.hidden && visible && !animFrameId) animate(); };
     const onResize = () => {
       const width = container.clientWidth;
       const height = container.clientHeight;
@@ -437,6 +394,12 @@ function ArtGalleryScene({ images, items, cellSize, zoomLevel, showHint, reduced
       container.addEventListener("pointercancel", onPointerUp);
       container.addEventListener("pointerleave", onPointerLeave);
       window.addEventListener("resize", onResize);
+      io = new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        if (visible && !animFrameId) animate();
+      });
+      io.observe(container);
+      document.addEventListener("visibilitychange", onVisibility);
       animate();
       setReady(true);
     };
@@ -445,7 +408,9 @@ function ArtGalleryScene({ images, items, cellSize, zoomLevel, showHint, reduced
 
     return () => {
       cancelled = true;
-      cancelAnimationFrame(animFrameId);
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+      io?.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
       container.removeEventListener("pointerdown", onPointerDown);
       container.removeEventListener("pointermove", onPointerMove);
       container.removeEventListener("pointerup", onPointerUp);
@@ -481,8 +446,8 @@ function ArtGalleryScene({ images, items, cellSize, zoomLevel, showHint, reduced
 
 /** @param {{ images?: string[], items?: { title: string, year: string | number }[], cellSize?: number, zoomLevel?: number, showHint?: boolean, className?: string, style?: import("react").CSSProperties }} props */
 export function ArtGallery({
-  images = defaultImages,
-  items = defaultItems,
+  images,
+  items,
   cellSize = defaultConfig.cellSize,
   zoomLevel = defaultConfig.zoomLevel,
   showHint = true,
@@ -490,8 +455,8 @@ export function ArtGallery({
   style,
 } = {}) {
   const reducedMotion = useEffectReducedMotion();
-  const tiles = images.length ? images : defaultImages;
-  const captions = tiles.map((_, index) => items[index % items.length] ?? { title: `Study ${index + 1}`, year: "2024" });
+  const tiles = images;
+  const captions = tiles.map((_, index) => items[index % items.length] ?? { title: `Frame ${index + 1}`, year: "" });
 
   return (
     <WebGLSurface className={cn("bg-black", className)} style={style} label="ObsidianUI Art Gallery">

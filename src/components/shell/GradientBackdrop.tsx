@@ -1,23 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
+import { hasHardwareWebGL } from '@/lib/gpu';
 
 const ShaderBackdrop = lazy(() => import('./ShaderBackdrop'));
-
-/* A full-screen fragment shader on a CPU rasteriser (SwiftShader, llvmpipe, a
-   remote desktop) burns a core for a background and makes Chromium log
-   "GPU stall due to ReadPixels". Only use the shader when the GPU is real. */
-function hasHardwareWebGL() {
-  try {
-    const c = document.createElement('canvas');
-    const gl = (c.getContext('webgl2') || c.getContext('webgl')) as WebGLRenderingContext | null;
-    if (!gl) return false;
-    const info = gl.getExtension('WEBGL_debug_renderer_info');
-    const renderer = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
-    gl.getExtension('WEBGL_lose_context')?.loseContext();
-    return !/swiftshader|llvmpipe|software|basic render/i.test(renderer);
-  } catch {
-    return false;
-  }
-}
 
 /** Fixed, non-interactive shader gradient behind the page. A plain CSS gradient
  *  of the same palette is always underneath, so there is no flash while the

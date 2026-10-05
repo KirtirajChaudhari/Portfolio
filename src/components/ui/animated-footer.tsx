@@ -66,6 +66,8 @@ export interface AnimatedFooterProps {
    */
   revealed?: boolean;
 
+  /** Draw the ASCII once and run nothing: no render loop, no pointer tracking, no reveal. Reduced motion and touch. */
+  still?: boolean;
   /** Extra class names for the root element. */
   className?: string;
 }
@@ -198,6 +200,7 @@ export function AnimatedFooter({
   hoverRadius = 8,
   revealOnScroll = true,
   revealed,
+  still = false,
   className,
 }: AnimatedFooterProps) {
   const rootRef = useRef<HTMLElement>(null);
@@ -236,8 +239,9 @@ export function AnimatedFooter({
         asciiChars,
         revealOnScroll,
         headingLines,
+        still,
       }),
-    [leftImage, rightImage, columns, cellSize, fontSize, asciiChars, revealOnScroll, headingLines],
+    [leftImage, rightImage, columns, cellSize, fontSize, asciiChars, revealOnScroll, headingLines, still],
   );
 
   useEffect(() => {
@@ -295,6 +299,8 @@ export function AnimatedFooter({
         if (initialized) return;
         initialized = true;
         setupHand(image, canvas, direction);
+        // A still footer paints each hand once, as soon as it exists (renderHand is defined by then).
+        if (still) queueMicrotask(() => { const h = hands[hands.length - 1]; if (h) renderHand(h, Date.now()); });
       };
       image.onload = init;
       image.src = src;
@@ -359,7 +365,7 @@ export function AnimatedFooter({
       pointer.y = ((event.clientY - rect.top) / h - 0.5) * strength * 2;
       for (const hand of hands) hoverHand(hand, event.clientX, event.clientY);
     };
-    window.addEventListener("mousemove", onMouseMove);
+    if (!still) window.addEventListener("mousemove", onMouseMove);
 
     // ── Unified render loop: ASCII + parallax + reveal curtain ───────────
     let rafId = 0;
@@ -393,7 +399,7 @@ export function AnimatedFooter({
     const onVisibility = () => { if (!document.hidden && visible && !rafId) rafId = requestAnimationFrame(frame); };
     document.addEventListener("visibilitychange", onVisibility);
     const loopObserver = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { rootMargin: "100px" });
-    loopObserver.observe(root);
+    if (!still) loopObserver.observe(root);
 
     // ── Reveal (chars + curtain) ─────────────────────────
     const chars = Array.from(root.querySelectorAll<HTMLElement>("[data-af-char]"));
@@ -426,7 +432,11 @@ export function AnimatedFooter({
 
     let observer: IntersectionObserver | null = null;
 
-    if (revealed !== undefined) {
+    if (still) {
+      curtain.offset = 0;
+      showAll();
+      wrappers.forEach((w) => { w.style.transform = "translateX(0%)"; });
+    } else if (revealed !== undefined) {
       // Controlled: the `revealed` effect below drives the reveal. Set the
       // initial state to match, and never attach the scroll observer.
       curtain.offset = revealed ? 0 : 125;
@@ -483,7 +493,7 @@ export function AnimatedFooter({
 
   // Whether the content starts masked on first paint (avoids a flash before the
   // effect runs): hidden unless it's meant to be shown immediately.
-  const startsHidden = revealed !== undefined ? !revealed : revealOnScroll;
+  const startsHidden = still ? false : revealed !== undefined ? !revealed : revealOnScroll;
   const offEdge = startsHidden ? 125 : 0;
 
   return (

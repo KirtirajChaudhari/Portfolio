@@ -82,6 +82,11 @@ export const professionalExpertise: ExpertiseArea[] = [
     description:
       "Classifiers for clinical decisions that can be reviewed: an XGBoost Prakriti classifier (88% CV accuracy) behind RasaCare, and a DenseNet121 multi-label model (0.81 weighted F1 on 37,649 fundus images) behind DrishtiManas.",
     tools: ["XGBoost", "PyTorch", "TensorFlow", "scikit-learn"],
+    figures: [
+      { value: "88%", label: "Prakriti classifier, CV accuracy" },
+      { value: "0.81", label: "weighted F1, DrishtiManas" },
+      { value: "37,649", label: "fundus images" },
+    ],
   },
   {
     id: "cv",
@@ -91,6 +96,10 @@ export const professionalExpertise: ExpertiseArea[] = [
     description:
       "Detection and explainability: YOLO11s track-hazard detection under 200 ms on a Jetson Orin Nano with 30% fewer false negatives than a YOLOv5 baseline, a YOLOv8-nano rail-defect second stage, and Grad-CAM heatmaps on medical images.",
     tools: ["OpenCV", "YOLO", "DenseNet121", "Grad-CAM"],
+    figures: [
+      { value: "<200 ms", label: "YOLO11s on a Jetson Orin Nano" },
+      { value: "30%", label: "fewer false negatives than YOLOv5" },
+    ],
   },
   {
     id: "kg",
@@ -100,6 +109,11 @@ export const professionalExpertise: ExpertiseArea[] = [
     description:
       "LLM-free clinical inference over a Neo4j knowledge graph (23K+ nodes, 538 rules, 31 conditions), with rules extracted from primary clinical PDFs, non-suppressible disclaimers and immutable audit logging.",
     tools: ["Neo4j", "XGBoost", "Python"],
+    figures: [
+      { value: "23K+", label: "graph nodes" },
+      { value: "538", label: "rules" },
+      { value: "31", label: "conditions" },
+    ],
   },
   {
     id: "data-science",
@@ -109,6 +123,10 @@ export const professionalExpertise: ExpertiseArea[] = [
     description:
       "Cleaning, EDA and feature work that catch bad data before training. At PCI LLP I cleaned a 10K-row student dataset, resolving missing values in 5 columns.",
     tools: ["pandas", "NumPy", "Matplotlib", "scikit-learn"],
+    figures: [
+      { value: "10K", label: "rows cleaned at PCI LLP" },
+      { value: "5", label: "columns with missing values resolved" },
+    ],
   },
 ];
 

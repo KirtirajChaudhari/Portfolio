@@ -51,5 +51,5 @@ export const heroHint = 'Hover to look closer. Hold to open it up.';
    that encodes nothing is an eyebrow pretending to be data. */
 export const heroTags = [
   { label: 'M.Tech AI & ML', detail: 'MIT-WPU, Pune' },
-  { label: 'Currently', detail: 'RasaCare — Ayurvedic practice + nutrient analysis' },
+  { label: 'Building', detail: 'RasaCare — Ayurvedic practice + nutrient analysis' },
 ];

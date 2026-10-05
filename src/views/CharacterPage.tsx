@@ -7,7 +7,7 @@ import CharacterCanvas from '../components/character/CharacterCanvas';
 import GlowCursor from '../components/character/GlowCursor';
 
 /* Real facts only, from content/xray.ts and content/professional.ts. */
-const BIO = 'I build machine learning that shows its reasoning: clinical nutrition, disease screening, railway safety. M.Tech AI & ML, now at RasaCare in Pune.';
+const BIO = 'I build machine learning that shows its reasoning: clinical nutrition, disease screening, railway safety. M.Tech AI & ML at MIT-WPU, Pune. Currently building RasaCare.';
 
 const FONT_HREF = 'https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap';
 

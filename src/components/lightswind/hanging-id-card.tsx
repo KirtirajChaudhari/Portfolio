@@ -3,13 +3,14 @@
  * https://lightswind.com/r/hanging-id-card.json). Source is otherwise unmodified except:
  *  - `dark:` variants removed: the site decides the card's colours, not the OS scheme;
  *  - `interactive` prop (false = still card, used for reduced motion and touch);
- *  - `onPointerCancel` wired to the pointer-up handler.
+ *  - `onPointerCancel` wired to the pointer-up handler;
+ *  - `ref.nudge(v)` pushes the pendulum (rad/s), so a page can swing it with scroll.
  * The shell passes real content as `children`, so the component's placeholder
  * barcode / "ACTIVE" / badge id never render here.
  */
 "use client";
 
-import React, { useRef, useEffect, useCallback, useState } from "react";
+import React, { forwardRef, useImperativeHandle, useRef, useEffect, useCallback, useState } from "react";
 import { cn } from "@/components/lib/utils";
 
 // ─── Physics constants ────────────────────────────────────────────────────────
@@ -175,7 +176,9 @@ const Lanyard = ({ length, color }: { length: number; color: string }) => {
 };
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export const HangingIdCard = ({
+export interface HangingIdCardHandle { nudge: (angularVelocity: number) => void }
+
+export const HangingIdCard = forwardRef<HangingIdCardHandle, HangingIdCardProps>(({
   children,
   ropeLength  = 140,
   ropeColor   = "#18181b",
@@ -185,7 +188,7 @@ export const HangingIdCard = ({
   badgeId     = "ID-84920",
   accentColor = "#2563eb",
   interactive = true,
-}: HangingIdCardProps) => {
+}, ref) => {
   const physRef      = useRef<CardPhysicsState>({ angle: 0, vel: 0 });
   const rafRef       = useRef<number | null>(null);
   const prevTimeRef  = useRef<number | null>(null);
@@ -223,6 +226,7 @@ export const HangingIdCard = ({
         // settled perfectly at bottom
         s.angle = 0; s.vel = 0;
         setAngle(0);
+        rafRef.current = null;   // loop is idle: lets ref.nudge() know it must restart it
       }
     } else {
       // Track velocity while dragging so we can "flick" it
@@ -276,6 +280,15 @@ export const HangingIdCard = ({
       startPhysics();
     }
   }, [startPhysics]);
+
+  useImperativeHandle(ref, () => ({
+    nudge(v: number) {
+      if (!interactive || isDraggingRef.current) return;
+      physRef.current.vel = Math.max(-6, Math.min(6, physRef.current.vel + v));
+      /* Restarting a running loop would zero its dt every call, so only start an idle one. */
+      if (rafRef.current == null) startPhysics();
+    },
+  }), [interactive, startPhysics]);
 
   useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
 
@@ -396,7 +409,8 @@ export const HangingIdCard = ({
       </p>}
     </div>
   );
-};
+});
+HangingIdCard.displayName = "HangingIdCard";
 
 export default HangingIdCard;
 

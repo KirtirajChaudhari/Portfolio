@@ -109,6 +109,8 @@ export interface ExpertiseArea {
   cursorLabel: string;
   description: string;
   tools: string[];
+  /** Numbers lifted verbatim from `description`, shown large in the bento tile. */
+  figures?: { value: string; label: string }[];
 }
 
 export interface Stat {

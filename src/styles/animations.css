@@ -83,15 +83,6 @@
   animation: float 6s ease-in-out infinite;
 }
 
-/* --- GSAP initial state ---
-   Elements driven by GSAP timelines start invisible; GSAP sets them
-   visible when their animation begins. Keeps content from flashing
-   before the timeline fires. */
-.gsap-reveal {
-  opacity: 0;
-  visibility: hidden;
-}
-
 /* --- Reduced motion --- */
 @media (prefers-reduced-motion: reduce) {
   .reveal { transition: opacity 0.3s ease; transform: none; }

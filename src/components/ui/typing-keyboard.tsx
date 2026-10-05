@@ -16,6 +16,8 @@ export interface TypingKeyboardProps extends React.HTMLAttributes<HTMLDivElement
   accentColor?: string;
   /** Secondary accent (enter key) */
   secondaryAccent?: string;
+  /** Show the whole text at once and never type: reduced motion and touch. */
+  still?: boolean;
 }
 
 // ─── Key sub-component ──────────────────────────────────────────────────────
@@ -49,11 +51,12 @@ const KC_MAP: Record<number, number> = {
 
 export function TypingKeyboard({
   className,
-  autoTypeText = "Draco. Fast, private, and beautiful web browser. Built with love by one stubborn developer.",
+  autoTypeText = "",
   typingSpeed = [40, 120],
   scale = 0.8,
   accentColor = "#3b82f6",
   secondaryAccent = "#a855f7",
+  still = false,
   ...props
 }: TypingKeyboardProps) {
   const mainRef = useRef<HTMLDivElement>(null);
@@ -68,17 +71,22 @@ export function TypingKeyboard({
     // Set fixed isometric perspective
     kb.style.transform = "perspective(10000px) rotateX(60deg) rotateZ(-35deg)";
 
+    // A still keyboard shows the finished text and runs nothing.
+    if (still) { screen.textContent = autoTypeText; return; }
+
     const allKeys = kb.querySelectorAll<HTMLDivElement>(".tk-key");
     let alive = true;
     let idx = 0;
     let timer: ReturnType<typeof setTimeout>;
+    const pending = new Set<ReturnType<typeof setTimeout>>();
 
     const pressKey = (kc: number) => {
       const domIdx = KC_MAP[kc];
       const el = allKeys[domIdx];
       if (el) {
         el.classList.add("tk-key--down");
-        setTimeout(() => el.classList.remove("tk-key--down"), 80);
+        const t = setTimeout(() => { el.classList.remove("tk-key--down"); pending.delete(t); }, 80);
+        pending.add(t);
       }
     };
 
@@ -88,13 +96,13 @@ export function TypingKeyboard({
       const kc = char === "" ? 32 : char.toUpperCase().charCodeAt(0);
 
       pressKey(kc);
-      screen.innerHTML += char === "" ? "" : char;
+      screen.textContent = (screen.textContent ?? "") + char;
 
       idx++;
       if (idx >= autoTypeText.length) {
         timer = setTimeout(() => {
           if (!alive) return;
-          screen.innerHTML = "";
+          screen.textContent = "";
           idx = 0;
           timer = setTimeout(typeNext, 1000);
         }, 2000);
@@ -105,11 +113,14 @@ export function TypingKeyboard({
     };
 
     timer = setTimeout(typeNext, 1500);
-    return () => { alive = false; clearTimeout(timer); };
-  }, [autoTypeText, typingSpeed]);
+    return () => { alive = false; clearTimeout(timer); pending.forEach(clearTimeout); };
+    // typingSpeed is a literal tuple at the call site; the text and `still` are the contract.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoTypeText, still]);
 
   return (
     <div className={cn("tk-container", className)} {...props}>
+      <span className="sr-only">{autoTypeText}</span>
       <style>{`
         .tk-container * { transform-style: preserve-3d; }
         .tk-container {
@@ -167,13 +178,7 @@ export function TypingKeyboard({
             0 0 20px color-mix(in srgb, ${accentColor} 50%, transparent),
             0 0 40px color-mix(in srgb, ${accentColor} 40%, transparent),
             0 0 60px color-mix(in srgb, ${accentColor} 30%, transparent);
-          animation: tk-screen-flicker 1s ease-in alternate infinite;
         }
-        @keyframes tk-screen-flicker {
-          0%, 90%, 96% { background-color: ${accentColor}; }
-          93%, 100%    { background-color: color-mix(in srgb, ${accentColor} 80%, black); }
-        }
-
         /* Keys container */
         .tk-keys {
           display: flex; justify-content: space-between;
@@ -248,7 +253,7 @@ export function TypingKeyboard({
         }
       `}</style>
 
-      <div className="tk-main tk-flex" ref={mainRef}>
+      <div className="tk-main tk-flex" ref={mainRef} aria-hidden="true">
         <div className="tk-keyboard tk-flex" ref={kbRef}>
           <div className="tk-screen tk-flex" ref={screenRef} />
 
@@ -304,4 +309,4 @@ export function TypingKeyboard({
 }
 
 export default TypingKeyboard;
-// trigger vercel build
+

@@ -2,8 +2,8 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 
 const LINKS = [
-  { to: '/work', label: 'Work' },
   { to: '/about', label: 'About' },
+  { to: '/work', label: 'Work' },
   { to: '/contact', label: 'Contact' },
 ];
 

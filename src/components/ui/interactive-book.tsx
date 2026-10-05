@@ -1,5 +1,11 @@
 "use client";
 
+/*
+ * VengeanceUI "interactive-book" (installed in its own commit), with keyboard access added:
+ * the cover opens with Enter/Space, visible Previous/Next/Close buttons replace the removed
+ * controls bar, and the "Click to Open" hint is a real button. Visual behaviour is unchanged.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/lib/utils';
@@ -113,6 +119,10 @@ export default function InteractiveBook({
                     }}
                     style={{ transformStyle: 'preserve-3d' }}
                     onClick={!isOpen ? handleOpenBook : undefined}
+                    role={!isOpen ? 'button' : undefined}
+                    tabIndex={!isOpen ? 0 : -1}
+                    aria-label={!isOpen ? `Open ${bookTitle}` : undefined}
+                    onKeyDown={(e) => { if (!isOpen && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); handleOpenBook(); } }}
                     onHoverStart={() => !isOpen && setIsHovering(true)}
                     onHoverEnd={() => setIsHovering(false)}
                 >
@@ -253,9 +263,16 @@ export default function InteractiveBook({
                     </div>
                 </div>
 
-                {/* Controls Bar Removed */}
+                {/* Controls Bar Removed upstream; visible buttons restored for keyboard and touch. */}
 
             </motion.div>
+
+            {isOpen && (
+                <div className="absolute bottom-2 left-1/2 z-[1000] flex -translate-x-1/2 items-center gap-2" role="group" aria-label="Book controls">
+                    <button type="button" onClick={prevPage} disabled={currentPageIndex < 0} className="rounded-full border border-neutral-300 bg-white/80 px-4 py-2 text-sm text-neutral-800 disabled:opacity-40">Previous page</button>
+                    <button type="button" onClick={nextPage} disabled={currentPageIndex >= pages.length - 1} className="rounded-full border border-neutral-300 bg-white/80 px-4 py-2 text-sm text-neutral-800 disabled:opacity-40">Next page</button>
+                </div>
+            )}
 
             {/* Side Navigation Arrows */}
             <AnimatePresence>
@@ -263,6 +280,7 @@ export default function InteractiveBook({
                     <>
                         {/* Close Button */}
                         <motion.button
+                            aria-label="Close the book"
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.8 }}
@@ -277,7 +295,8 @@ export default function InteractiveBook({
 
             {/* Hint */}
             {!isOpen && (
-                <motion.div
+                <motion.button
+                    type="button"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 1, duration: 1 }}
@@ -285,7 +304,7 @@ export default function InteractiveBook({
                     onClick={handleOpenBook}
                 >
                     Click to Open
-                </motion.div>
+                </motion.button>
             )}
         </div>
     );
