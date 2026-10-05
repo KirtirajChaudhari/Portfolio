@@ -1,4 +1,4 @@
-import type { SkillGroup, Project, TimelineEntry, Achievement } from "./types";
+import type { SkillGroup, Project, TimelineEntry, ExpertiseArea } from "./types";
 import { siteMeta } from "./shared";
 
 /*
@@ -25,12 +25,6 @@ export const professionalAbout = {
    */
   detail:
     "I am an AI/ML Engineer and a Computer Engineering graduate currently pursuing my M.Tech in Artificial Intelligence and Machine Learning at MIT WPU, Pune. My core passion lies at the intersection of HealthTech, Computer Vision, and Generative AI—building intelligent systems that create a tangible impact on society. Backed by a technical foundation spanning deep learning frameworks (PyTorch, TensorFlow), modern backends (FastAPI, Django), and graph databases (Neo4j), I focus on turning complex models into real-world solutions. Recently, I developed RasaCare, a comprehensive cloud-based practice management and nutrient analysis software tailored specifically for Ayurvedic dietitians.",
-  stats: [
-    { value: 4, label: "Internships" },
-    { value: 9, label: "Projects shipped" },
-    { value: 7.86, label: "B.E. CGPA", decimals: 2 },
-    { value: 22, label: "Tools in rotation" },
-  ] as { value: number; label: string; decimals?: number }[],
 };
 
 export const professionalPrinciples = [
@@ -75,53 +69,46 @@ export const professionalFacts: {
 export const professionalMyStoryHref = "#timeline";
 
 /**
- * Service section, reframed from the template's billable services into
- * areas of expertise (Kirtiraj is a student/fresher, not freelancing).
- * Each row drives a distinct follow-cursor label per the spec.
+ * "What I'm good at" on the Work page. This is the single source for that section:
+ * the page renders `description` and `tools` as written. Every figure here comes
+ * from the 2026 resume (RasaCare, DrishtiManas, Pravaas, PCI LLP).
  */
-export const professionalExpertise: {
-  id: string;
-  index: string;
-  title: string;
-  cursorLabel: string;
-  description: string;
-  tools: string[];
-}[] = [
+export const professionalExpertise: ExpertiseArea[] = [
   {
     id: "ml",
     index: "01",
     title: "Machine Learning",
-    cursorLabel: "Explainable",
+    cursorLabel: "Reviewable",
     description:
-      "Explainable, auditable models for high-stakes decisions — patient-constitution classification at 89% accuracy, Grad-CAM overlays that show clinicians why a prediction was made, and pipelines built to be reviewed, not just run.",
-    tools: ["PyTorch", "TensorFlow", "XGBoost", "scikit-learn"],
+      "Classifiers for clinical decisions that can be reviewed: an XGBoost Prakriti classifier (88% CV accuracy) behind RasaCare, and a DenseNet121 multi-label model (0.81 weighted F1 on 37,649 fundus images) behind DrishtiManas.",
+    tools: ["XGBoost", "PyTorch", "TensorFlow", "scikit-learn"],
   },
   {
-    id: "fullstack",
+    id: "cv",
     index: "02",
-    title: "Full-Stack Development",
-    cursorLabel: "Production",
+    title: "Computer Vision",
+    cursorLabel: "Detection",
     description:
-      "Shipping ML behind real products — FastAPI and Django backends, Next.js and React frontends, role-based access, audit logging, and PostgreSQL/Neo4j data layers. Four internships spent building for production, not for the notebook.",
-    tools: ["FastAPI", "Django", "Next.js", "React", "PostgreSQL"],
+      "Detection and explainability: YOLO11s track-hazard detection under 200 ms on a Jetson Orin Nano with 30% fewer false negatives than a YOLOv5 baseline, a YOLOv8-nano rail-defect second stage, and Grad-CAM heatmaps on medical images.",
+    tools: ["OpenCV", "YOLO", "DenseNet121", "Grad-CAM"],
+  },
+  {
+    id: "kg",
+    index: "03",
+    title: "Knowledge Graphs & Clinical Decision Support",
+    cursorLabel: "Traceable",
+    description:
+      "LLM-free clinical inference over a Neo4j knowledge graph (23K+ nodes, 538 rules, 31 conditions), with rules extracted from primary clinical PDFs, non-suppressible disclaimers and immutable audit logging.",
+    tools: ["Neo4j", "XGBoost", "Python"],
   },
   {
     id: "data-science",
-    index: "03",
-    title: "Data Science & Analysis",
-    cursorLabel: "Insight",
-    description:
-      "Turning raw data into decisions — cleaning, feature engineering, EDA that catches bad data before training, and forecasting that compares models on held-out error rather than trusting one.",
-    tools: ["pandas", "NumPy", "Matplotlib", "XGBoost"],
-  },
-  {
-    id: "cv-nlp",
     index: "04",
-    title: "Computer Vision & NLP",
-    cursorLabel: "Perception",
+    title: "Data Science & Analysis",
+    cursorLabel: "Clean data",
     description:
-      "Real-time perception where latency and safety matter — YOLOv5 obstacle detection at 81% mAP and 28 FPS for railway safety, plus classification and knowledge-graph work spanning medical imaging and language.",
-    tools: ["OpenCV", "YOLOv5", "Grad-CAM", "Neo4j"],
+      "Cleaning, EDA and feature work that catch bad data before training. At PCI LLP I cleaned a 10K-row student dataset, resolving missing values in 5 columns.",
+    tools: ["pandas", "NumPy", "Matplotlib", "scikit-learn"],
   },
 ];
 
@@ -223,31 +210,35 @@ export interface Certification {
   title: string;
   provider: string;
   tier: "program" | "platform" | "simulation";
-  /** Path under /public/certificates/. Empty → text-only card. */
+  /** Shown as a small label next to the title, e.g. "On-going". */
+  status?: string;
+  /** Path under /public/certificates/. Empty → text-only. */
   image: string;
   blurb: string;
 }
 
 /*
- * Certificate images: drop files into `public/certificates/` and set `image`
- * to "/certificates/<filename>" — the card renders it automatically.
+ * Union of the two resumes, in resume wording. `blurb` stays factual: it only
+ * says what the programme covers, never what it led to.
+ * Certificate images: drop files into `public/certificates/` and set `image`.
  */
 export const professionalCertifications: Certification[] = [
   {
     id: "iitk-genai",
-    title: "Gen. AI & Machine Learning",
+    title: "Generative AI & Machine Learning",
     provider: "IIT Kanpur",
     tier: "program",
     image: "",
-    blurb: "Full program in generative AI and applied ML, closed out with three capstone builds.",
+    blurb: "Cohort programme in generative AI and applied machine learning.",
   },
   {
     id: "meta-fullstack",
     title: "Meta Full-Stack Developer",
     provider: "Coursera · Meta",
     tier: "program",
+    status: "On-going",
     image: "",
-    blurb: "Professional certificate covering front-end, back-end, databases, and deployment.",
+    blurb: "Professional certificate covering front-end, back-end, databases and deployment.",
   },
   {
     id: "iitg-cs",
@@ -255,7 +246,7 @@ export const professionalCertifications: Certification[] = [
     provider: "IIT Guwahati",
     tier: "program",
     image: "",
-    blurb: "Core computer-science fundamentals delivered as a credited micro-program.",
+    blurb: "Computer-science fundamentals as a credited micro-programme.",
   },
   {
     id: "oci-ds",
@@ -271,7 +262,7 @@ export const professionalCertifications: Certification[] = [
     provider: "Oracle",
     tier: "platform",
     image: "",
-    blurb: "LLM services, retrieval augmentation, and generative workloads on OCI.",
+    blurb: "Generative AI services on Oracle Cloud Infrastructure.",
   },
   {
     id: "aws-ml",
@@ -279,98 +270,93 @@ export const professionalCertifications: Certification[] = [
     provider: "Coursera · AWS",
     tier: "platform",
     image: "",
-    blurb: "ML services and managed training/inference on the AWS stack.",
+    blurb: "Machine learning services on AWS.",
   },
   {
     id: "deloitte-forage",
-    title: "Deloitte Australia Data Analytics Job Simulation",
-    provider: "Forage",
+    title: "Data Analytics Job Simulation",
+    provider: "Forage · Deloitte Australia",
     tier: "simulation",
     image: "",
-    blurb: "Client-style analytics engagement — forensic data analysis and reporting.",
+    blurb: "Virtual job simulation in data analytics.",
   },
   {
     id: "tata-forage",
-    title: "Tata GenAI Powered Data Analytics Job Simulation",
-    provider: "Forage",
+    title: "GenAI-Powered Data Analytics Job Simulation",
+    provider: "Forage · Tata",
     tier: "simulation",
     image: "",
-    blurb: "GenAI-assisted analytics workflow, from exploration through recommendation.",
+    blurb: "Virtual job simulation in GenAI-powered data analytics.",
   },
 ];
 
 export interface AchievementCard {
   id: string;
-  category: "Professional" | "Academic";
-  year: string;
+  category: "Research" | "Recognition" | "IP";
+  /** Omit when the source gives no year. */
+  year?: string;
+  /** Short label shown beside the year, e.g. "Under review". */
+  status?: string;
   title: string;
   institution: string;
   description: string;
-  /** Path under /public/achievements/. Empty → icon-only card. */
+  /** Path under /public/achievements/. Empty → text only. */
   image: string;
 }
 
 /*
- * Only source-verified achievements. Add more by appending here; drop matching
- * images into `public/achievements/` and set `image` to "/achievements/<file>".
+ * Only source-verified entries (2026 resume + the user's own confirmations).
+ * Statuses are literal: "Under review" is not "accepted", "Registered" carries
+ * no date, diary number or placement beyond what is written here.
  */
 export const professionalAchievementCards: AchievementCard[] = [
   {
-    id: "sih-2025",
-    category: "Professional",
-    year: "2025",
-    title: "Smart India Hackathon — 5th Place, Grand Finale",
-    institution: "Ministry of Education, Govt. of India",
-    description:
-      "Built RasaCare, an Ayurvedic clinical diet platform, in partnership with a practicing physician — a 23K-node Neo4j knowledge graph, an XGBoost Prakriti classifier at 88% CV accuracy, and a 6-layer diet engine under full clinical audit. Placed 5th in the national finals; now live at rasacare.app.",
-    image: "",
-  },
-  {
-    id: "iitk-capstones",
-    category: "Academic",
-    year: "2024",
-    title: "Three Capstone Projects — Gen AI & ML Program",
-    institution: "IIT Kanpur",
-    description:
-      "Completed the program's capstone track with three independent builds: CNN vehicle detection with an autopilot-fatality data study, transfer-learning classification of 11 heritage-architecture categories with a tourism recommender, and multi-restaurant demand forecasting benchmarked across Linear Regression, Random Forest, and XGBoost.",
-    image: "",
-  },
-  {
-    id: "be-hons",
-    category: "Academic",
+    id: "rtcsa-2026",
+    category: "Recognition",
     year: "2026",
-    title: "B.E. Computer Engineering with Honours in AI & ML",
-    institution: "MVPS's KBT College of Engineering, Nashik",
+    title: "1st Position, RTCSA-2026",
+    institution:
+      "Dept. of Computer Science, K K Wagh Arts, Commerce, Science and Computer Science College, Nashik",
     description:
-      "Four-year degree carrying an additional Honours track in AI & ML on top of the core Computer Engineering curriculum. Graduated with a CGPA of 7.86/10.",
+      "Presented the RasaCare research paper at the one-day research conference “Recent Trends in Computer Science and Application (RTCSA-2026)” and placed first.",
     image: "",
   },
   {
-    id: "cbse-x",
-    category: "Academic",
-    year: "2020",
-    title: "92.8% — CBSE Class X",
-    institution: "Shree Swaminarayan Gurukul C.B.S.E. School, Savda",
+    id: "icccmla-2026",
+    category: "Research",
+    year: "2026",
+    status: "Under review",
+    title: "Research paper submitted, ICCCMLA 2026",
+    institution:
+      "2026 IEEE 8th International Conference on Cybernetics, Cognition & Machine Learning Applications",
     description:
-      "Top-band secondary result that opened the Science stream and, from there, the path into computer engineering.",
+      "“RasaCare: A Neuro-Symbolic Clinical Decision-Support System for Constitution-Aware Ayurvedic Diet Recommendation”.",
+    image: "",
+  },
+  {
+    id: "copyright-rasacare",
+    category: "IP",
+    year: "2025",
+    status: "Registered",
+    title: "Copyright registered, Government of India",
+    institution: "Copyright Office, Government of India",
+    description: "The RasaCare software was registered with the Copyright Office.",
+    image: "",
+  },
+  {
+    id: "incubate-2025",
+    category: "Recognition",
+    year: "2025",
+    title: "Finalist, InCubate 2025 (National MedTech Hackathon)",
+    institution: "JIPMER × IIT Bombay",
+    description:
+      "Team shortlisted to the offline finals at JIPMER, Puducherry (5 October 2025) in the inaugural national MedTech hackathon, supported by KCDH, JUSRC and the IIT Bombay Institute Technical Council.",
     image: "",
   },
 ];
 
 export const achievementsSubheading =
-  "Recognition earned by shipping — hackathon finals, capstone builds, and results that held up outside the notebook.";
-
-/**
- * Headline counters. Deliberately reports Internships rather than the template's
- * "Awards" slot — one verified award reads weaker than four real internships,
- * and inventing the rest was not an option.
- */
-export const professionalStatCounters: { value: number; suffix?: string; label: string }[] = [
-  { value: 2, suffix: "+", label: "Years Experience" },
-  { value: 8, label: "Certifications" },
-  { value: 9, label: "Projects" },
-  { value: 4, label: "Internships" },
-];
+  "Research, IP and recognition outside the coursework.";
 
 export const professionalProjects: Project[] = [
   {
@@ -380,8 +366,8 @@ export const professionalProjects: Project[] = [
     description: "A HIPAA-aligned clinical platform generating Prakriti-aware Ayurvedic diet prescriptions. A knowledge graph of 700 herbs, 741 recipes, and 25K+ triples — with classical Rasa/Guna/Virya/Vipaka properties — powers condition-aware diet generation across 10 clinical conditions at 89.1% overall clinical accuracy. Doctors review, prescribe, and version diet charts through a dedicated portal; patients access and download prescribed plans as PDF — all behind audit logging, role-based access, and encrypted transit.",
     role: "Full-Stack AI Developer",
     techStack: ["React", "Django", "MongoDB"],
-    metrics: ["89.1% clinical accuracy", "25K+ graph nodes", "10 clinical conditions", "SIH 2025"],
-    outcome: "5th place, hackathon finals · live at rasacare.app",
+    metrics: ["89.1% clinical accuracy", "25K+ graph nodes", "10 clinical conditions"],
+    outcome: "Live at rasacare.app",
     links: { live: "https://rasacare.app", github: "https://github.com/KirtirajChaudhari/rasacare" },
     thumbnail: "", // Placeholder - uses lucide-react icon gradient if missing
     featured: true,
@@ -593,14 +579,3 @@ export const professionalTimeline: TimelineEntry[] = [
   }
 ];
 
-/*
- * About stat cards. These are REAL counts derived from the content above
- * (7 projects, 8 certifications, 4 internships) — deliberately NOT the
- * template's fabricated "12 years / 270 projects / 50 clients".
- * TODO(kirtiraj): confirm/adjust these numbers before shipping.
- */
-export const professionalAchievements: Achievement[] = [
-  { label: "Projects Shipped", value: 7, suffix: "+" },
-  { label: "Certifications", value: 8 },
-  { label: "Internships", value: 4 },
-];

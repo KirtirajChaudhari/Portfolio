@@ -1,0 +1,49 @@
+{
+  "swipeArc": {
+    "draws": 19,
+    "maxStep": 3,
+    "ringSteps": 18,
+    "centreSwaps": 0,
+    "reversals": 0
+  },
+  "teleport": {
+    "draws": 21,
+    "maxStep": 7,
+    "ringSteps": 20,
+    "centreSwaps": 0,
+    "reversals": 1
+  },
+  "jitter-enter": {
+    "draws": 12,
+    "maxStep": 0,
+    "ringSteps": 0,
+    "centreSwaps": 11,
+    "reversals": 0
+  },
+  "jitter-exit": {
+    "draws": 1,
+    "maxStep": 0,
+    "ringSteps": 0,
+    "centreSwaps": 0,
+    "reversals": 0
+  },
+  "leaveReenter": {
+    "draws": 3,
+    "maxStep": 0,
+    "ringSteps": 0,
+    "centreSwaps": 2,
+    "reversals": 0
+  },
+  "longTasks": [],
+  "idleAfterMs": 590,
+  "idleBaselineOutstanding": 0,
+  "centreHash": "1f1abb9b9ea7ad320556e6fb40b5c636832e6462baea06e0b437fcb47edff144",
+  "settle60": {
+    "settleMs": 240,
+    "draws": 11
+  },
+  "settle144": {
+    "settleMs": 205,
+    "draws": 11
+  }
+}

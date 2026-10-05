@@ -44,6 +44,9 @@ export const heroArt: HeroLayerCopy = {
   action: 'Chapter Two',
 };
 
+/* UI instruction, identical in both layers. Shown only where the lens runs. */
+export const heroHint = 'Hover to look closer. Hold to open it up.';
+
 /* Tiny factual tags. Real information only — place, stack, programme. A label
    that encodes nothing is an eyebrow pretending to be data. */
 export const heroTags = [

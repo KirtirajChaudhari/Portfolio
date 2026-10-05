@@ -10,7 +10,7 @@ export default defineConfig({
   reporter: [['list']],
   use: {
     viewport: { width: 1280, height: 800 },
-    baseURL: 'http://localhost:5173',
+    baseURL: process.env.BASE_URL ?? 'http://localhost:5173',
   },
   webServer: {
     command: 'npm run dev',

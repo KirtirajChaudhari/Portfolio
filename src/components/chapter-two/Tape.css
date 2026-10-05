@@ -1,0 +1,14 @@
+.washi {
+  position: absolute;
+  top: -10px;
+  left: 22%;
+  width: 54px;
+  height: 20px;
+  transform: rotate(var(--rot));
+  background: var(--hue);
+  opacity: 0.55;
+  /* Torn edges. */
+  clip-path: polygon(0 12%, 6% 0, 100% 6%, 96% 100%, 4% 92%);
+  pointer-events: none;
+}
+.washi--right { left: auto; right: 22%; }

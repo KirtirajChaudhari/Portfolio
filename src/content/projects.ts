@@ -30,7 +30,7 @@ export const projectCases: ProjectCase[] = [
   {
     slug: "rasacare",
     title: "RasaCare",
-    oneLiner: "Ayurvedic Clinical Diet & Nutrition Portal (SIH 2025)",
+    oneLiner: "Ayurvedic Clinical Diet & Nutrition Portal",
     techLine: "Next.js 14 · FastAPI · Neo4j · XGBoost",
     screenshot: "/project/RasaCare.png",
     github: "https://github.com/KirtirajChaudhari/RasaCare",
@@ -50,7 +50,7 @@ export const projectCases: ProjectCase[] = [
       "Implemented a 7-signal composite scoring system weighting ML models, Dosha rules, and KG triples to rank meal candidates.",
       "Enforced clinical governance through non-suppressible disclaimers, doctor-only prescribing, and immutable audit logging.",
     ],
-    outcome: "SIH 2025 project · 88% Prakriti classification accuracy · 23K+ graph nodes",
+    outcome: "Live at rasacare.app · 88% Prakriti classification accuracy · 23K+ graph nodes",
   },
   {
     slug: "drishtimanas",

@@ -10,7 +10,7 @@ import path from 'node:path';
  * is a picture of the boot counter (learned in Loop 2).
  */
 
-const URL_ = '/?noboot=1';
+const URL_ = '/xray';
 const SHOTS = path.resolve(process.cwd(), 'docs/shots/loop3');
 
 async function installProbe(page: Page) {

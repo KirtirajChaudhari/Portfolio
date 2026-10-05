@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-05T00:00:00Z",
+  "title": "Design System: Kirtiraj Chaudhari — X-Ray Hero",
+  "extensions": {
+    "colorMeta": {
+      "signal": { "role": "primary", "displayName": "Signal Blue", "canonical": "#0b63e5", "tonalRamp": [] },
+      "safelight": { "role": "primary", "displayName": "Safelight Red", "canonical": "#e4465a", "tonalRamp": [] },
+      "filtered-white": { "role": "neutral", "displayName": "Filtered White", "canonical": "#f2f4f6", "tonalRamp": [] },
+      "safelight-ground": { "role": "neutral", "displayName": "Safelight Ground", "canonical": "#140a0c", "tonalRamp": [] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "H1 in both layers; identical box by construction." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(0.23, 1, 0.32, 1)", "purpose": "Ring opacity fade (220ms)." },
+      { "name": "ink-spring-open", "value": "stiffness 33, damping 9.4", "purpose": "Blot expansion, about 850ms, zeta 0.82." },
+      { "name": "ink-spring-shut", "value": "stiffness 66, damping 13.3", "purpose": "Blot recession, about 600ms." }
+    ],
+    "breakpoints": [
+      { "name": "md", "value": "900px" },
+      { "name": "sm", "value": "600px" },
+      { "name": "xs", "value": "400px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Professional CTA",
+      "kind": "button",
+      "refersTo": "cta-pro",
+      "description": "The single hero action in the professional layer.",
+      "html": "<a class=\"ds-cta-pro\" href=\"#\">See the work</a>",
+      "css": ".ds-cta-pro{display:inline-flex;align-items:center;height:48px;padding:0 28px;border-radius:999px;background:#0b63e5;color:#fff;font:600 17px Inter,system-ui,sans-serif;text-decoration:none;white-space:nowrap}.ds-cta-pro:focus-visible{outline:2px solid #0b63e5;outline-offset:3px}"
+    },
+    {
+      "name": "Artistic Ghost CTA",
+      "kind": "button",
+      "refersTo": "cta-art-ghost",
+      "description": "Inert twin that holds the slot open under the lens. Not pressable.",
+      "html": "<span class=\"ds-cta-art\">Chapter Two</span>",
+      "css": ".ds-cta-art{display:inline-flex;align-items:center;height:48px;padding:0 28px;border-radius:999px;background:#e4465a;color:#140a0c;font:600 17px Inter,system-ui,sans-serif;white-space:nowrap}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Explainability Overlay",
+    "overview": "The hero is the author's own thesis turned on himself: models that show their reasoning, run on the person who built them. A cold professional layer states what he builds. A warm darkroom layer, uncovered by a lens, states why.",
+    "keyCharacteristics": [
+      "Two layers from one template; every geometry value declared once on .hero.",
+      "One accent per layer: signal (cold) and safelight (hot).",
+      "A single display face and weight in both layers.",
+      "Flat surfaces. No card shadows, no glows.",
+      "The lens is theatre, not navigation."
+    ],
+    "rules": [
+      { "name": "The One Voice Rule", "body": "Each layer has one accent and no second.", "section": "colors" },
+      { "name": "The Feather Rule", "body": "No artistic type may live permanently in the 40%-alpha feather band.", "section": "colors" },
+      { "name": "The Registration Rule", "body": "Both layers share the display face, weight and tracking.", "section": "typography" },
+      { "name": "The Per-Frame Rule", "body": "Only transform, opacity and mask-feeding attributes change per frame.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do declare every geometry value once on .hero and consume it in both layers.",
+      "Do keep every link, heading, and case study reachable in accessible DOM.",
+      "Do hold 4.5:1 for all text in both layers."
+    ],
+    "donts": [
+      "Don't invent poetry, lyrics, captions, or photo credits.",
+      "Don't add a second CTA, a second accent, or a gradient blob.",
+      "Don't use live filters or full-bleed raster imagery in the masked layer."
+    ]
+  }
+}

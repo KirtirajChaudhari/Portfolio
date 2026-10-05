@@ -1,0 +1,291 @@
+/* ============================================================
+   THE REGISTRATION CONTRACT
+
+   Every geometry value lives here, on .hero, and is consumed by both layers.
+   Slot heights are explicit grid rows rather than content-driven, so the two
+   stacks are identical by construction: a longer headline on one side can
+   never push that side's lead, CTA or tags out of alignment with the other.
+   ============================================================ */
+.hero {
+  /* — type scale. 44 → 96px display; leading lands on 112px (4 × 28px baseline)
+       at the top of the ramp and holds a ~1.166 ratio all the way down. */
+  --hero-fs: clamp(2.75rem, 7.2vw, 6rem);
+  --hero-lh: clamp(3.2rem, 8.4vw, 7rem);
+  --hero-track: -0.035em;
+  --hero-title-lines: 2;
+
+  --lead-fs: 1.0625rem;   /* 17px */
+  --lead-lh: 1.75rem;     /* 28px — the shared baseline unit */
+  --lead-lines: 4;
+  --lead-measure: 46ch;
+
+  --eyebrow-lh: 1.25rem;
+  --cta-h: 3rem;
+  /* The tag row is fixed too. Every grid row is now a pure function of these
+     properties, so .hero__stack has one deterministic height and
+     `align-content: center` cannot leak a content-length difference from the
+     last row upward into every slot above it — which is exactly what it did
+     at 2560px when this row was `auto`. */
+  --tags-lines: 1;
+  --tags-h: calc(var(--eyebrow-lh) * var(--tags-lines) + 0.5rem * (var(--tags-lines) - 1));
+
+  /* — origin. Both layers anchor their stack to exactly these. */
+  --hero-x: max(var(--sp-6), calc((100vw - var(--maxw-grid)) / 2));
+  --hero-y: clamp(4.5rem, 11vh, 8rem);
+  --hero-gap: 1.75rem;    /* 28px */
+
+  /* — Clean Room (professional). docs/xray-plan.md §4 */
+  --cr-ground: #f2f4f6;
+  --cr-ink: #14161a;
+  --cr-mute: #5a6068;
+  --cr-signal: #0b63e5;
+  --cr-hair: rgba(20, 22, 26, 0.1);
+
+  /* — Safelight (artistic). One accent each, never two. */
+  --sl-ground: #140a0c;
+  --sl-print: #f0e4d9;
+  --sl-mute: #b39c90;
+  --sl-safelight: #e4465a;
+
+  /* Shared display face. BOTH layers use it — that is what lets the two
+     headlines hold the same box, and what makes a font swap harmless. */
+  --hero-display: 'Inter Tight', 'Inter', system-ui, sans-serif;
+
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero__layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+}
+
+.hero__layer--pro {
+  z-index: 0;
+  background: var(--cr-ground);
+  color: var(--cr-ink);
+}
+
+/* No lens (coarse pointer, reduced motion, no JS) means the artistic layer is
+   simply not there and the professional layer is complete on its own. */
+.hero__layer--art {
+  z-index: 1;
+  background: var(--sl-ground);
+  color: var(--sl-print);
+  opacity: 0;
+}
+
+.hero[data-lens-mode='lens'] .hero__layer--art {
+  opacity: 1;
+  -webkit-mask-image: url(#xray-lens);
+  mask: url(#xray-lens);
+}
+
+/* The native cursor is hidden only inside the hero, and only while the lens is
+   actually running — never `html *`, which is what the deleted global cursor
+   did. Anything clickable keeps a pointer so you can still see what is. */
+.hero[data-lens-mode='lens'] { cursor: none; }
+.hero[data-lens-mode='lens'] :is(a, button, [role='button']) { cursor: pointer; }
+
+.hero__defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* The blots start hidden so the displacement filter is not merely idle but
+   absent: nothing to raster, nothing to cache, zero cost until the first
+   pointerdown. The rAF loop flips this once per spill, not per frame. */
+.hero__ink { display: none; }
+
+/* Offscreen animations are never allowed to run. The artistic layer's motion
+   is opt-in per element and only unpauses once the spill has become the room.
+   Loop 5 fills this in; the contract is declared here so it cannot be
+   forgotten there. */
+.hero__layer--art [data-anim] { animation-play-state: paused; }
+.hero[data-flooded] .hero__layer--art [data-anim] { animation-play-state: running; }
+
+.hero__lens-ui {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Negative margin centres the ring on the point, so the rAF loop writes raw
+   coordinates and the transform stays a pure translate. */
+.hero__ring {
+  --ring: 34px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--ring);
+  height: var(--ring);
+  margin: calc(var(--ring) / -2);
+  border: 1.5px solid #fff;
+  border-radius: 50%;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms var(--ease-out);
+  will-change: transform;
+}
+
+/* ── The stack. Identical in both layers, by construction. ────────── */
+/* --hero-x is the GUTTER, and the column is sized by subtracting it rather
+   than by padding a max-width box: with border-box, `max-width: 1360px` plus
+   `padding-inline: 600px` leaves a 160px column at 2560px, which is what broke
+   registration the first time this ran. */
+.hero__stack {
+  width: min(calc(100% - 2 * var(--hero-x)), var(--maxw-grid));
+  margin-inline: auto;
+  padding-block: var(--hero-y) var(--hero-gap);
+
+  display: grid;
+  grid-template-rows:
+    var(--eyebrow-lh)
+    calc(var(--hero-lh) * var(--hero-title-lines))
+    calc(var(--lead-lh) * var(--lead-lines))
+    var(--cta-h)
+    var(--tags-h);
+  gap: var(--hero-gap);
+  justify-items: start;
+}
+
+.hero__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: var(--eyebrow-lh);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.hero__title {
+  font-family: var(--hero-display);
+  font-size: var(--hero-fs);
+  line-height: var(--hero-lh);
+  letter-spacing: var(--hero-track);
+  font-weight: 600;
+  margin: 0;
+  max-width: 15ch;
+  text-wrap: balance;
+}
+
+.hero__lead {
+  font-family: var(--font-body);
+  font-size: var(--lead-fs);
+  line-height: var(--lead-lh);
+  margin: 0;
+  max-width: var(--lead-measure);
+}
+
+.hero__actions {
+  display: flex;
+  align-items: center;
+  height: var(--cta-h);
+}
+
+.hero__cta {
+  display: inline-flex;
+  align-items: center;
+  height: var(--cta-h);
+  padding-inline: 1.75rem;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.hero__tags {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: var(--eyebrow-lh);
+}
+
+.hero__tags li {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.hero__tag-label { text-transform: uppercase; letter-spacing: 0.1em; }
+
+.hero__chapter-link { text-decoration: none; border-bottom: 1px solid currentColor; }
+
+/* Lens instruction. Absolute and identical in both layers, so it registers
+   under the lens. Only where the lens runs: touch and reduced-motion users get
+   no instruction for something that is not there. */
+.hero__hint {
+  display: none;
+  position: absolute;
+  right: var(--hero-x);
+  bottom: clamp(2rem, 6vh, 4rem);
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: var(--eyebrow-lh);
+}
+.hero[data-lens-mode='lens'] .hero__hint { display: flex; }
+.hero__hint-ring {
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
+
+/* ── Per-layer colour. Colour only — never geometry. ──────────────── */
+.hero__layer--pro .hero__hint { color: var(--cr-mute); }
+.hero__layer--art .hero__hint { color: var(--sl-mute); }
+
+.hero__layer--pro .hero__eyebrow,
+.hero__layer--pro .hero__tag-label { color: var(--cr-signal); }
+.hero__layer--pro .hero__lead,
+.hero__layer--pro .hero__tag-detail { color: var(--cr-mute); }
+.hero__layer--pro .hero__cta { background: var(--cr-signal); color: #fff; }
+.hero__layer--pro .hero__chapter-link { color: var(--cr-ink); }
+.hero__layer--pro .hero__cta:focus-visible,
+.hero__layer--pro .hero__chapter-link:focus-visible {
+  outline: 2px solid var(--cr-signal);
+  outline-offset: 3px;
+}
+
+.hero__layer--art .hero__eyebrow,
+.hero__layer--art .hero__tag-label { color: var(--sl-safelight); }
+.hero__layer--art .hero__lead,
+.hero__layer--art .hero__tag-detail { color: var(--sl-mute); }
+/* The artistic CTA is inert (a span that holds the slot). Dressed as a pill it
+   promised a press that lands on "See the work" underneath, so it is plain
+   accent text instead: same height, no false affordance. */
+.hero__layer--art .hero__cta { background: transparent; color: var(--sl-safelight); padding-inline: 0; }
+.hero__layer--art .hero__chapter-link { color: var(--sl-print); }
+
+/* ── Widths. Only the shared custom properties change — never a rule that
+     applies to one layer and not the other. ────────────────────────── */
+@media (max-width: 900px) {
+  .hero { --tags-lines: 2; }
+  .hero__hint { display: none !important; }
+}
+
+@media (max-width: 600px) {
+  .hero {
+    --hero-title-lines: 3;
+    --lead-lines: 5;
+    --hero-gap: 1.25rem;
+    --hero-x: var(--sp-5);
+    --tags-lines: 3;
+  }
+}
+
+@media (max-width: 400px) {
+  .hero { --lead-lines: 6; --tags-lines: 4; }
+}

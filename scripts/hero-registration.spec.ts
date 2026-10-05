@@ -51,12 +51,15 @@ test.describe('hero layer registration', () => {
   for (const width of WIDTHS) {
     test(`registers at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: width < 700 ? 720 : 900 });
-      await page.goto('/');
-      /* BootSequence.vue paints a full-screen curtain at z-index 70. Element
-         screenshots capture whatever overlays the box, so without this every
-         "hero" screenshot is a picture of the boot counter. */
-      await page.waitForSelector('.boot', { state: 'detached', timeout: 15_000 });
-      await page.waitForFunction(() => document.fonts.status === 'loaded');
+      await page.goto('/xray');
+      /* The boot curtain is gone; what matters now is that the hero's fonts have
+         actually been requested and loaded before anything is measured
+         (`document.fonts.status` reads 'loaded' until something asks for a face). */
+      await page.waitForSelector('.hero__title');
+      await page.evaluate(async () => {
+        await Promise.all([document.fonts.load('600 96px "Inter Tight"'), document.fonts.load('400 17px Inter')]);
+        await document.fonts.ready;
+      });
       await page.waitForTimeout(300);
 
       const pro = await slotBoxes(page, 'pro');
@@ -185,7 +188,7 @@ test('cumulative layout shift is zero', async ({ page, browserName }) => {
     }).observe({ type: 'layout-shift', buffered: true });
   });
 
-  await page.goto('/', { waitUntil: 'load' });
+  await page.goto('/xray', { waitUntil: 'load' });
   await page.waitForTimeout(2500);
   const cls = await page.evaluate(() => (window as any).__cls);
   const sources = await page.evaluate(() => (window as any).__clsSources);
@@ -203,7 +206,7 @@ const summarise = (violations: any[]) =>
 
 test('axe: no violations in the hero', async ({ page, browserName }) => {
   test.skip(browserName !== 'chromium', 'run the a11y gate once');
-  await page.goto('/');
+  await page.goto('/xray');
   await page.waitForSelector('.boot', { state: 'detached', timeout: 15_000 });
   await page.waitForTimeout(500);
 

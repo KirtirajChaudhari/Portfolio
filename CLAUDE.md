@@ -1,8 +1,20 @@
 # PROJECT GUARDRAILS — X-Ray Hero
 
-> Scope: this file governs `portfolio-vue`. The parent `../../CLAUDE.md` (premium-site
-> config) still applies for anything not contradicted here. Where they disagree — this
-> repo is Vue 3 + Vite + hand-written CSS tokens, NOT Next.js + Tailwind — this file wins.
+> Scope: this file governs this repo (directory still named `portfolio-vue`; it was
+> migrated from Vue 3 to React on branch `react-tailwind`). The parent `../../CLAUDE.md`
+> (premium-site config) still applies for anything not contradicted here. Where they
+> disagree — this repo is React 19 + Vite + Tailwind v4 + hand-written CSS tokens,
+> NOT Next.js — this file wins.
+
+## Stack
+- React 19, react-router-dom 7, Vite 8, TypeScript. Tailwind v4 via `@tailwindcss/vite`,
+  **no preflight** (`styles/reset.css` owns the reset) and utilities are `important`, so
+  a Tailwind class always beats the unlayered hand-written CSS. New code uses Tailwind;
+  migrated sections keep their former scoped CSS as a sibling `Component.css`.
+- Former Vue scoped styles are now global. BEM names are unique; when adding a generic
+  class name (`card`, `counters`, `tape`) grep for collisions first.
+- Motion: GSAP + Lenis (`hooks/useLenis.tsx`), `motion/react` for new UI, `@react-three/fiber`
+  for the optional 3D overlay. Hooks live in `src/hooks/`.
 
 ## Non-negotiables
 1. Never animate `filter`, `backdrop-filter`, `box-shadow`, `width/height`, `top/left`,
@@ -25,7 +37,7 @@
 - Never invent poetry, lyrics, captions, or photo credits to fill an artistic layout.
   Empty stays empty until Kirtiraj supplies the real thing.
 - `poemFragments` is `[]` and `photographyWall[].src` is `''` by design. Placeholders
-  render as `chapter-two/FilmFrame.vue`, never as a stand-in photo.
+  render as `chapter-two/FilmFrame.tsx`, never as a stand-in photo.
 
 ## Performance budget (hard gates)
 - 60fps sustained during lens movement with Chrome DevTools CPU throttle 4x.
@@ -74,7 +86,41 @@
   dirty check with EPS=0.05px, half-pixel quantisation, `pointerrawupdate` preferred.
   One bug found and fixed at close-out: radius snap threshold 0.5px too tight, loop
   never went idle (delta=9–12 writes). Raised to 2px + position snap on close.
-  All 8 acceptance tests pass. `CustomCursor.vue` deleted (confirmed no orphaned CSS).
+  All 8 acceptance tests pass. `CustomCursor` deleted (confirmed no orphaned CSS).
   BootSequence bypass is dev-only (`import.meta.env.DEV`). Measured: 60fps @1×, 60fps
   @4×, 57.2fps @2560×1440. Lens closes in 299ms. 0 idle writes. Deferred: Loop 3
   seam screenshots in `docs/shots/loop3/` — visual review by human before Loop 5.
+- **Loop 4.1** — lens hint (mirrored static line, lens-mode only), inert art CTA restyled as
+  plain text, feather stops 0.74/0.9, mobile nav pill collision fixed. `DESIGN.md` written.
+- **Migration** — Vue 3 to React 19 + Tailwind v4 (31 SFCs ported, specs unchanged and green:
+  registration 320–2560, lens 60fps, ink). Added the character hero (home `/`): canvas head-tracker driven by
+  64 WebP frames from `scripts/extract_frames.py` (never seeks or plays the MP4).
+- **Site redesign** — routes `/about`, `/work`, `/contact` are separate pages on a shared shell
+  (`components/shell/`: SiteNav pill, lazy ShaderGradient backdrop, editorial-split `Section`).
+  Profile 2 (`/creator`) is one chip in the nav. The lens hero lives at `/xray` (specs run there).
+  Old single-page sections, ScrollIsland, boot curtain, Lenis and GSAP were removed; the Vue
+  originals are in git history. Page copy is written plainly, facts only from `src/content/`.
+- **2026-10-05, five-part update** — (1) `CharacterCanvas` rewritten: time-based smoothing (tau 80ms,
+  dt <= 50ms), frame walking (<= 2 frames/tick at a 120 frames/s budget), centre-lock hysteresis
+  (enter 0.12 / exit 0.14 of vw, +-0.35 frame), centre pose entered and left through the ring frame
+  nearest to it (`manifest.nearestToCenter`), progressive failure-tolerant preload, synchronous redraw on
+  resize, `hover: none` = static centre. Frames regenerated: the ring's old 60->61 seam is now a
+  7-frame bridge through neutral. Gate: `scripts/character-smooth.spec.ts`. (2) Work page order is
+  Projects, Internships, What I'm good at; `professionalExpertise` is the only source. (3) About uses
+  vendored Lightswind `HangingIdCard` (`@/` alias), `LineReveal`/`WordReveal`. (4) Certifications and
+  achievements replaced. (5) Stats strip and every Smart India Hackathon claim removed (SIH was false).
+  Copyright registration year 2025 per the author.
+
+## Learned constraints (2026-10-05)
+- Tailwind v4 without preflight: `border-dashed` / `divide-dashed` set border-style on all four sides and
+  the untouched sides render 3px dashed. `index.css` restores `border-width: 0` in `@layer base`; keep it.
+- A full-screen shader on a software rasteriser (SwiftShader, llvmpipe) logs Chromium's "GPU stall due to
+  ReadPixels" and burns a core. `GradientBackdrop` only uses WebGL when the renderer is not software.
+  three / r3f / ShaderGradient were removed: THREE.Clock deprecation warnings and ~285 kB gzip.
+- Windows setTimeout fake-vsync turns "60Hz" into ~32Hz. The smoothness spec pumps ticks from a
+  MessageChannel against performance.now() instead.
+- `document.fonts.status` reads 'loaded' until something requests a face; specs must call
+  `document.fonts.load(...)` before measuring text.
+- motion/react logs a dev-only "Reduced Motion enabled" warning; console-cleanliness runs use the
+  production build (`BASE_URL=http://localhost:4173 npx playwright test ...`).
+- A route named like a root-level file (`/portfolio` vs `portfolio.html`) is served that file by Vite dev.

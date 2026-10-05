@@ -149,7 +149,11 @@
         <stop offset="0.82" stop-color="#fff" stop-opacity="0.4"/>
         <stop offset="1"    stop-color="#fff" stop-opacity="0"/>
       </radialGradient>
-      <mask id="lens" maskUnits="userSpaceOnUse">
+      <!-- NO maskUnits. See the Loop 4 recovery note in docs/xray-plan.md §11:
+           userSpaceOnUse resolves the mask REGION's default -10%/120% against
+           this 0×0 svg, masking the layer out entirely — which is what the
+           original Loop 1 "svg" rows unknowingly measured. -->
+      <mask id="lens">
         <circle id="lensCircle" cx="640" cy="400" r="240" fill="url(#feather)"/>
       </mask>
     </defs>

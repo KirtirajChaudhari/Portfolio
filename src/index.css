@@ -1,0 +1,41 @@
+/* Tailwind v4 without preflight: styles/reset.css already owns the reset, and
+   preflight would shift button/heading/img defaults the hand-written CSS
+   relies on. The hand-written CSS is unlayered and would beat layered
+   utilities (reset.css `a { color: inherit }` did), so utilities are `important`:
+   a Tailwind class on an element always wins. */
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities) important;
+
+@import './styles/tokens.css';
+@import './styles/reset.css';
+@import './styles/typography.css';
+@import './styles/components.css';
+@import './styles/animations.css';
+
+/* Design tokens exposed as utilities (bg-surface, text-muted, font-display ...).
+   `inline` keeps them live-bound to the chapter-scoped custom properties. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface-solid);
+  --color-ink: var(--text);
+  --color-muted: var(--text-muted);
+  --color-faint: var(--text-faint);
+  --color-accent: var(--accent);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+}
+
+/* Set by GlowCursor while it is running; it draws its own pointer. */
+html.glow-cursor,
+html.glow-cursor * { cursor: none !important; }
+dd { margin: 0; }
+
+/* The one piece of preflight that matters: Tailwind's `border-dashed` and `divide-dashed`
+   set border-style on all four sides, and without a zero border-width reset the
+   untouched sides render as 3px dashed lines. Layered, so any hand-written border
+   (unlayered) and every utility still wins over it. */
+@layer base {
+  *, ::before, ::after { border-width: 0; border-style: solid; }
+}

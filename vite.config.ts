@@ -1,10 +1,12 @@
 import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-// Tells the compiler that <TresMesh>, <primitive> etc. are Tres elements,
-// not unresolved Vue components.
-import { templateCompilerOptions } from '@tresjs/core'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+import { fileURLToPath, URL } from 'node:url'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue({ ...templateCompilerOptions })],
+  plugins: [react(), tailwindcss()],
+  resolve: {
+    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+  },
 })
