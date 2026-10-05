@@ -272,9 +272,14 @@ function createTextureAtlas(textures, isText = false) {
       const y = Math.floor(index / atlasSize) * textureSize;
       const src = texture.source?.data ?? texture.image;
       if (!src) return;
-      try { ctx.drawImage(src, x, y, textureSize, textureSize); }
+      // cover-crop: tiles are square, photos are not
+      const draw = (img) => {
+        const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height, side = Math.min(w, h);
+        ctx.drawImage(img, (w - side) / 2, (h - side) / 2, side, side, x, y, textureSize, textureSize);
+      };
+      try { draw(src); }
       catch {
-        if (fallbackSource) ctx.drawImage(fallbackSource, x, y, textureSize, textureSize);
+        if (fallbackSource) draw(fallbackSource);
       }
     });
   }

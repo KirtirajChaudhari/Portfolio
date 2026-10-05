@@ -289,14 +289,14 @@ test('loop, listener and WebGL-context leak: 10 cycles across five pages', async
     const c = await state();
     expect(c.gl.connected, 'contact: WebGL contexts').toBeLessThanOrEqual(1);
 
-    await go('Profile 2', 1200);
+    await go('Artistic', 1200);
     await page.evaluate(() => document.getElementById('photos')?.scrollIntoView());
     await page.waitForTimeout(2600);
     const p = await state();
     expect(p.gl.connected, 'creator: WebGL contexts').toBeLessThanOrEqual(1);
     expect(p.books, 'creator: books').toBeLessThanOrEqual(1);
 
-    await page.click('nav[aria-label=Primary] >> text=KC');
+    await page.click('nav[aria-label=Primary] >> [aria-label=Home]');
     await page.waitForTimeout(1800);
     const h = await state();
     expect(h.canvases, 'home: canvases').toBe(1);

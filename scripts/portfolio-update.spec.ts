@@ -209,7 +209,7 @@ test('loop-leak: 10 navigation cycles return to baseline', async ({ page }) => {
     expect(w.cards, 'work: id cards leaked').toBe(0);
     if (!perPage.work) perPage.work = w; else expect(w.listeners).toBeLessThanOrEqual(perPage.work.listeners + 1);
 
-    await page.click('nav[aria-label=Primary] >> text=KC');
+    await page.click('nav[aria-label=Primary] >> [aria-label=Home]');
     await page.waitForTimeout(1600);
     const h = await state();
     expect(h.canvases, 'home: duplicate canvases').toBe(1);

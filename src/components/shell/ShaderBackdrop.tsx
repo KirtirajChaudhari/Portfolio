@@ -46,21 +46,25 @@ function compile(gl: WebGLRenderingContext, type: number, src: string) {
 }
 
 export default function ShaderBackdrop({ animate }: { animate: boolean }) {
-  const ref = useRef<HTMLCanvasElement>(null);
+  const host = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const canvas = ref.current;
-    const gl = canvas?.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'low-power' });
-    if (!canvas || !gl) return;       /* the CSS gradient underneath stays */
+    /* A fresh canvas per run: loseContext() in cleanup kills a canvas for good, and StrictMode
+       (dev) re-runs this effect on the same element, which left the backdrop flat and dark. */
+    const canvas = document.createElement('canvas');
+    canvas.className = 'absolute inset-0 h-full w-full';
+    host.current?.appendChild(canvas);
+    const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'low-power' });
+    if (!gl) { canvas.remove(); return; }       /* the CSS gradient underneath stays */
 
     const vs = compile(gl, gl.VERTEX_SHADER, VERT);
     const fs = compile(gl, gl.FRAGMENT_SHADER, FRAG);
-    if (!vs || !fs) return;
+    if (!vs || !fs) { canvas.remove(); return; }
     const prog = gl.createProgram()!;
     gl.attachShader(prog, vs);
     gl.attachShader(prog, fs);
     gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { canvas.remove(); return; }
     gl.useProgram(prog);
 
     const buf = gl.createBuffer();
@@ -110,8 +114,9 @@ export default function ShaderBackdrop({ animate }: { animate: boolean }) {
       window.removeEventListener('resize', resize);
       document.removeEventListener('visibilitychange', onVis);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
+      canvas.remove();
     };
   }, [animate]);
 
-  return <canvas ref={ref} className="absolute inset-0 h-full w-full" />;
+  return <div ref={host} className="absolute inset-0" />;
 }

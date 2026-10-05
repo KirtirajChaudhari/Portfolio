@@ -46,7 +46,7 @@ function useActiveSection(ids: string[]) {
 export default function SiteNav() {
   const { pathname } = useLocation();
   const onCreator = pathname.startsWith('/creator');
-  /* Profile 2 is a paper-white page; the pill flips to dark ink there. */
+  /* Artistic profile is a paper-white page; the pill flips to dark ink there. */
   const light = onCreator;
 
   const activeSection = useActiveSection(
@@ -70,13 +70,13 @@ export default function SiteNav() {
       >
         {/* Home monogram — hidden on the root, always shown on creator so users can escape */}
         {(pathname !== '/' || onCreator) && (
-          <Link to="/" aria-label="Home" className={`${item} hidden font-semibold sm:inline-flex`}>
-            KC
+          <Link to="/" aria-label="Home" className={`${item} hidden items-center sm:inline-flex`}>
+            <img src="/favicon-64.png" alt="" width={24} height={24} className="h-6 w-6 rounded-full" />
           </Link>
         )}
 
         {onCreator ? (
-          /* ── Profile 2: in-page section anchors ── */
+          /* ── Artistic: in-page section anchors ── */
           CREATOR_SECTIONS.map((s) => (
             <a
               key={s.id}
@@ -91,7 +91,7 @@ export default function SiteNav() {
             </a>
           ))
         ) : (
-          /* ── Profile 1: page-level routes ── */
+          /* ── Professional: page-level routes ── */
           PROFILE1_LINKS.map((l) => (
             <NavLink
               key={l.to}
@@ -109,9 +109,9 @@ export default function SiteNav() {
         <Link
           to={onCreator ? '/' : '/creator'}
           className={`${item} inline-flex items-center gap-1 ${onCreator ? '' : active}`}
-          title={onCreator ? 'Back to the engineering profile' : 'See the other side: music, photography, poems'}
+          title={onCreator ? 'Back to the professional profile' : 'See the other side: music, photography, poems'}
         >
-          {onCreator ? 'Profile 1' : 'Profile 2'}
+          {onCreator ? 'Professional' : 'Artistic'}
           <ArrowUpRight size={12} strokeWidth={1.75} />
         </Link>
       </nav>

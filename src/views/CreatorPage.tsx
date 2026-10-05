@@ -16,7 +16,7 @@ function Hero({ vis }: { vis: boolean }) {
     <header className="relative overflow-hidden pb-10 pt-32 sm:pt-40">
       <div className="mx-auto grid max-w-[1180px] items-end gap-10 px-5 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)] lg:gap-16 lg:px-12">
         <div className={`transition-[opacity,transform] duration-[900ms] ease-[cubic-bezier(0.32,0.72,0,1)] ${vis ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
-          <p className="font-mono text-xs uppercase tracking-[0.2em] opacity-70">{meta.kicker} · Profile 2</p>
+          <p className="font-mono text-xs uppercase tracking-[0.2em] opacity-70">{meta.kicker} · Artistic profile</p>
           <h1 className="mt-5 font-display text-[clamp(4rem,15vw,11rem)] font-bold uppercase leading-[0.84] tracking-[-0.02em]">
             Beyond
             <br />
@@ -30,7 +30,7 @@ function Hero({ vis }: { vis: boolean }) {
               to="/"
               className="inline-flex min-h-11 items-center gap-2 rounded-full border border-current/30 px-5 text-sm hover:bg-black/5 focus-visible:outline-2 focus-visible:outline-offset-2"
             >
-              Back to the engineering profile
+              Back to the professional profile
             </Link>
           </div>
         </div>

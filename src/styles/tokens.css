@@ -125,6 +125,27 @@
   --z-boot: 70;
 }
 
+/* --- Chapter One explicit override ---------------------------------
+   When data-chapter="one" is set (by ChapterTheme or by index.html on
+   initial load), override the --bg to the oxblood dark so body
+   background is never the white default, regardless of CSS parse order. */
+[data-chapter="one"] {
+  --bg: #12090a;
+  --text: #f7ece7;
+  --text-muted: rgba(247, 236, 231, 0.7);
+  --text-faint: rgba(247, 236, 231, 0.45);
+  --border: rgba(247, 236, 231, 0.12);
+  --surface-solid: #1e0e10;
+  --surface-2: #2a1416;
+  --surface: rgba(30, 14, 16, 0.72);
+  --accent: #b41d1c;
+  --accent-deep: #d6402c;
+  --accent-glass: rgba(180, 29, 28, 0.12);
+  --accent-glow: rgba(180, 29, 28, 0.22);
+  --chrome: rgba(18, 9, 10, 0.8);
+  --chrome-core: #12090a;
+}
+
 /* --- Tile modes ------------------------------------------------
    Apple stacks edge-to-edge tiles and lets the colour change BE the
    divider. A dark tile re-declares the surface tokens, so children

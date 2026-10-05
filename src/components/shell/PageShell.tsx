@@ -29,7 +29,7 @@ export default function PageShell({ title, children, closing, shader = true }: {
             <Link className="hover:text-white" to="/about">About</Link>
             <Link className="hover:text-white" to="/work">Work</Link>
             <Link className="hover:text-white" to="/contact">Contact</Link>
-            <Link className="hover:text-white" to="/creator">Profile 2</Link>
+            <Link className="hover:text-white" to="/creator">Artistic</Link>
           </nav>
         </div>
       </footer>
