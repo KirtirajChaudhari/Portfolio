@@ -24,6 +24,62 @@ const defaultConfig = {
   hoverColor: "rgba(180, 29, 28, 0.45)",
 };
 
+const defaultItems = [
+  { title: "Motion Study", year: 2024 },
+  { title: "Idle Form", year: 2023 },
+  { title: "Blur Signal", year: 2024 },
+  { title: "Still Drift", year: 2023 },
+  { title: "Tidewalk", year: 2024 },
+  { title: "Core Motion", year: 2022 },
+  { title: "White Bloom", year: 2024 },
+  { title: "Backrun", year: 2023 },
+  { title: "Rushline", year: 2024 },
+  { title: "Afterimage", year: 2023 },
+  { title: "Shadowhead", year: 2022 },
+  { title: "Opal Lace", year: 2024 },
+  { title: "Glassprint", year: 2024 },
+  { title: "Redshift", year: 2023 },
+  { title: "White Noise", year: 2023 },
+  { title: "Twin Field", year: 2024 },
+  { title: "Petalloop", year: 2023 },
+  { title: "Ghostwalk", year: 2024 },
+  { title: "Heatwave", year: 2023 },
+  { title: "Sky Drift", year: 2024 },
+  { title: "Spindle", year: 2022 },
+  { title: "Pacer", year: 2023 },
+  { title: "Stride", year: 2024 },
+  { title: "Cryo Pulse", year: 2022 },
+  { title: "Velvet Blur", year: 2024 },
+];
+
+const defaultImages = [
+  "https://cdn-new.obsidianui.dev/imagess/1.png",
+  "https://cdn-new.obsidianui.dev/imagess/2.png",
+  "https://cdn-new.obsidianui.dev/imagess/3.png",
+  "https://cdn-new.obsidianui.dev/imagess/4.png",
+  "https://cdn-new.obsidianui.dev/imagess/5.png",
+  "https://cdn-new.obsidianui.dev/imagess/6.png",
+  "https://cdn-new.obsidianui.dev/imagess/7.png",
+  "https://cdn-new.obsidianui.dev/imagess/8.png",
+  "https://cdn-new.obsidianui.dev/imagess/9.png",
+  "https://cdn-new.obsidianui.dev/imagess/10.png",
+  "https://cdn-new.obsidianui.dev/imagess/11.png",
+  "https://cdn-new.obsidianui.dev/imagess/12.png",
+  "https://cdn-new.obsidianui.dev/imagess/13.png",
+  "https://cdn-new.obsidianui.dev/imagess/14.png",
+  "https://cdn-new.obsidianui.dev/imagess/15.png",
+  "https://cdn-new.obsidianui.dev/imagess/16.png",
+  "https://cdn-new.obsidianui.dev/imagess/17.png",
+  "https://cdn-new.obsidianui.dev/imagess/18.png",
+  "https://cdn-new.obsidianui.dev/imagess/19.png",
+  "https://cdn-new.obsidianui.dev/imagess/20.jpg",
+  "https://cdn-new.obsidianui.dev/imagess/21.jpg",
+  "https://cdn-new.obsidianui.dev/imagess/22.jpg",
+  "https://cdn-new.obsidianui.dev/imagess/23.jpg",
+  "https://cdn-new.obsidianui.dev/imagess/24.jpg",
+  "https://cdn-new.obsidianui.dev/imagess/25.jpg",
+];
+
 const vertexShader = `
   varying vec2 vUv;
   void main() {
@@ -447,8 +503,8 @@ function ArtGalleryScene({ images, items, cellSize, zoomLevel, showHint, reduced
 
 /** @param {{ images?: string[], items?: { title: string, year: string | number }[], cellSize?: number, zoomLevel?: number, showHint?: boolean, className?: string, style?: import("react").CSSProperties }} props */
 export function ArtGallery({
-  images,
-  items,
+  images = defaultImages,
+  items = defaultItems,
   cellSize = defaultConfig.cellSize,
   zoomLevel = defaultConfig.zoomLevel,
   showHint = true,
@@ -456,8 +512,9 @@ export function ArtGallery({
   style,
 } = {}) {
   const reducedMotion = useEffectReducedMotion();
-  const tiles = images;
-  const captions = tiles.map((_, index) => items[index % items.length] ?? { title: `Frame ${index + 1}`, year: "" });
+  const tiles = images && images.length ? images : defaultImages;
+  const listItems = items && items.length ? items : defaultItems;
+  const captions = tiles.map((_, index) => listItems[index % listItems.length] ?? { title: `Frame ${index + 1}`, year: "" });
 
   return (
     <WebGLSurface className={cn("bg-black", className)} style={style} label="ObsidianUI Art Gallery">

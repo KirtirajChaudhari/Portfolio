@@ -36,7 +36,7 @@ export function LoaderGooeyBlobs({
             <feColorMatrix
               in="blur"
               mode="matrix"
-              values="1 0  18 -7"
+              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7"
               result="gooey"
             />
             <feBlend in="SourceGraphic" in2="gooey" />
