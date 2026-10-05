@@ -111,7 +111,7 @@ export default function InteractiveBook({
                         rotateY: { duration: BOOK_OPEN_DURATION, ease: EASING },
                         zIndex: { delay: isOpen ? BOOK_OPEN_DURATION * 0.6 : BOOK_OPEN_DURATION * 0.4 }
                     }}
-                    style={{ transformStyle: 'transform-3d' }}
+                    style={{ transformStyle: 'preserve-3d' }}
                     onClick={!isOpen ? handleOpenBook : undefined}
                     onHoverStart={() => !isOpen && setIsHovering(true)}
                     onHoverEnd={() => setIsHovering(false)}
@@ -156,7 +156,7 @@ export default function InteractiveBook({
                 </motion.div>
 
                 {/* Pages Stack */}
-                <div className="absolute inset-0 w-full h-full z-0" style={{ transformStyle: 'transform-3d' }}>
+                <div className="absolute inset-0 w-full h-full z-0" style={{ transformStyle: 'preserve-3d' }}>
                     {pages.map((page, index) => {
                         const isFlipped = index <= currentPageIndex;
                         // Stagger delays slightly for a realistic "whip" effect if user clicks fast, 
@@ -166,7 +166,7 @@ export default function InteractiveBook({
                             <motion.div
                                 key={index}
                                 className="absolute inset-0 w-full h-full origin-left bg-[#fdfbf7] rounded-r-md rounded-l-sm shadow-sm border border-neutral-100 "
-                                style={{ transformStyle: 'transform-3d' }}
+                                style={{ transformStyle: 'preserve-3d' }}
                                 initial={{ rotateY: 0, zIndex: pages.length - index }}
                                 animate={{
                                     rotateY: isFlipped ? -180 : 0,
