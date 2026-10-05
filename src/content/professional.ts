@@ -71,7 +71,7 @@ export const professionalMyStoryHref = "#timeline";
 /**
  * "What I'm good at" on the Work page. This is the single source for that section:
  * the page renders `description` and `tools` as written. Every figure here comes
- * from the 2026 resume (RasaCare, DrishtiManas, Pravaas, PCI LLP).
+ * from the project repositories on GitHub (RasaCare, DrishtiManas, RailwayObjectDetectionProject) and PCI LLP.
  */
 export const professionalExpertise: ExpertiseArea[] = [
   {
@@ -80,12 +80,12 @@ export const professionalExpertise: ExpertiseArea[] = [
     title: "Machine Learning",
     cursorLabel: "Reviewable",
     description:
-      "Classifiers for clinical decisions that can be reviewed: an XGBoost Prakriti classifier (88% CV accuracy) behind RasaCare, and a DenseNet121 multi-label model (0.81 weighted F1 on 37,649 fundus images) behind DrishtiManas.",
+      "Classifiers whose output a person can review: an XGBoost Prakriti classifier behind RasaCare (85.6% on a 1,000-sample holdout, 86.74% five-fold CV) and a neural network written from scratch in NumPy behind DrishtiManas (69.1% on a balanced OCT test set).",
     tools: ["XGBoost", "PyTorch", "TensorFlow", "scikit-learn"],
     figures: [
-      { value: "88%", label: "Prakriti classifier, CV accuracy" },
-      { value: "0.81", label: "weighted F1, DrishtiManas" },
-      { value: "37,649", label: "fundus images" },
+      { value: "86.74%", label: "Prakriti classifier, 5-fold CV" },
+      { value: "69.1%", label: "DrishtiManas test accuracy" },
+      { value: "1,000", label: "balanced OCT test images" },
     ],
   },
   {
@@ -94,11 +94,11 @@ export const professionalExpertise: ExpertiseArea[] = [
     title: "Computer Vision",
     cursorLabel: "Detection",
     description:
-      "Detection and explainability: YOLO11s track-hazard detection under 200 ms on a Jetson Orin Nano with 30% fewer false negatives than a YOLOv5 baseline, a YOLOv8-nano rail-defect second stage, and Grad-CAM heatmaps on medical images.",
-    tools: ["OpenCV", "YOLO", "DenseNet121", "Grad-CAM"],
+      "Detection and segmentation: a YOLO11s obstacle detector for railway tracks (67.3% mAP50 after 40 epochs on a small custom set), a YOLOv8-nano rail-defect second stage, and U-Net and DeepLabV3+ experiments for ID-card boundary detection.",
+    tools: ["OpenCV", "YOLO", "U-Net", "DeepLabV3+"],
     figures: [
-      { value: "<200 ms", label: "YOLO11s on a Jetson Orin Nano" },
-      { value: "30%", label: "fewer false negatives than YOLOv5" },
+      { value: "67.3%", label: "mAP50, YOLO11s obstacle detector" },
+      { value: "6.1 ms", label: "per image on a Tesla T4" },
     ],
   },
   {
@@ -107,10 +107,10 @@ export const professionalExpertise: ExpertiseArea[] = [
     title: "Knowledge Graphs & Clinical Decision Support",
     cursorLabel: "Traceable",
     description:
-      "LLM-free clinical inference over a Neo4j knowledge graph (23K+ nodes, 538 rules, 31 conditions), with rules extracted from primary clinical PDFs, non-suppressible disclaimers and immutable audit logging.",
+      "LLM-free clinical inference over a Neo4j knowledge graph (23,756 nodes, 538 pathya-apathya rules, a 31-condition constraint engine), with rules extracted from primary clinical PDFs, non-suppressible disclaimers and immutable audit logging.",
     tools: ["Neo4j", "XGBoost", "Python"],
     figures: [
-      { value: "23K+", label: "graph nodes" },
+      { value: "23,756", label: "graph nodes" },
       { value: "538", label: "rules" },
       { value: "31", label: "conditions" },
     ],
@@ -149,7 +149,7 @@ export const professionalSkills: SkillGroup[] = [
   },
   {
     category: "CV & NLP",
-    items: ["OpenCV", "YOLOv5", "Grad-CAM"],
+    items: ["OpenCV", "YOLOv5", "YOLO11", "U-Net", "DeepLabV3+"],
   },
 ];
 
@@ -381,25 +381,25 @@ export const professionalProjects: Project[] = [
     id: "rasacare",
     title: "RasaCare",
     oneLiner: "Ayurvedic Clinical Diet Intelligence Platform",
-    description: "A HIPAA-aligned clinical platform generating Prakriti-aware Ayurvedic diet prescriptions. A knowledge graph of 700 herbs, 741 recipes, and 25K+ triples — with classical Rasa/Guna/Virya/Vipaka properties — powers condition-aware diet generation across 10 clinical conditions at 89.1% overall clinical accuracy. Doctors review, prescribe, and version diet charts through a dedicated portal; patients access and download prescribed plans as PDF — all behind audit logging, role-based access, and encrypted transit.",
+    description: "A clinical portal that generates Prakriti-aware Ayurvedic diet plans for doctors to review and prescribe. An XGBoost classifier reads 18 physiological features, a Neo4j knowledge graph (23,756 nodes) and 538 pathya-apathya rules extracted from clinical PDFs shape the menu, and a 31-condition constraint engine checks allergens and CKD/ADA thresholds. Every plan carries a clinical disclaimer, and every override and prescription is audit-logged.",
     role: "Full-Stack AI Developer",
-    techStack: ["React", "Django", "MongoDB"],
-    metrics: ["89.1% clinical accuracy", "25K+ graph nodes", "10 clinical conditions"],
+    techStack: ["Next.js", "FastAPI", "PostgreSQL", "Neo4j", "XGBoost"],
+    metrics: ["86.74% Prakriti CV accuracy", "23,756 graph nodes", "31 clinical conditions"],
     outcome: "Live at rasacare.app",
-    links: { live: "https://rasacare.app", github: "https://github.com/KirtirajChaudhari/rasacare" },
+    links: { live: "https://rasacare.app", github: "https://github.com/KirtirajChaudhari/RasaCare" },
     thumbnail: "", // Placeholder - uses lucide-react icon gradient if missing
     featured: true,
   },
   {
     id: "drishtimanas",
     title: "DrishtiManas",
-    oneLiner: "AI-Driven Ocular Disease Screening Platform",
-    description: "An AI-driven screening platform for fundus images. A DenseNet121 multi-label classifier (8 conditions, 0.81 weighted F1 on ~7,530 test images) pairs with Grad-CAM overlays that highlight which image region drove each prediction, giving clinicians an explainable basis to confirm or override the call. Role-based workflows separate technician (upload, QC), doctor (review, sign-off), and admin (audit, model versioning) responsibilities across a Dockerized React + FastAPI + PostgreSQL platform.",
+    oneLiner: "Retinal OCT Classifier, Neural Network From Scratch",
+    description: "A full-stack web app that sorts retinal OCT scans into CNV, DME, Drusen or Normal with a multilayer perceptron written in NumPy: forward pass, backpropagation, optimizers and metrics are all hand-coded, and a numerical gradient check confirms the maths. It scores 69.1% accuracy and 67.9% macro-F1 on a balanced 1,000-image OCTMNIST test set, and the app includes a model report page with every curve and tuning run.",
     role: "AI Developer",
-    techStack: ["PyTorch", "DenseNet121", "FastAPI", "React", "PostgreSQL"],
-    metrics: ["0.81 weighted F1", "7,530 test images", "8 conditions"],
-    outcome: "0.81 weighted F1 · platform shipped",
-    links: { github: "https://github.com/KirtirajChaudhari/drishtimanas" },
+    techStack: ["NumPy", "FastAPI", "React", "TypeScript", "Docker"],
+    metrics: ["69.1% test accuracy", "67.9% macro-F1", "1,000 balanced test images"],
+    outcome: "69.1% test accuracy · live on Vercel",
+    links: { live: "https://drishtimanas-mu.vercel.app", github: "https://github.com/KirtirajChaudhari/DrishtiManas" },
     thumbnail: "", // Placeholder
     featured: true,
   },
@@ -410,9 +410,9 @@ export const professionalProjects: Project[] = [
     description: "A two-model railway safety pipeline: a YOLO11s obstacle detector trained on a custom-annotated set across 6 classes (Animal, Debris, Human, Object, Stone, Tree) as a proof-of-concept dataset → training → deployable-weights workflow, paired with a YOLOv8-nano rail-surface defect detection module in a Streamlit app. Both deploy as lightweight local inference rather than cloud services.",
     role: "ML Engineer",
     techStack: ["Python", "YOLO11s", "Ultralytics", "OpenCV"],
-    metrics: ["81% mAP", "28 FPS inference", "6 obstacle classes"],
+    metrics: ["67.3% mAP50", "6.1 ms per image on a T4", "6 obstacle classes"],
     outcome: "Working two-model safety prototype",
-    links: { github: "https://github.com/KirtirajChaudhari/pravaas" },
+    links: { github: "https://github.com/KirtirajChaudhari/RailwayObjectDetectionProject" },
     thumbnail: "", // Placeholder
     featured: true,
   },

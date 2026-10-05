@@ -38,43 +38,44 @@ export const projectCases: ProjectCase[] = [
     problem:
       "Ayurvedic diet prescription depends on bridging traditional medicine with modern ML-driven clinical decision support. Generic diet apps lack the rigorous clinical constraints, multi-layered Ayurvedic rules, and doctor-prescribable audit trails required for real-world clinical use.",
     approach:
-      "RasaCare is a cloud-based clinical portal built in partnership with a practicing Ayurvedic physician. A doctor selects a patient, and the system generates a personalized meal plan through an 11-phase, non-skippable recommendation pipeline. This pipeline uses an XGBoost model (88% CV accuracy) for Prakriti classification based on 18 physiological features. It then runs through a 6-layer diet engine that evaluates a Neo4j knowledge graph (23K+ nodes), a 31-condition clinical constraint engine (with allergen and CKD/ADA thresholds), and 538 pathya-apathya rules. Designed for strict clinical governance: no LLMs are used for clinical inference, every generated plan includes a non-suppressible clinical disclaimer, and all overrides and prescriptions are immutably audited.",
+      "RasaCare is a cloud-based clinical portal built in partnership with a practicing Ayurvedic physician. A doctor selects a patient, and the system generates a personalized meal plan through an 11-phase, non-skippable recommendation pipeline. This pipeline uses an XGBoost model for Prakriti classification (86.74% five-fold CV accuracy, 85.6% on a 1,000-sample holdout) based on 18 physiological features. It then runs through a 6-layer diet engine that evaluates a Neo4j knowledge graph (23,756 nodes), a 31-condition clinical constraint engine (with allergen and CKD/ADA thresholds), and 538 pathya-apathya rules. Designed for strict clinical governance: no LLMs are used for clinical inference, every generated plan includes a non-suppressible clinical disclaimer, and all overrides and prescriptions are immutably audited.",
     stack: [
       { name: "Next.js 14 & TailwindCSS", role: "Frontend portals for Doctors and Patients with Supabase Auth" },
       { name: "FastAPI & PostgreSQL", role: "Application tier (12 routers) and relational data via SQLAlchemy" },
-      { name: "Neo4j V2", role: "Ayurvedic knowledge graph (23K+ nodes) with a 10-phase deterministic rebuild pipeline" },
-      { name: "XGBoost", role: "Prakriti classification (88% CV accuracy) and 7-signal composite diet scoring" },
+      { name: "Neo4j V2", role: "Ayurvedic knowledge graph (23,756 nodes) with a 10-phase deterministic rebuild pipeline" },
+      { name: "XGBoost", role: "Prakriti classification (86.74% five-fold CV accuracy) and 7-signal composite diet scoring" },
     ],
     decisions: [
       "Total LLM isolation for clinical inference — 538 pathya-apathya rules were extracted directly from primary clinical PDFs, preventing hallucination.",
       "Implemented a 7-signal composite scoring system weighting ML models, Dosha rules, and KG triples to rank meal candidates.",
       "Enforced clinical governance through non-suppressible disclaimers, doctor-only prescribing, and immutable audit logging.",
     ],
-    outcome: "Live at rasacare.app · 88% Prakriti classification accuracy · 23K+ graph nodes",
+    outcome: "Live at rasacare.app · 86.74% Prakriti CV accuracy · 23,756 graph nodes",
   },
   {
     slug: "drishtimanas",
     title: "Drishti Manas",
-    oneLiner: "AI-driven ocular disease screening platform — from Kaggle research to a deployable clinical-support app",
-    techLine: "PyTorch · DenseNet121 · FastAPI · React · PostgreSQL",
+    oneLiner: "Retinal OCT classification with a neural network written from scratch",
+    techLine: "NumPy · FastAPI · React · TypeScript · Tailwind",
     screenshot: "/project/DrishtiManas.png",
     github: "https://github.com/KirtirajChaudhari/DrishtiManas",
+    live: "https://drishtimanas-mu.vercel.app",
     problem:
-      "Diseases such as diabetic retinopathy, glaucoma, and cataracts are leading causes of preventable blindness, but diagnosis still depends on manual fundus-image review by ophthalmologists — a role in chronic global shortage. Screening is slow, repetitive, and subject to fatigue-driven inconsistency, which delays detection precisely when early detection matters most.",
+      "Retinal OCT scans are read by specialists, and two of the four classes need urgent referral: CNV (wet age-related macular degeneration) and DME (diabetic macular edema). Drusen means routine follow-up and a normal retina means nothing. The project asks how far a small, fully transparent neural network can go at sorting these scans.",
     approach:
-      "Framed as an 8-class multi-label classification problem on a combined 37,649 fundus images. The research workflow followed a full data-science lifecycle: data cleaning (blur detection flagged ~14.5% of images), EDA, and modeling via a two-phase transfer-learning strategy on an ImageNet-pretrained DenseNet121. Per-class probability thresholds were computed to improve recall on harder classes, achieving a 0.81 weighted test F1 (0.91 on cataract) over a ~7,530-image test set. The production-facing platform is a React + Vite SPA talking to a FastAPI backend backed by PostgreSQL, containerized with Docker Compose. It features three role-based personas: Technician (guided upload with quality checks), Doctor (AI-prioritized worklist, Grad-CAM heatmap review), and Admin (user management and audit logging).",
+      "The app classifies OCTMNIST scans (109,309 B-scans, 4 classes) with a multilayer perceptron written in NumPy. Each image is cropped, resized to 64x64, and turned into raw-pixel and HOG features (2,788 dimensions). The network is 256 ReLU units with 40% dropout and a 4-way softmax, trained with SGD and momentum on all 97,477 training images. The served model averages three networks and applies a per-class bias correction tuned on a class-balanced validation subsample. A FastAPI service runs the model, and a React and TypeScript app shows predictions next to a model report page with the curves and tuning runs.",
     stack: [
-      { name: "PyTorch & MONAI", role: "Model training (DenseNet121) and Grad-CAM explainability" },
-      { name: "FastAPI", role: "Async backend (SQLAlchemy, Pydantic v2)" },
-      { name: "React 18, Vite, TailwindCSS", role: "Frontend UI for Technician, Doctor, and Admin personas" },
-      { name: "PostgreSQL & Docker Compose", role: "Relational database and GitHub Actions CI blueprint" },
+      { name: "NumPy", role: "The MLP itself: forward pass, backpropagation, optimizers (SGD, momentum, Adam), L2 and early stopping, in about 300 lines" },
+      { name: "scikit-learn", role: "Baseline models and a cross-check of the hand-written metrics only" },
+      { name: "FastAPI", role: "Prediction API that also serves the built frontend" },
+      { name: "React, Vite, TypeScript, Tailwind", role: "Upload, results and model-report pages" },
     ],
     decisions: [
-      "Framed as a multi-label problem because real patients frequently present more than one condition simultaneously.",
-      "Explainability is a first-class feature: a dedicated utility generates Grad-CAM heatmaps so every prediction ships with a visual justification, not just a probability score.",
-      "Deliberate separation between platform engineering and model research — the live repository's inference class is intentionally a lightweight placeholder network engineered model-agnostically so the trained checkpoint can be swapped in.",
+      "Wrote the network by hand instead of using PyTorch, and verified backpropagation with a numerical gradient check (max relative error 1.4e-9).",
+      "Dropout and class-prior calibration helped; the three-model ensemble did not move the test score. It stayed, because it was chosen on validation, and dropping it after seeing the test result would be choosing on the test set.",
+      "Tuned the calibration on a class-balanced subsample, because tuning on the full imbalanced validation split raised validation F1 but lowered test macro-F1 (66.1% to 60.6%).",
     ],
-    outcome: "0.81 weighted F1 on ~7,530 test images · Full-stack 3-persona application",
+    outcome: "69.1% test accuracy · 67.9% macro-F1 on 1,000 balanced OCTMNIST images · live on Vercel",
   },
   {
     slug: "pravaas",
@@ -89,7 +90,7 @@ export const projectCases: ProjectCase[] = [
     problem:
       "Two distinct but related hazards threaten railway track safety: unauthorized objects or beings on the track (animals, people, debris, fallen trees) and physical defects in the rail surface itself (cracks, wear, joint failures). Both are traditionally caught through manual patrols and visual inspection, which cannot scale across thousands of kilometres of track and are prone to human fatigue and inconsistency.",
     approach:
-      "PRAVAAS pairs two YOLO-based systems into one conceptual safety pipeline. Component 1 (my build) watches for track obstructions: a YOLO11s object detector trained on a custom-annotated dataset covering six classes (Animal, Debris, Human, Object, Stone, Tree). It was trained for 40 epochs at 640px on a Tesla T4 GPU, resulting in portable weights for downstream inference on images, video, or a live USB camera feed. Component 2 watches for structural rail defects: a YOLOv8-nano model trained on public Kaggle and Roboflow railway-fault datasets, wrapped in a Streamlit web application. The app supports folder-based batch image upload, session-level caching, a manual accuracy-validation calculator, and a detection summary table.",
+      "PRAVAAS pairs two YOLO-based systems into one conceptual safety pipeline. Component 1 (my build) watches for track obstructions: a YOLO11s object detector trained on a custom-annotated dataset covering six classes (Animal, Debris, Human, Object, Stone, Tree). It was trained for 40 epochs at 640px on a Tesla T4 GPU and reached 67.3% mAP50 (51.8% mAP50-95) on a 26-image validation split, resulting in portable weights for downstream inference on images, video, or a live USB camera feed. Component 2 watches for structural rail defects: a YOLOv8-nano model trained on public Kaggle and Roboflow railway-fault datasets, wrapped in a Streamlit web application. The app supports folder-based batch image upload, session-level caching, a manual accuracy-validation calculator, and a detection summary table.",
     stack: [
       { name: "YOLO11s (Ultralytics)", role: "Obstacle detection model (6 custom classes)" },
       { name: "YOLOv8-nano (Ultralytics)", role: "Rail surface defect detection model" },
@@ -97,10 +98,10 @@ export const projectCases: ProjectCase[] = [
       { name: "Streamlit & OpenCV", role: "Batch upload interface with caching and summary tables" },
     ],
     decisions: [
-      "Obstacle detector framed as a proof-of-concept pipeline (dataset -> training -> deployable weights) on a small 41-image dataset, rather than claiming production-grade accuracy.",
+      "Obstacle detector framed as a proof-of-concept pipeline (dataset -> training -> deployable weights) on a small dataset (about 150 images), rather than claiming production-grade accuracy.",
       "Combined two deployable local inference applications rather than heavyweight cloud services to align with real-world trackside hardware constraints.",
     ],
-    outcome: "Combined safety pipeline — track obstacle detection + rail defect detection",
+    outcome: "67.3% mAP50 on the obstacle detector · two-model safety prototype",
   },
   {
     slug: "bhojansetu",

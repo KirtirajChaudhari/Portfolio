@@ -1,23 +1,15 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
-import { chapterTwoMeta as meta, creatorIntro as intro, musicSection as music, photographyMeta, poetryMeta } from '../content/novel';
+import { chapterTwoMeta as meta, creatorIntro as intro, musicSection as music, poetryMeta } from '../content/novel';
 import SectionHeader from '../components/chapter-two/SectionHeader';
 import Tape from '../components/chapter-two/Tape';
-import PhotoWall from '../components/creator/PhotoWall';
+import PhotographyWall from '../components/chapter-two/PhotographyWall';
 import WritingsBook from '../components/creator/WritingsBook';
 import Reveal from '../components/shell/Reveal';
 import './CreatorPage.css';
 
 const TICKER = ['Tabla', 'Lens', 'Ink'];
-
-/* The dark band for photography keeps the section header's own styling by overriding the chapter's tokens locally. */
-const DARKROOM = {
-  '--text': '#f7ece7',
-  '--text-muted': 'rgb(247 236 231 / 0.72)',
-  '--text-faint': 'rgb(247 236 231 / 0.55)',
-  '--bg': '#12090a',
-} as CSSProperties;
 
 function Hero({ vis }: { vis: boolean }) {
   return (
@@ -151,21 +143,7 @@ export default function CreatorPage() {
     <div className="text-[var(--text)]">
       <Hero vis={vis} />
 
-      {/* Photography: a dark room in the middle of the paper page. */}
-      <section id="photos" className="bg-[#12090a] py-20 sm:py-28" style={DARKROOM} aria-label="Photography">
-        <div className="mx-auto max-w-[1180px] px-5 text-[#f7ece7] sm:px-8 lg:px-12">
-          <SectionHeader
-            note="chasing light…"
-            title="Photography"
-            highlight="Photography"
-            hue="blue"
-            handle={photographyMeta.handle}
-            handleHref={photographyMeta.profileUrl}
-            vis={vis}
-          />
-          <div className="mt-10"><PhotoWall /></div>
-        </div>
-      </section>
+      <PhotographyWall vis={vis} />
 
       <Music vis={vis} />
 

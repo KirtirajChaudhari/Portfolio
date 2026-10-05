@@ -47,7 +47,7 @@ export const techMarquee = [
   "Python", "PyTorch", "TensorFlow", "XGBoost", "scikit-learn",
   "FastAPI", "Django", "Next.js", "React", "TypeScript",
   "PostgreSQL", "Neo4j", "MongoDB", "MySQL",
-  "OpenCV", "YOLOv5", "Grad-CAM", "pandas", "NumPy", "Git",
+  "OpenCV", "YOLO11", "U-Net", "pandas", "NumPy", "Git",
 ];
 
 export const chapterTwoMeta = {

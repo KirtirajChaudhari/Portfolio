@@ -37,8 +37,12 @@ async function scrollThrough(page: Page) {
   await page.waitForTimeout(800);
 }
 
-/* Spotify's embed logs a Windows PlayReady notice in Chromium; it comes from their iframe, not this site. */
-const ours = (b: string[]) => b.filter((x) => !/playready/i.test(x) && !/requestfailed https:\/\/open\.spotify\.com/.test(x));
+/* Spotify's embed logs a Windows PlayReady notice in Chromium, and Instagram's embed makes its own
+   requests and logs its own errors. All of it comes from their frames, not this site. */
+const ours = (b: string[]) => b.filter((x) => !/playready/i.test(x)
+  && !/requestfailed https:\/\/open\.spotify\.com/.test(x)
+  && !/instagram|cdninstagram|fbcdn/i.test(x)
+  && !/Feature Policy: Skipping unsupported feature name/.test(x)); /* Firefox, from the Spotify iframe's `allow` list */
 
 test.describe('navigation order', () => {
   for (const [label, vp] of [['desktop', { width: 1440, height: 900 }], ['mobile', { width: 360, height: 740 }]] as const) {
@@ -148,7 +152,7 @@ test.describe('axe', () => {
       await page.waitForTimeout(2200);
       if (route !== '/') await scrollThrough(page);
       /* Spotify's own embed is third-party markup (aria-required-children inside their list); not ours to fix. */
-      const r = await new AxeBuilder({ page }).exclude('iframe[src*="spotify"]').analyze();
+      const r = await new AxeBuilder({ page }).exclude('iframe[src*="spotify"]').exclude('iframe[src*="instagram"]').exclude('.instagram-media').analyze();
       const rows = r.violations.map((v) => `${v.id} (${v.impact}) x${v.nodes.length}: ${v.nodes[0]?.target?.join(' ')}`);
       console.log(`AXE ${route}`, JSON.stringify(rows));
       expect(rows.filter((x) => /\((serious|critical)\)/.test(x)), `axe ${route}`).toEqual([]);

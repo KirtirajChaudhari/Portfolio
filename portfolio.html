@@ -592,10 +592,10 @@ input,textarea{font:inherit;}
           <span class="corner corner--bl"></span><span class="corner corner--br"></span>
           <div class="project-card__top">
             <h3>RasaCare</h3>
-            <span class="project-card__badge">88% ACC</span>
+            <span class="project-card__badge">86.7% CV</span>
           </div>
-          <p>Ayurvedic Clinical Diet &amp; Nutrition Portal. An XGBoost model classifies the patient's Prakriti at 88% accuracy
-            (5-fold CV, 18 features); a Neo4j food-dosha graph with 23K+ nodes and 538 clinical
+          <p>Ayurvedic Clinical Diet &amp; Nutrition Portal. An XGBoost model classifies the patient's Prakriti at 86.74% accuracy
+            (5-fold CV, 18 features); a Neo4j food-dosha graph with 23,756 nodes and 538 clinical
             rules builds a meal plan across 31 medical conditions for a doctor to review.</p>
           <div class="tag-row">
             <span class="tag">Python</span><span class="tag">FastAPI</span>
@@ -609,14 +609,13 @@ input,textarea{font:inherit;}
           <span class="corner corner--bl"></span><span class="corner corner--br"></span>
           <div class="project-card__top">
             <h3>DrishtiManas</h3>
-            <span class="project-card__badge">5 CLASSES · 3 MODALITIES</span>
+            <span class="project-card__badge">69.1% ACC · OCT</span>
           </div>
-          <p>Ocular &amp; neurological disease screening from fundus, retinal, and OCT imaging.
-            PyTorch handles classification across 5 disease categories; Grad-CAM overlays show
-            which region drove each prediction. FastAPI backend with role-based logins for
-            technician, doctor, and admin.</p>
+          <p>Retinal OCT classifier (CNV, DME, Drusen, Normal) built around a multilayer perceptron
+            written from scratch in NumPy. 69.1% accuracy and 67.9% macro-F1 on a balanced
+            1,000-image OCTMNIST test set, served through a FastAPI backend and a React app.</p>
           <div class="tag-row">
-            <span class="tag">PyTorch</span><span class="tag">TensorFlow</span>
+            <span class="tag">NumPy</span><span class="tag">scikit-learn</span>
             <span class="tag">FastAPI</span><span class="tag">React</span>
           </div>
         </div>
@@ -626,13 +625,13 @@ input,textarea{font:inherit;}
           <span class="corner corner--bl"></span><span class="corner corner--br"></span>
           <div class="project-card__top">
             <h3>PRAVAAS</h3>
-            <span class="project-card__badge">81% mAP · 28 FPS</span>
+            <span class="project-card__badge">67.3% mAP50</span>
           </div>
-          <p>Obstacle detection on railway tracks. A YOLOv5 model trained on 400 labelled frames
-            across 5 obstacle classes — people, animals, debris, vehicles, fallen objects — running
-            fast enough for near-real-time track monitoring on a mid-range GPU.</p>
+          <p>Obstacle detection on railway tracks. A YOLO11s model trained for 40 epochs on a small
+            custom set across 6 classes (animal, debris, human, object, stone, tree), reaching 67.3%
+            mAP50 on a 26-image validation split at about 6 ms per image on a Tesla T4.</p>
           <div class="tag-row">
-            <span class="tag">Python</span><span class="tag">YOLOv5</span><span class="tag">OpenCV</span>
+            <span class="tag">Python</span><span class="tag">YOLO11</span><span class="tag">OpenCV</span>
           </div>
         </div>
 
@@ -698,7 +697,7 @@ input,textarea{font:inherit;}
         <div class="skill-group reveal">
           <p class="skill-group__title">Computer Vision</p>
           <div class="skill-tags">
-            <span class="skill-tag">OpenCV</span><span class="skill-tag">YOLOv5</span>
+            <span class="skill-tag">OpenCV</span><span class="skill-tag">YOLO11</span>
             <span class="skill-tag">Grad-CAM</span>
           </div>
         </div>
