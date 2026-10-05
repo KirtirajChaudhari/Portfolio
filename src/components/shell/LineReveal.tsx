@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, type ElementType } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 
 /** Heading that rises into view one line at a time, each line clipped by its own
@@ -7,9 +7,9 @@ import { motion, useReducedMotion } from 'motion/react';
  *  The full text stays one string for assistive tech; the split spans are hidden. */
 export default function LineReveal({
   text, as: Tag = 'h2', className, delay = 0,
-}: { text: string; as?: ElementType; className?: string; delay?: number }) {
+}: { text: string; as?: 'h1' | 'h2' | 'h3'; className?: string; delay?: number }) {
   const reduce = useReducedMotion();
-  const ref = useRef<HTMLElement>(null);
+  const ref = useRef<HTMLHeadingElement>(null);
   const [lines, setLines] = useState<string[] | null>(null);
   /* Once the first reveal has finished, a re-measure (resize) must not replay it. */
   const played = useRef(false);
