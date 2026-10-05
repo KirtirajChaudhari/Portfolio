@@ -124,3 +124,26 @@
 - motion/react logs a dev-only "Reduced Motion enabled" warning; console-cleanliness runs use the
   production build (`BASE_URL=http://localhost:4173 npx playwright test ...`).
 - A route named like a root-level file (`/portfolio` vs `portfolio.html`) is served that file by Vite dev.
+- **2026-10-05, portfolio v2** — nav order About, Work, Contact. About = pinned dossier (sticky ID card with the new
+  photo that sways with scroll velocity via `ref.nudge`, numbered chapters, typing-keyboard of the tools). Work =
+  project index + detail pane, annotated internship timeline, research-bento expertise (`figures` added to
+  `ExpertiseArea`). Contact = liquid-ocean hero (GPU only) + animated-footer (the two avatars as ASCII) + the
+  mailto form. Profile 2 restyled; writings = `interactive-book` (cover = creative avatar; one real page until
+  `poemFragments` has entries). Six registry installs, one commit each (tag `checkpoint-pre-v2`). `components.json`
+  was hand-written so `shadcn add` never ran `init`; the CLI mis-resolved the first item's `@components` targets
+  into a literal `@/` folder (moved into `src/`). The user's own edits kept: About without "How I work", the
+  Profile-2 portal, and PhotoWall rebuilt on real Instagram embeds (so `art-gallery` is installed, adapted, unused).
+  Currently = "Building RasaCare" (a project, not an employer); MIT-WPU is the current institution.
+
+## Learned constraints (portfolio v2)
+- shadcn registry items declare their own deps even when the project already has an equivalent: `animated-footer`
+  pulled gsap + next-themes, `interactive-book`/`research-bento-grid` pulled framer-motion. Port to `motion/react`
+  and uninstall; GSAP/Lenis stay out. `liquid-ocean` declares none but needs r3f + three.
+- Pin `three` to 0.182: r183+ logs a THREE.Clock deprecation warning through r3f (breaks the clean-console gate).
+- Installing `@react-three/fiber` augments JSX types and breaks `ElementType`-typed tags; use string-literal tag unions.
+- Max one WebGL context per page: `PageShell shader={false}` on Contact (its own ocean). `hasHardwareWebGL()` gates every
+  WebGL piece; the leak spec forces it on with `window.__FORCE_WEBGL__`.
+- Spotify's embed fails axe (aria-required-children) and logs a PlayReady notice on Windows; both come from their
+  iframe and are filtered in `scripts/portfolio-v2.spec.ts`.
+- Lazy routes: a spec that scrolls to an id must wait for the element first.
+

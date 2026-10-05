@@ -423,6 +423,7 @@ function ArtGalleryScene({ images, items, cellSize, zoomLevel, showHint, reduced
       geometry?.dispose();
       material?.dispose();
       renderer?.dispose();
+      renderer?.forceContextLoss?.();   // free the GPU context now, not whenever the GC gets to it
       if (renderer?.domElement?.parentNode === container) container.removeChild(renderer.domElement);
     };
   }, [images, items, cellSize, zoomLevel, reducedMotion]);

@@ -6,9 +6,6 @@ html { -webkit-text-size-adjust: 100%; }
 /* Held while the boot curtain is up, so the page can't move underneath it. */
 html.is-booting, html.is-booting body { overflow: hidden; }
 /* Lenis smooth scrolling — height auto so Lenis can measure document. */
-html.lenis,
-html.lenis body { height: auto; }
-html.lenis { scroll-behavior: auto; }
 body {
   margin: 0;
   background: var(--bg);

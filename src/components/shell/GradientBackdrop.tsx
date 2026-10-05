@@ -7,14 +7,14 @@ const ShaderBackdrop = lazy(() => import('./ShaderBackdrop'));
  *  of the same palette is always underneath, so there is no flash while the
  *  WebGL chunk loads, and it is all you get without a hardware GPU. Reduced motion
  *  renders the shader as a still frame. */
-export default function GradientBackdrop() {
+export default function GradientBackdrop({ shader = true }: { shader?: boolean }) {
   const [gl, setGl] = useState(false);
   const [still, setStill] = useState(false);
 
   useEffect(() => {
-    setGl(hasHardwareWebGL());
+    setGl(shader && hasHardwareWebGL());
     setStill(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  }, []);
+  }, [shader]);
 
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#12090a]">

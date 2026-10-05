@@ -91,3 +91,15 @@
   .pulse-dot::after { animation: none; }
   .float { animation: none; }
 }
+
+/* --- Photo-wall shimmer bar --- */
+@keyframes slide {
+  0%   { transform: translateX(-300%); }
+  100% { transform: translateX(400%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Replace the slide animation with a static opacity fade so the bar is
+     still visible as a progress cue without triggering motion sensitivity. */
+  [class*="animate-[slide"] { animation: none; opacity: 0.4; }
+}
+

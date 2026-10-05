@@ -66,7 +66,7 @@ export default function ContactPage() {
   };
 
   return (
-    <PageShell title="Contact" closing={<FooterBand />}>
+    <PageShell title="Contact" closing={<FooterBand />} shader={false}>
       <OceanHero>
         <div className="px-6 py-14 sm:px-12 sm:py-20 lg:max-w-[46rem]">
           <h1 className="text-balance text-6xl font-semibold leading-[0.98] tracking-[-0.04em] sm:text-8xl">Let's talk.</h1>

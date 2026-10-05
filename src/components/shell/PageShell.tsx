@@ -4,8 +4,9 @@ import { siteMeta } from '../../content/shared';
 import GradientBackdrop from './GradientBackdrop';
 
 /** Dark, red-lit frame shared by About, Work, Contact and the case studies.
- *  `closing` is an optional full-bleed band above the footer nav (Contact uses it). */
-export default function PageShell({ title, children, closing }: { title: string; children: ReactNode; closing?: ReactNode }) {
+ *  `closing` is an optional full-bleed band above the footer nav (Contact uses it).
+ *  `shader={false}` keeps the backdrop static: a page that has its own WebGL scene gets no second context. */
+export default function PageShell({ title, children, closing, shader = true }: { title: string; children: ReactNode; closing?: ReactNode; shader?: boolean }) {
   useEffect(() => {
     document.title = `${title} · ${siteMeta.displayName}`;
     const prev = document.body.style.background;
@@ -15,7 +16,7 @@ export default function PageShell({ title, children, closing }: { title: string;
 
   return (
     <div className="relative isolate min-h-dvh text-[#f7ece7]">
-      <GradientBackdrop />
+      <GradientBackdrop shader={shader} />
       <div className="mx-auto w-full max-w-[1180px] px-5 pb-24 pt-28 sm:px-8 sm:pt-36 lg:px-12">
         {children}
       </div>
