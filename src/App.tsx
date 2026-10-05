@@ -40,7 +40,7 @@ function ScrollManager() {
 function ChapterTheme() {
   const { pathname } = useLocation();
   useEffect(() => {
-    const two = pathname.startsWith('/creator');
+    const two = pathname.startsWith('/creator') || pathname.startsWith('/profile-2');
     document.documentElement.dataset.chapter = two ? 'two' : 'one';
     document.documentElement.style.colorScheme = two ? 'light' : 'dark';
   }, [pathname]);
@@ -61,6 +61,7 @@ export default function App() {
             <Route path="/work" element={<WorkPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/creator" element={<CreatorPage />} />
+            <Route path="/profile-2" element={<CreatorPage />} />
             <Route path="/projects/:slug" element={<ProjectCasePage />} />
             <Route path="/xray" element={<XRayPage />} />
           </Routes>
