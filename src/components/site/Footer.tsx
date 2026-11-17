@@ -13,7 +13,7 @@ const SOCIAL = [
 function Out({ href, children }: { href?: string; children: string }) {
   if (!href) return null;
   return (
-    <a href={href} target="_blank" rel="noopener" className="link inline-flex min-h-9 items-center gap-1">
+    <a href={href} target="_blank" rel="noopener" className="link inline-flex min-h-11 items-center gap-1">
       {children}
       <ArrowUpRight size={14} strokeWidth={1.75} aria-hidden="true" />
       <span className="sr-only"> (opens in a new tab)</span>
@@ -51,18 +51,18 @@ export default function Footer({ close = true }: { close?: boolean }) {
             <ThemeToggle className="-ml-3 mt-3" />
           </div>
           <nav aria-label="Footer" className="flex flex-col items-start">
-            <Link to="/work" viewTransition className="link inline-flex min-h-9 items-center">Work</Link>
-            <Link to="/about" viewTransition className="link inline-flex min-h-9 items-center">About</Link>
-            <Link to="/contact" viewTransition className="link inline-flex min-h-9 items-center">Contact</Link>
+            <Link to="/work" viewTransition className="link inline-flex min-h-11 items-center">Work</Link>
+            <Link to="/about" viewTransition className="link inline-flex min-h-11 items-center">About</Link>
+            <Link to="/contact" viewTransition className="link inline-flex min-h-11 items-center">Contact</Link>
             <Out href={siteMeta.resumeUrl}>Résumé</Out>
           </nav>
           <div className="flex flex-col items-start">
             {SOCIAL.map((s) => <Out key={s.label} href={s.href}>{s.label}</Out>)}
           </div>
           <div className="flex flex-col items-start">
-            <Link to="/creator" className="link inline-flex min-h-9 items-center">Artistic profile</Link>
-            <Link to="/xray" className="link inline-flex min-h-9 items-center">Experiment: lens</Link>
-            <Link to="/character" className="link inline-flex min-h-9 items-center">Experiment: head-tracker</Link>
+            <Link to="/creator" className="link inline-flex min-h-11 items-center">Artistic profile</Link>
+            <Link to="/xray" className="link inline-flex min-h-11 items-center">Experiment: lens</Link>
+            <Link to="/character" className="link inline-flex min-h-11 items-center">Experiment: head-tracker</Link>
           </div>
         </div>
       </div>

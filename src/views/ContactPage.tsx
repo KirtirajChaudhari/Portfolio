@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ArrowUpRight, Check, Copy } from 'lucide-react';
 import Page from '../components/site/Page';
 import { siteMeta as meta } from '../content/shared';
@@ -17,6 +17,10 @@ const ELSEWHERE = [
 type Fields = { name: string; email: string; reason: string; subject: string; message: string };
 type Errors = Partial<Record<keyof Fields, string>>;
 
+const trimmed = (f: Fields): Fields => ({
+  ...f, name: f.name.trim(), email: f.email.trim(), subject: f.subject.trim(), message: f.message.trim(),
+});
+
 function validate(f: Fields): Errors {
   const e: Errors = {};
   if (!f.name) e.name = 'Add your name.';
@@ -31,13 +35,34 @@ export default function ContactPage() {
   const [form, setForm] = useState<Fields>({ name: '', email: '', reason: REASONS[0], subject: '', message: '' });
   const [errors, setErrors] = useState<Errors>({});
   const [sent, setSent] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle');
+  const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const copyAttempt = useRef(0);
+  const copied = copyState === 'copied';
+
+  useEffect(() => () => {
+    if (copyTimer.current) clearTimeout(copyTimer.current);
+    copyAttempt.current++;
+  }, []);
 
   const bind = (k: keyof Fields) => ({
     id: `contact-${k}`,
     name: k,
     value: form[k],
-    onChange: (e: { target: { value: string } }) => setForm((f) => ({ ...f, [k]: e.target.value })),
+    required: k !== 'reason',
+    onChange: (e: { target: { value: string } }) => {
+      const next = { ...form, [k]: e.target.value };
+      setForm(next);
+      setSent(false);
+      // Keep partial/invalid input marked until it passes the submit validator.
+      if (errors[k] && !validate(trimmed(next))[k]) {
+        setErrors((current) => {
+          const remaining = { ...current };
+          delete remaining[k];
+          return remaining;
+        });
+      }
+    },
     'aria-invalid': errors[k] ? true : undefined,
     'aria-describedby': errors[k] ? `contact-${k}-error` : undefined,
   });
@@ -47,7 +72,7 @@ export default function ContactPage() {
   const send = (e: FormEvent) => {
     e.preventDefault();
     setSent(false);
-    const f: Fields = { ...form, name: form.name.trim(), email: form.email.trim(), subject: form.subject.trim(), message: form.message.trim() };
+    const f = trimmed(form);
     const found = validate(f);
     setErrors(found);
     const first = Object.keys(found)[0];
@@ -61,11 +86,17 @@ export default function ContactPage() {
   };
 
   const copy = async () => {
+    const attempt = ++copyAttempt.current;
+    if (copyTimer.current) clearTimeout(copyTimer.current);
+    setCopyState('idle');
     try {
       await navigator.clipboard.writeText(meta.email);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch { /* clipboard blocked: the address is on screen and selectable */ }
+      if (attempt !== copyAttempt.current) return;
+      setCopyState('copied');
+      copyTimer.current = setTimeout(() => setCopyState('idle'), 2000);
+    } catch {
+      if (attempt === copyAttempt.current) setCopyState('error');
+    }
   };
 
   return (
@@ -80,11 +111,15 @@ export default function ContactPage() {
           <a href={`mailto:${meta.email}`} className="t-h2 link break-all [text-decoration-thickness:2px] sm:break-normal">
             {meta.email}
           </a>
-          <button type="button" onClick={copy} className="button button-line">
+          <button type="button" onClick={copy} aria-describedby="copy-address-status" className="button button-line">
             {copied ? <Check size={16} strokeWidth={1.75} aria-hidden="true" /> : <Copy size={16} strokeWidth={1.75} aria-hidden="true" />}
-            <span aria-live="polite">{copied ? 'Copied' : 'Copy address'}</span>
+            <span>{copied ? 'Copied' : 'Copy address'}</span>
           </button>
         </div>
+        <p id="copy-address-status" role="status" className="mt-3 min-h-6 text-sm text-fg-2">
+          {copied && 'Email address copied.'}
+          {copyState === 'error' && "Copy failed. Select the address above."}
+        </p>
       </header>
 
       <div className="wrap grid gap-x-16 gap-y-16 pb-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">

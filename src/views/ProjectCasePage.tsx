@@ -118,7 +118,7 @@ export default function ProjectCasePage() {
 
         <nav aria-label="Next project" className="rule-top">
           <Link to={`/projects/${next.slug}`} viewTransition className="row-link group flex items-end justify-between gap-6 py-12 lg:py-16">
-            <span>
+            <span className="min-w-0">
               <span className="t-data block">Next</span>
               <span className="t-h2 mt-2 block">{next.title}</span>
             </span>

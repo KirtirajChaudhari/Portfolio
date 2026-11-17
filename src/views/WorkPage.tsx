@@ -62,7 +62,7 @@ export default function WorkPage() {
           {rest.map((c) => (
             <article key={c.slug} className="py-14 lg:py-20">
               {c.figure && (
-                <Tilt className="enter mb-9">
+                <Tilt className="enter mb-16">
                   <div className="plate aspect-[4/3]" style={{ viewTransitionName: `shot-${c.slug}` }}>
                     <FormationFigure formation={c.figure} />
                   </div>

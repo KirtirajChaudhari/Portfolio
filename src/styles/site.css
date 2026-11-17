@@ -210,7 +210,7 @@
 }
 
 /* A text link with a travelling arrow: the one "go deeper" affordance. */
-.go { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 560; }
+.go { min-height: 2.75rem; display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 560; }
 .go svg { transition: transform 240ms var(--ease-out); }
 .go:active { transform: scale(0.98); }
 @media (hover: hover) and (pointer: fine) {
@@ -280,7 +280,7 @@
 .skip:focus-visible { transform: none; }
 
 /* ---------- Home stage ---------- */
-.stage { position: relative; }
+.stage { position: relative; --field-wide: 1; }
 .stage-field {
   position: sticky;
   top: 0;
@@ -323,8 +323,9 @@
 .stage[data-step='2'] .stage-caption[data-for='2'],
 .stage[data-step='3'] .stage-caption[data-for='3'] { opacity: 1; }
 
-@media (max-width: 899px) {
-  /* Phones: each panel is a window onto the pinned figure followed by its copy
+@media (max-width: 899px), (max-aspect-ratio: 23/20) {
+  .stage { --field-wide: 0; }
+  /* Stacked layouts: each panel is a window onto the pinned figure followed by its copy
      on solid ground. Scrolling slides the copy up over the figure, and the next
      window opens on the next formation. No point ever crosses a word. */
   .panel {
@@ -448,7 +449,7 @@
   letter-spacing: -0.025em;
   max-width: 11.6em;
 }
-@media (max-width: 899px) {
+@media (max-width: 899px), (max-aspect-ratio: 23/20) {
   .home-title { font-size: clamp(2.25rem, 9.6vw, 3.5rem); font-stretch: 104%; }
 }
 
@@ -462,3 +463,32 @@
   .go:hover .back-arrow { transform: translateX(-4px); }
 }
 .lead-link { transition: color 160ms var(--ease-out); }
+
+/* Long project identifiers remain whole in the accessible name and wrap only
+   where a narrow column needs it. */
+.t-display, .t-h2, .t-h3 { overflow-wrap: anywhere; }
+
+/* Native disclosure keeps the full navigation usable on small screens and
+   before hydration. Theme controls stay outside it and are always available. */
+.desktop-nav { display: flex; align-items: center; }
+.mobile-nav { display: none; }
+@media (max-width: 639px) {
+  .desktop-nav { display: none; }
+  .mobile-nav { display: block; }
+  .mobile-nav summary {
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
+    min-height: 44px; padding-inline: .75rem; cursor: pointer;
+    list-style: none; font-size: .9375rem; border: 1px solid var(--rule-2);
+    border-radius: var(--r-control);
+  }
+  .mobile-nav summary::-webkit-details-marker { display: none; }
+  .mobile-nav nav {
+    position: absolute; top: calc(100% - 1px); left: var(--gutter); right: var(--gutter);
+    display: grid; padding: .5rem; border: 1px solid var(--rule-2);
+    border-radius: var(--r-plate); background: var(--paper);
+    box-shadow: 0 12px 24px -12px var(--shade);
+  }
+  .mobile-nav .nav-link { min-height: 48px; padding-inline: .75rem; }
+  .mobile-nav .nav-link[aria-current='page']::after { display: none; }
+  .mobile-nav .nav-link[aria-current='page'] { background: var(--sunk); }
+}

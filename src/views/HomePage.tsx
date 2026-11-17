@@ -83,7 +83,7 @@ export default function HomePage() {
                 </ul>
                 <Stack line={c.techLine} className="mt-5" />
                 <div className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-3">
-                  <Link to={`/projects/${c.slug}`} viewTransition className="go">
+                  <Link to={`/projects/${c.slug}`} viewTransition className="go" aria-label={`Read the ${c.title} case`}>
                     Read the case
                     <ArrowRight size={18} strokeWidth={1.75} aria-hidden="true" />
                   </Link>

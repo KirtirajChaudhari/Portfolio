@@ -1,5 +1,5 @@
-import { useEffect, type ReactNode } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useEffect, useRef, type ReactNode } from 'react';
+import { useLocation, useNavigationType } from 'react-router-dom';
 import { routeMeta } from '../../content/meta';
 import Footer from './Footer';
 
@@ -7,7 +7,15 @@ import Footer from './Footer';
  *  robots tag in step with the route (content/meta.ts), and renders the main
  *  landmark and the footer. */
 export default function Page({ close = true, children }: { close?: boolean; children: ReactNode }) {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
+  const navigation = useNavigationType();
+  const main = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    // Announce the loaded page and start keyboard reading in its content.
+    // Initial loads and browser Back/Forward retain native focus/restoration.
+    if (navigation !== 'POP' && !hash) main.current?.focus({ preventScroll: true });
+  }, [pathname, hash, navigation]);
 
   useEffect(() => {
     const meta = routeMeta(pathname);
@@ -37,7 +45,7 @@ export default function Page({ close = true, children }: { close?: boolean; chil
 
   return (
     <>
-      <main id="main" tabIndex={-1} className="outline-none">{children}</main>
+      <main ref={main} id="main" tabIndex={-1} className="outline-none">{children}</main>
       <Footer close={close} />
     </>
   );

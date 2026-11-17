@@ -36,7 +36,7 @@ export default function ThemeToggle({ className = '' }: { className?: string }) 
       type="button"
       onClick={flip}
       aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-      className={`grid h-11 w-11 place-items-center rounded-[6px] text-fg-2 transition-[color,transform] duration-150 ease-out hover:text-fg active:scale-[0.94] ${className}`}
+      className={`grid h-11 w-11 shrink-0 place-items-center rounded-[6px] text-fg-2 transition-[color,transform] duration-150 ease-out hover:text-fg active:scale-[0.94] ${className}`}
     >
       <Icon size={18} strokeWidth={1.75} aria-hidden="true" />
     </button>

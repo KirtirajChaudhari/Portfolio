@@ -238,3 +238,13 @@ legacy shell and gallery. Historical results are not new validation of the curre
   Three-run mobile median Performance96, CLS0, LCP2.801s (FAIL<2s). Legacy font/registration
   and two experimental timing gates remain failed here; see docs/creator-plan.md. No full
   acceptance claim. Gallery thumbnails reduce transfer; viewers retain original sources.
+
+
+- Professional UI polish: the home scene reads `--field-wide` from its stage on
+  resize. CSS owns the width/aspect layout contract for both copy and canvas;
+  separate responsive conditions previously caused portrait-tablet overlap and
+  hidden landscape figures. Keep the renderer, formations and easing intact.
+- Professional UI validation is documented in `docs/pro-ui-plan.md`; run the
+  new `scripts/pro-ui.spec.ts` alongside the existing redev gate. The mobile
+  header uses a native disclosure, and client navigation focuses the loaded main
+  landmark while browser Back/Forward retains its normal restoration.

@@ -11,6 +11,8 @@ npm run preview    # serve dist/ with production routing on http://localhost:417
 
 # Acceptance gate, against the build:
 BASE_URL=http://localhost:4173 npx playwright test scripts/redev.spec.ts --project=chromium
+# Professional UI regression gate:
+BASE_URL=http://localhost:4173 npx playwright test scripts/pro-ui.spec.ts --project=chromium
 # Lens and head-tracker gates:
 BASE_URL=http://localhost:4173 npx playwright test scripts/hero-registration.spec.ts scripts/hero-lens.spec.ts scripts/character-smooth.spec.ts --project=chromium
 ```

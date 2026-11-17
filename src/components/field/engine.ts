@@ -166,6 +166,7 @@ export function mountField(canvas: HTMLCanvasElement, stage: HTMLElement, opts: 
     last: 0,
     time: 0,
     dirtySize: true,
+    wide: true,
     dirtyColor: true,
     step: -1,
     /* shown (smoothed) values */
@@ -246,6 +247,8 @@ export function mountField(canvas: HTMLCanvasElement, stage: HTMLElement, opts: 
 
   function resize() {
     const rect = canvas.getBoundingClientRect();
+    // CSS owns both the copy layout and the scene framing. Read only on resize.
+    state.wide = getComputedStyle(stage).getPropertyValue('--field-wide').trim() === '1';
     state.dpr = Math.min(window.devicePixelRatio || 1, gl ? 2 : 1.5);
     state.w = Math.max(1, Math.round(rect.width * state.dpr));
     state.h = Math.max(1, Math.round(rect.height * state.dpr));
@@ -290,7 +293,7 @@ export function mountField(canvas: HTMLCanvasElement, stage: HTMLElement, opts: 
        headline and pushed in once the first project is on screen. Tall screens:
        it sits above the copy. Distance is whatever keeps RADIUS inside that frame. */
     const aspect = state.w / state.h;
-    const wide = aspect > 1.15;
+    const wide = state.wide;
     const halfX = wide ? 0.4 + 0.07 * state.dolly : 0.92;
     const halfY = wide ? 0.88 : 0.46;
     const dist = Math.max(RADIUS / (TAN * aspect * halfX), RADIUS / (TAN * halfY)) * mix3(g.zoom, n.zoom, t.zoom);
