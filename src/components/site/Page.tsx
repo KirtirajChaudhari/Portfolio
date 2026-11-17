@@ -13,6 +13,16 @@ export default function Page({ close = true, children }: { close?: boolean; chil
     const meta = routeMeta(pathname);
     document.title = meta.title;
     document.querySelector('meta[name="description"]')?.setAttribute('content', meta.description);
+    const path = meta.canonicalPath ?? (pathname.replace(/\/+$/, '') || '/');
+    const url = `https://kirtiraj-chaudhari.vercel.app${path}`;
+    document.querySelector('link[rel="canonical"]')?.setAttribute('href', url);
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', url);
+    for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) {
+      document.querySelector(selector)?.setAttribute('content', meta.title);
+    }
+    for (const selector of ['meta[property="og:description"]', 'meta[name="twitter:description"]']) {
+      document.querySelector(selector)?.setAttribute('content', meta.description);
+    }
     let robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
     if (meta.index) robots?.remove();
     else {

@@ -26,12 +26,20 @@ const inlineCss = `<style>${(await readFile(join(dist, sheet[1]), 'utf8')).repla
 const attr = (s) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 function page(route, markup) {
   const meta = routeMeta(route);
-  const url = ORIGIN + (route === '/' ? '/' : route);
+  const url = ORIGIN + (meta.canonicalPath ?? route);
   const swap = (html, pattern, value) => {
     if (!pattern.test(html)) throw new Error(`prerender: ${pattern} not found in index.html`);
     return html.replace(pattern, value);
   };
   let html = shell.replace(sheet[0], () => inlineCss);
+  if (route === '/creator' || route === '/profile-2') {
+    // These faces/images are already in the initial HTML. Discover them in the
+    // head, before the module script and the browser's lazy gallery prefetches.
+    const imagePreload = markup.match(/<link rel="preload" as="image"[^>]*>/)?.[0] ?? '';
+    markup = markup.replace(imagePreload, '');
+    const preload = '<link rel="preload" href="/fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin />' + imagePreload;
+    html = html.replace(/(<script type="module")/, (_, script) => preload + script);
+  }
   html = swap(html, /<title>[^<]*<\/title>/, `<title>${attr(meta.title)}</title>`);
   html = swap(html, /(<meta name="description" content=")[^"]*/, `$1${attr(meta.description)}`);
   html = swap(html, /(<link rel="canonical" href=")[^"]*/, `$1${url}`);

@@ -3,7 +3,7 @@
 
    One identity for the professional pages. Tokens and element rules are
    scoped to `:root[data-chapter="pro"]`; the legacy stylesheets that ship
-   with /creator, /xray and /character are scoped to everything else, so
+   with /xray and /character are scoped to everything else, so
    neither set reaches the other even after both have loaded.
 
    Colour is OKLCH and declared once with light-dark(). The theme follows

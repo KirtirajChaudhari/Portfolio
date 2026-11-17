@@ -9,16 +9,14 @@ const AboutPage = lazy(() => import('./views/AboutPage'));
 const ContactPage = lazy(() => import('./views/ContactPage'));
 const NotFoundPage = lazy(() => import('./views/NotFoundPage'));
 
-/* The three pages that predate the re-dev keep their own nav and stylesheets,
-   all inside their lazy chunks: the artistic profile, and two experiments. */
 const CreatorPage = lazy(() => import('./views/CreatorPage'));
+/* The two experiments keep their own nav and stylesheets in their lazy chunks. */
 const XRayPage = lazy(() => import('./views/XRayPage'));
 const CharacterPage = lazy(() => import('./views/CharacterPage'));
 const LegacyNav = lazy(() => import('./components/shell/SiteNav'));
 
 /** Which token set and stylesheet family a path belongs to. */
-function chapterOf(pathname: string): 'pro' | 'one' | 'two' {
-  if (pathname.startsWith('/creator') || pathname.startsWith('/profile-2')) return 'two';
+function chapterOf(pathname: string): 'pro' | 'one' {
   if (pathname.startsWith('/xray') || pathname.startsWith('/character')) return 'one';
   return 'pro';
 }
@@ -51,11 +49,11 @@ function ScrollManager() {
 /* Set on <html> so every page, including portalled bits, inherits its chapter's
    tokens. Professional pages take their colour scheme from the stylesheet
    (system preference or the saved theme); the legacy pages pin theirs inline. */
-function ChapterTheme({ chapter }: { chapter: 'pro' | 'one' | 'two' }) {
+function ChapterTheme({ chapter }: { chapter: 'pro' | 'one' }) {
   useEffect(() => {
     const root = document.documentElement;
     root.dataset.chapter = chapter;
-    root.style.colorScheme = chapter === 'pro' ? '' : chapter === 'two' ? 'light' : 'dark';
+    root.style.colorScheme = chapter === 'pro' ? '' : 'dark';
   }, [chapter]);
   return null;
 }
@@ -76,8 +74,8 @@ export default function App() {
           <Route path="/projects/:slug" element={<ProjectCasePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/creator" element={<main><CreatorPage /></main>} />
-          <Route path="/profile-2" element={<main><CreatorPage /></main>} />
+          <Route path="/creator" element={<CreatorPage />} />
+          <Route path="/profile-2" element={<CreatorPage />} />
           <Route path="/xray" element={<main><XRayPage /></main>} />
           <Route path="/character" element={<main><CharacterPage /></main>} />
           <Route path="*" element={<NotFoundPage />} />

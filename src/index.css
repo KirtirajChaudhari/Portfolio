@@ -6,6 +6,8 @@
 @import 'tailwindcss/utilities.css' layer(utilities) important;
 
 @import './styles/site.css';
+/* Prerendered Creator layout must be styled before hydration, including with JS off. */
+@import './views/CreatorPage.css';
 
 @theme inline {
   /* Professional pages (styles/site.css). */
@@ -20,7 +22,7 @@
   --font-ui: var(--f-sans);
   --font-data: var(--f-mono);
 
-  /* Legacy pages (styles/legacy.css): /creator, /xray, /character. */
+  /* Legacy pages (styles/legacy.css): /xray, /character. */
   --color-bg: var(--bg);
   --color-surface: var(--surface-solid);
   --color-ink: var(--text);

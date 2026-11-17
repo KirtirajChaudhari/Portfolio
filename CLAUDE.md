@@ -13,8 +13,10 @@
   migrated sections keep their former scoped CSS as a sibling `Component.css`.
 - Former Vue scoped styles are now global. BEM names are unique; when adding a generic
   class name (`card`, `counters`, `tape`) grep for collisions first.
-- Motion: GSAP + Lenis (`hooks/useLenis.tsx`), `motion/react` for new UI, `@react-three/fiber`
-  for the optional 3D overlay. Hooks live in `src/hooks/`.
+- Motion: `motion/react` where needed, CSS transforms and small native rAF loops.
+  GSAP, Lenis, `three` and `@react-three/fiber` are not installed. Home's figure is
+  raw WebGL2 with a 2D fallback; Creator's gallery uses CSS depth without a renderer.
+  Hooks live in `src/hooks/`.
 
 ## Non-negotiables
 1. Never animate `filter`, `backdrop-filter`, `box-shadow`, `width/height`, `top/left`,
@@ -32,12 +34,21 @@
    reference site. Reference sites inform STRUCTURE and CADENCE only.
 
 ## Content truth (repo-specific, overrides any invented copy)
-- Chapter Two / Creator content comes from `src/content/novel.ts`. `src/content/artistic.ts`
+- Creator copy and supplied links come from `src/content/novel.ts`. `src/content/artistic.ts`
   is an older draft and its `poemContent` is AI filler — never render it.
 - Never invent poetry, lyrics, captions, or photo credits to fill an artistic layout.
   Empty stays empty until Kirtiraj supplies the real thing.
-- `poemFragments` is `[]` and `photographyWall[].src` is `''` by design. Placeholders
-  render as `chapter-two/FilmFrame.tsx`, never as a stand-in photo.
+- `poemFragments` in `src/content/poetry.ts` is `[]`. When real fragments are supplied,
+  Creator renders their lines as plain set text; there is no book or placeholder poem.
+- The 57 local images in `src/assets/gallery/` are the supplied collection, not proof
+  of provenance. `20250125-45.webp` has an Adobe Firefly watermark and is excluded.
+  `src/content/photographs.ts` selects 14 in a stable order, with intrinsic dimensions
+  and descriptions of visible subjects only. No invented photo titles or captions.
+  The old empty `photographyWall` records, shuffled gallery and film-frame components
+  have been removed. Do not delete the originals in `public/creator/photos`.
+- The unconfirmed debut story, artist bio and subscriber count are omitted. Reel URLs
+  retain neutral labels until the owner supplies titles. Preserve every word of the
+  supplied `creatorIntro`; its one em dash was changed to a semicolon for the dash rule.
 
 ## Performance budget (hard gates)
 - 60fps sustained during lens movement with Chrome DevTools CPU throttle 4x.
@@ -75,6 +86,10 @@
   invisible center point.
 
 ## Build log
+
+These entries record their respective implementations, not the current dependency list.
+The Creator migration entry below supersedes earlier descriptions of its book, embeds,
+legacy shell and gallery. Historical results are not new validation of the current build.
 
 - **Loop 0** — `docs/xray-plan.md` written. Palette: Clean Room / Safelight.
   Signature: Grad-CAM annotation, not the aperture.
@@ -170,6 +185,25 @@
   RasaCare has a `shot`. Gate: `scripts/redev.spec.ts` (replaces portfolio-v2 and portfolio-update specs).
   Chapter values on `<html data-chapter>` are now `pro`, `one` (xray, character) and `two` (creator).
 
+- **Creator migration (2026-11-17, branch `re-dev`)**. Review and decisions are in
+  `docs/creator-plan.md`. Creator and its `/profile-2` alias now use `Page`, the shared
+  Header/Footer, Archivo/Geist Mono, site tokens and both themes (`data-chapter="pro"`).
+  Only `/xray` and `/character` retain the legacy shell, stylesheet and font loader.
+  The former gallery was already rendering all 57 local photographs in random order,
+  not the placeholders or Instagram embeds described in older entries. It is replaced
+  by a stable 14-photo selection, a CSS pointer wall and a native keyboard-operable
+  dialog. Reduced motion and touch use a static grid; there is no Creator WebGL path.
+  The avatar, duplicate epigraph, marquee, book, invented frame/post numbering and
+  unconfirmed copy are gone. Spotify's titled iframe is inserted near the viewport;
+  direct music and writing links remain available without it. Orphaned gallery/book
+  files and `three`, `@react-three/fiber`, `@types/three` were removed.
+  `/creator` and `/profile-2` are prerendered (15 total routes); the alias canonicals to
+  `/creator` without redirecting. `scripts/redev.spec.ts` now covers Creator, including
+  dialog keys/focus, stable order, static motion paths, no WebGL, metadata and no-JS
+  markup. Current build, browser gates, screenshots and three-run Lighthouse results
+  must be read from the completed evidence in `docs/creator-plan.md`; implementation
+  alone does not establish those gates pass.
+
 ## Learned constraints (re-dev)
 - Two stylesheet families share one document. Keep them apart with zero-specificity scopes, not with weight:
   site base rules are `:where(:root[data-chapter='pro']) el`, legacy reset rules are
@@ -195,3 +229,12 @@
 - Archivo with both axes is 90 kB; instanced to wght 400 to 720 and wdth 100 to 118 and cut to Latin-1 it is
   47 kB (`fonttools`: `varLib.instancer` then `subset`). New weights or widths outside those ranges need a re-cut.
 
+
+- Restart `scripts/serve-dist.mjs` after rebuilding: its compression cache is keyed by
+  path and can serve an old HTML shell referencing deleted asset hashes. A stale
+  server can produce blank lazy routes and misleading test timeouts.
+
+- Creator migration validation: production build and affected12 Creator/prerender checks pass.
+  Three-run mobile median Performance96, CLS0, LCP2.801s (FAIL<2s). Legacy font/registration
+  and two experimental timing gates remain failed here; see docs/creator-plan.md. No full
+  acceptance claim. Gallery thumbnails reduce transfer; viewers retain original sources.

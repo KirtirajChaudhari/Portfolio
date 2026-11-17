@@ -8,7 +8,7 @@ import AxeBuilder from '@axe-core/playwright';
      BASE_URL=http://localhost:4173 npx playwright test scripts/redev.spec.ts --project=chromium
 */
 
-const ROUTES = ['/', '/work', '/projects/rasacare', '/projects/drishtimanas', '/projects/lab-complaint', '/about', '/contact', '/not-a-page'];
+const ROUTES = ['/', '/work', '/projects/rasacare', '/projects/drishtimanas', '/projects/lab-complaint', '/about', '/contact', '/creator', '/not-a-page'];
 const WIDTHS = [320, 390, 768, 1024, 1440];
 
 function watchConsole(page: Page) {
@@ -258,4 +258,161 @@ test('prerendered pages read correctly with JavaScript off', async ({ browser })
     expect(await page.locator('link[rel=canonical]').getAttribute('href')).toBe(`https://kirtiraj-chaudhari.vercel.app${route}`);
   }
   await ctx.close();
+});
+
+
+/* Creator: the photographs stay ordinary images with a keyboard-operated
+   larger view; no GPU or third-party typography participates in first load. */
+const creatorPhotos = (page: Page) => page.locator('#photos button').filter({ has: page.locator('img') });
+
+test('creator: the heading has a readable accessible name and the shared theme persists', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto('/creator');
+  await expect(page.getByRole('heading', { level: 1, name: 'Beyond the code', exact: true })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('data-chapter', 'pro');
+  const light = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  await page.getByRole('button', { name: 'Switch to dark theme' }).first().click();
+  const dark = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  expect(dark).not.toBe(light);
+  await page.reload();
+  await expect(page.locator('h1')).toBeVisible();
+  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(dark);
+});
+
+test('creator: photograph order survives reloads and every thumbnail decodes', async ({ page }) => {
+  await page.goto('/creator');
+  const photos = creatorPhotos(page);
+  await expect(photos).toHaveCount(14);
+  const sources = () => photos.locator('img').evaluateAll((images) => images.map((img) => img.getAttribute('src')));
+  const original = await sources();
+  expect(new Set(original).size).toBe(original.length);
+  for (const image of await photos.locator('img').all()) {
+    await image.scrollIntoViewIfNeeded();
+    await expect.poll(() => image.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+    expect(await image.getAttribute('alt')).toBeTruthy();
+  }
+  await page.reload();
+  await expect(photos).toHaveCount(14);
+  expect(await sources()).toEqual(original);
+});
+
+test('creator: photograph dialog supports arrows, focus containment, Escape and focus return', async ({ page }) => {
+  await page.goto('/creator');
+  const photos = creatorPhotos(page);
+  const opener = photos.first();
+  await opener.scrollIntoViewIfNeeded();
+  await opener.focus();
+  await page.keyboard.press('Enter');
+  const dialog = page.getByRole('dialog', { name: 'Photograph viewer' });
+  await expect(dialog).toBeVisible();
+  expect(await dialog.evaluate((el) => el.contains(document.activeElement))).toBe(true);
+  const picture = dialog.locator('img');
+  const first = await picture.getAttribute('src');
+  await page.keyboard.press('ArrowRight');
+  await expect(picture).not.toHaveAttribute('src', first!);
+  const second = await picture.getAttribute('src');
+  await page.keyboard.press('ArrowLeft');
+  await expect(picture).toHaveAttribute('src', first!);
+  await dialog.getByRole('button', { name: 'Next photograph', exact: true }).click();
+  await expect(picture).toHaveAttribute('src', second!);
+  await dialog.getByRole('button', { name: 'Previous photograph', exact: true }).click();
+  await expect(picture).toHaveAttribute('src', first!);
+  // Tabbing repeatedly must stay inside the native modal, in both directions.
+  for (let i = 0; i < 5; i++) {
+    await page.keyboard.press('Tab');
+    expect(await dialog.evaluate((el) => el.contains(document.activeElement))).toBe(true);
+  }
+  await page.keyboard.press('Shift+Tab');
+  expect(await dialog.evaluate((el) => el.contains(document.activeElement))).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(dialog).not.toBeVisible();
+  await expect(opener).toBeFocused();
+  await opener.click();
+  await dialog.getByRole('button', { name: 'Close photograph', exact: true }).click();
+  await expect(dialog).not.toBeVisible();
+  await expect(opener).toBeFocused();
+});
+
+async function assertStaticCreator(page: Page) {
+  await page.goto('/creator');
+  const wall = page.locator('.creator-photo-wall');
+  await wall.scrollIntoViewIfNeeded();
+  await expect(wall).toHaveAttribute('data-motion', 'static');
+  await expect(creatorPhotos(page)).toHaveCount(14);
+  await page.waitForTimeout(500);
+  // Start counting after hydration and scrolling settle. The static gallery
+  // must not keep scheduling frames in an otherwise idle document.
+  await page.evaluate(() => {
+    const w = window as unknown as { __creatorIdleFrames: number };
+    w.__creatorIdleFrames = 0;
+    const request = window.requestAnimationFrame.bind(window);
+    window.requestAnimationFrame = (callback) => { w.__creatorIdleFrames++; return request(callback); };
+  });
+  await page.mouse.move(160, 400);
+  await page.waitForTimeout(700);
+  expect(await page.evaluate(() => (window as unknown as { __creatorIdleFrames: number }).__creatorIdleFrames)).toBe(0);
+  expect(await page.locator('.creator-photo-grid').evaluate((el) => getComputedStyle(el).transform)).toBe('none');
+}
+
+test('creator: reduced motion has a static grid without idle animation frames', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await assertStaticCreator(page);
+});
+
+test('creator: touch has a static grid without idle animation frames', async ({ browser }) => {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 780 }, hasTouch: true, isMobile: true });
+  try { await assertStaticCreator(await ctx.newPage()); }
+  finally { await ctx.close(); }
+});
+
+test('creator: first load needs no WebGL, Google Fonts, or gallery library', async ({ page }) => {
+  const requests: string[] = [];
+  page.on('request', (request) => requests.push(request.url()));
+  await page.addInitScript(() => {
+    const w = window as unknown as { __creatorWebGLAttempts: number };
+    w.__creatorWebGLAttempts = 0;
+    const getContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, type: string, ...args: unknown[]) {
+      if (/webgl/i.test(type)) w.__creatorWebGLAttempts++;
+      return (getContext as (...args: unknown[]) => unknown).call(this, type, ...args);
+    } as typeof getContext;
+  });
+  await page.goto('/creator');
+  await expect(page.locator('h1')).toBeVisible();
+  await page.waitForTimeout(500);
+  expect(requests.filter((url) => /fonts\.googleapis\.com|fonts\.gstatic\.com|three(?:\.module)?(?:[-.]|\/)|art-gallery/i.test(url))).toEqual([]);
+  await page.locator('#photos').scrollIntoViewIfNeeded();
+  await creatorPhotos(page).last().scrollIntoViewIfNeeded();
+  expect(await page.evaluate(() => (window as unknown as { __creatorWebGLAttempts: number }).__creatorWebGLAttempts)).toBe(0);
+  await expect(page.locator('canvas')).toHaveCount(0);
+});
+
+test('creator: Spotify is deferred until the music section approaches', async ({ page }) => {
+  const spotifyRequests: string[] = [];
+  page.on('request', (request) => { if (request.url().startsWith('https://open.spotify.com/embed/')) spotifyRequests.push(request.url()); });
+  await page.goto('/creator');
+  await expect(page.locator('h1')).toBeVisible();
+  expect(spotifyRequests).toEqual([]);
+  await expect(page.locator('iframe[src^="https://open.spotify.com/embed/"]')).toHaveCount(0);
+  await page.locator('#music').scrollIntoViewIfNeeded();
+  const player = page.locator('iframe[src^="https://open.spotify.com/embed/"]');
+  await expect(player).toHaveCount(1);
+  await expect(player).toHaveAttribute('title', /.+/);
+  await expect.poll(() => spotifyRequests.length).toBeGreaterThan(0);
+});
+
+test('creator and profile-2 keep canonical, readable HTML with JavaScript off', async ({ browser }) => {
+  const ctx = await browser.newContext({ javaScriptEnabled: false });
+  try {
+    const page = await ctx.newPage();
+    for (const route of ['/creator', '/profile-2']) {
+      await page.goto(route);
+      await expect(page.getByRole('heading', { level: 1, name: 'Beyond the code', exact: true })).toBeVisible();
+      await expect(page.locator('h1')).toHaveCount(1);
+      await expect(page).toHaveTitle('Creator · Kirtiraj Chaudhari');
+      await expect(page.locator('link[rel=canonical]')).toHaveAttribute('href', 'https://kirtiraj-chaudhari.vercel.app/creator');
+      await expect(page.locator('#photos img')).toHaveCount(14);
+      await expect(page.getByRole('link', { name: /Musical Kirtiraj|YouTube/ }).first()).toHaveAttribute('href', 'https://www.youtube.com/@MusicalKirtiraj');
+    }
+  } finally { await ctx.close(); }
 });

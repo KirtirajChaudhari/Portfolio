@@ -5,14 +5,14 @@
  * and were deleted rather than carried forward. The section links out to
  * the real account instead.
  *
- * `poemFragments` is the slot for that to change: drop ONE short, real
- * fragment in and the notebook's open page renders it automatically.
+ * `poemFragments` is the slot for that to change: supplied real fragments
+ * render as plain set text on /creator, with their publication links.
  * Leave it empty rather than inventing something to fill the space.
  */
 
 export interface PoemFragment {
   id: string;
-  /** A few real lines — kept short; the notebook is not a reader. */
+  /** Real lines, preserved as supplied and rendered with line breaks. */
   lines: string[];
   /** Where this piece is published. */
   href: string;
