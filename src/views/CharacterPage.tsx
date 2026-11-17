@@ -5,11 +5,15 @@ import { ArrowUpRight } from 'lucide-react';
 import { siteMeta } from '../content/shared';
 import CharacterCanvas from '../components/character/CharacterCanvas';
 import GlowCursor from '../components/character/GlowCursor';
+import { LEGACY_FONTS, loadStylesheet } from '../lib/fonts';
+import '../styles/legacy.css';
 
 /* Real facts only, from content/xray.ts and content/professional.ts. */
 const BIO = 'I build machine learning that shows its reasoning: clinical nutrition, disease screening, railway safety. M.Tech AI & ML at MIT-WPU, Pune. Currently building RasaCare.';
 
 const FONT_HREF = 'https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap';
+
+loadStylesheet(LEGACY_FONTS);
 
 export default function CharacterPage() {
   const reduce = useReducedMotion();
@@ -18,7 +22,7 @@ export default function CharacterPage() {
   const [bg, setBg] = useState('#b41d1c');
 
   useEffect(() => {
-    document.title = 'Kirtiraj Nitin Chaudhari — AI/ML Engineer';
+    document.title = 'Head-tracker · Kirtiraj Chaudhari';
     let link = document.querySelector<HTMLLinkElement>(`link[href="${FONT_HREF}"]`);
     if (!link) {
       link = document.createElement('link');

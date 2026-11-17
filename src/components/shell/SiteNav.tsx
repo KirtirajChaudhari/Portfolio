@@ -1,6 +1,7 @@
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
+import '../../styles/legacy.css';
 
 const PROFILE1_LINKS = [
   { to: '/about', label: 'About' },
@@ -45,9 +46,9 @@ function useActiveSection(ids: string[]) {
  *  the end as its own chip, so the two sides of the site are always one click apart. */
 export default function SiteNav() {
   const { pathname } = useLocation();
-  const onCreator = pathname.startsWith('/creator');
-  /* Artistic profile is a paper-white page; the pill flips to dark ink there. */
-  const light = onCreator;
+  const onCreator = pathname.startsWith('/creator') || pathname.startsWith('/profile-2');
+  /* The artistic profile and the lens experiment sit on pale grounds; the pill flips to dark ink there. */
+  const light = onCreator || pathname.startsWith('/xray');
 
   const activeSection = useActiveSection(
     onCreator ? CREATOR_SECTIONS.map((s) => s.id) : [],
@@ -69,8 +70,8 @@ export default function SiteNav() {
         className={`flex items-center gap-0.5 rounded-full border p-1.5 backdrop-blur-[20px] ${shell}`}
       >
         {/* Home monogram — hidden on the root, always shown on creator so users can escape */}
-        {(pathname !== '/' || onCreator) && (
-          <Link to="/" aria-label="Home" className={`${item} hidden items-center sm:inline-flex`}>
+        {(
+          <Link to="/" aria-label="Home" className={`${item} inline-flex items-center`}>
             <img src="/favicon-64.png" alt="" width={24} height={24} className="h-6 w-6 rounded-full" />
           </Link>
         )}

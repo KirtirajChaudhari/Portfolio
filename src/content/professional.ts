@@ -3,7 +3,7 @@ import { siteMeta } from "./shared";
 
 /*
  * The hero tile carries exactly three lines: the role above the name, the name
- * itself, and a one-line tagline under it. Author-supplied — do not expand.
+ * itself, and a one-line tagline under it. Author-supplied, do not expand.
  */
 export const professionalHero = {
   eyebrow: siteMeta.role,
@@ -12,10 +12,21 @@ export const professionalHero = {
 };
 
 export const professionalMission =
-  "To build machine learning that explains itself — models a doctor, a reviewer, or an operator can interrogate before they act on it. Accuracy is the entry fee; accountability is the product.";
+  "To build machine learning that explains itself, models a doctor, a reviewer, or an operator can interrogate before they act on it. Accuracy is the entry fee; accountability is the product.";
 
 export const professionalVision =
   "A world where high-stakes AI is auditable by default: every prediction traceable to its evidence, every override logged, and every system built so the people it serves can question it.";
+
+/*
+ * The About page renders `aboutBio`: the same facts as the author's paragraph
+ * below it, in plain sentences. `professionalAbout.detail` is the author's own
+ * wording, kept verbatim so the page can go back to it.
+ */
+export const aboutBio = [
+  "I'm an AI/ML engineer and a computer engineering graduate, now doing an M.Tech in Artificial Intelligence and Machine Learning at MIT-WPU, Pune.",
+  "My interests are health tech, computer vision and generative AI. I use PyTorch and TensorFlow for the models, FastAPI and Django for the services around them, and Neo4j when the problem is a graph.",
+  "The most recent build is RasaCare, a cloud-based practice-management and nutrient-analysis tool for Ayurvedic dietitians.",
+];
 
 export const professionalAbout = {
   heading: "About",
@@ -24,7 +35,7 @@ export const professionalAbout = {
    * because the statement line it used to carry now opens the hero.
    */
   detail:
-    "I am an AI/ML Engineer and a Computer Engineering graduate currently pursuing my M.Tech in Artificial Intelligence and Machine Learning at MIT WPU, Pune. My core passion lies at the intersection of HealthTech, Computer Vision, and Generative AI—building intelligent systems that create a tangible impact on society. Backed by a technical foundation spanning deep learning frameworks (PyTorch, TensorFlow), modern backends (FastAPI, Django), and graph databases (Neo4j), I focus on turning complex models into real-world solutions. Recently, I developed RasaCare, a comprehensive cloud-based practice management and nutrient analysis software tailored specifically for Ayurvedic dietitians.",
+    "I am an AI/ML Engineer and a Computer Engineering graduate currently pursuing my M.Tech in Artificial Intelligence and Machine Learning at MIT WPU, Pune. My core passion lies at the intersection of HealthTech, Computer Vision, and Generative AI, building intelligent systems that create a tangible impact on society. Backed by a technical foundation spanning deep learning frameworks (PyTorch, TensorFlow), modern backends (FastAPI, Django), and graph databases (Neo4j), I focus on turning complex models into real-world solutions. Recently, I developed RasaCare, a comprehensive cloud-based practice management and nutrient analysis software tailored specifically for Ayurvedic dietitians.",
 };
 
 export const professionalPrinciples = [
@@ -51,7 +62,7 @@ export const professionalFacts: {
   href?: string;
 }[] = [
   { label: "Location", value: "Pune, India" },
-  { label: "Education", value: "M.Tech AI & ML — MIT-WPU" },
+  { label: "Education", value: "M.Tech AI & ML, MIT-WPU" },
   { label: "Experience", value: "4 internships" },
   {
     label: "GitHub",
@@ -65,7 +76,7 @@ export const professionalFacts: {
   },
 ];
 
-/** "My Story" primary button target — in-page anchor to the journey (Experience & Education). */
+/** "My Story" primary button target, in-page anchor to the journey (Experience & Education). */
 export const professionalMyStoryHref = "#timeline";
 
 /**
@@ -156,7 +167,7 @@ export const professionalSkills: SkillGroup[] = [
 /**
  * Skills with proficiency levels for the animated progress bars.
  * Levels are self-assessed against depth of use across the four internships
- * and nine projects — not a benchmark score.
+ * and nine projects, not a benchmark score.
  */
 export const professionalSkillLevels: { category: string; icon: string; items: { name: string; level: number }[] }[] = [
   {
@@ -420,7 +431,7 @@ export const professionalProjects: Project[] = [
     id: "lab-complaint",
     title: "Lab Complaint Management System",
     oneLiner: "Ticketing system for lab equipment complaints",
-    description: "A ticketing system tracking lab-equipment complaints across 3 labs and 4 user roles. Staff raise tickets, admins move them through open → in-progress → resolved. Deployed and in active use — 200+ tickets processed across 8 complaint categories since launch.",
+    description: "A ticketing system tracking lab-equipment complaints across 3 labs and 4 user roles. Staff raise tickets, admins move them through open → in-progress → resolved. Deployed and in active use: 200+ tickets processed across 8 complaint categories since launch.",
     role: "Backend Developer",
     techStack: ["Django", "MySQL", "REST APIs"],
     metrics: ["200+ tickets processed", "8 complaint categories", "4 user roles"],
@@ -433,7 +444,7 @@ export const professionalProjects: Project[] = [
     id: "autonomous-driving",
     title: "Autonomous Driving",
     oneLiner: "Vehicle Detection & Autopilot Safety Analysis",
-    description: "A CNN-based object-detection model that classifies and localizes vehicles in road imagery, paired with a data-science investigation of the Tesla-Deaths dataset — cleaning, EDA across year, country, and model, and analysis of verified autopilot-involved fatalities.",
+    description: "A CNN-based object-detection model that classifies and localizes vehicles in road imagery, paired with a data-science investigation of the Tesla-Deaths dataset: cleaning, EDA across year, country, and model, and analysis of verified autopilot-involved fatalities.",
     role: "ML/Data Science Engineer",
     techStack: ["Python", "TensorFlow/PyTorch", "OpenCV", "pandas"],
     links: { github: "https://github.com/KirtirajChaudhari/autonomous-driving" },
@@ -445,7 +456,7 @@ export const professionalProjects: Project[] = [
     id: "preserving-heritage",
     title: "Preserving Heritage",
     oneLiner: "Structure Classification & Tourism Recommender",
-    description: "Transfer learning on a pretrained CNN backbone to classify 11 categories of historical architecture — trained with and without augmentation and monitored for overfitting — plus a collaborative-filtering engine recommending Indonesian tourism destinations from a tourist's location.",
+    description: "Transfer learning on a pretrained CNN backbone to classify 11 categories of historical architecture, trained with and without augmentation and monitored for overfitting, plus a collaborative-filtering engine recommending Indonesian tourism destinations from a tourist's location.",
     role: "ML Engineer",
     techStack: ["Python", "TensorFlow", "OpenCV", "pandas"],
     links: { github: "https://github.com/KirtirajChaudhari/preserving-heritage" },
@@ -457,7 +468,7 @@ export const professionalProjects: Project[] = [
     id: "sales-forecasting",
     title: "Sales Forecasting",
     oneLiner: "Multi-Restaurant Demand Prediction",
-    description: "Item-level demand forecasting across a multi-restaurant chain. Merges sales, item, and store data, engineers temporal features, then compares Linear Regression, Random Forest, and XGBoost — scored by RMSE on a held-out six months — to produce a next-year forecast.",
+    description: "Item-level demand forecasting across a multi-restaurant chain. Merges sales, item, and store data, engineers temporal features, then compares Linear Regression, Random Forest, and XGBoost, scored by RMSE on a held-out six months, to produce a next-year forecast.",
     role: "Data Scientist",
     techStack: ["Python", "scikit-learn", "XGBoost", "pandas"],
     links: { github: "https://github.com/KirtirajChaudhari/sales-forecasting" },
@@ -474,7 +485,7 @@ export const professionalTimeline: TimelineEntry[] = [
     title: "Software Developer Intern",
     organization: "QuasarCyberTech Private Limited, Nashik",
     dateRange: "Apr 2026 – May 2026",
-    description: "Wrote the report-generation module for QRGT, the firm's internal penetration-testing platform — FastAPI endpoints and ReportLab-driven PDF generation turning raw findings into Web PT, API PT, and Network PT reports, with CVSS v3.1 scoring and OWASP Top 10 mapping.",
+    description: "Wrote the report-generation module for QRGT, the firm's internal penetration-testing platform: FastAPI endpoints and ReportLab-driven PDF generation turning raw findings into Web PT, API PT, and Network PT reports, with CVSS v3.1 scoring and OWASP Top 10 mapping.",
   },
   {
     id: "exp-2",
@@ -490,7 +501,7 @@ export const professionalTimeline: TimelineEntry[] = [
     title: "Python Developer Intern",
     organization: "BitSpark Technologies",
     dateRange: "Aug 2024 – Feb 2025",
-    description: "Built and maintained live Django full-stack applications — shipped new features, fixed bugs, and sped up several slow-loading pages by reworking their database queries.",
+    description: "Built and maintained live Django full-stack applications: shipped new features, fixed bugs, and sped up several slow-loading pages by reworking their database queries.",
   },
   {
     id: "exp-4",
@@ -503,7 +514,7 @@ export const professionalTimeline: TimelineEntry[] = [
   {
     id: "edu-1",
     type: "education",
-    title: "M.Tech, AI & ML — First Year, Semester I",
+    title: "M.Tech, AI & ML, First Year, Semester I",
     organization: "MIT WPU School of Engineering and Technology",
     dateRange: "Current",
   },

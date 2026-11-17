@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kirtiraj-chaudhari.vercel.app/sitemap.xml

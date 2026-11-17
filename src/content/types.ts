@@ -37,22 +37,6 @@ export interface Project {
   badge?: string;
 }
 
-export interface ProjectCase {
-  slug: string;
-  title: string;
-  oneLiner: string;
-  techLine: string;
-  screenshot: string;
-  github?: string;
-  live?: string;
-  extraLinks?: { label: string; href: string }[];
-  problem: string;
-  approach: string;
-  stack: { name: string; role: string }[];
-  decisions: string[];
-  outcome?: string;
-}
-
 export interface TimelineEntry {
   id: string;
   type: 'education' | 'internship' | 'certification';

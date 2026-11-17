@@ -1,11 +1,15 @@
 import { professionalProjects } from "./professional";
+import type { Formation } from "../components/field/formations";
 
 /*
- * Dedicated project-page content — ground truth: the "Project Portfolio —
- * Technical Deep-Dive" PDF (source-verified from the GitHub repos, Kaggle
- * notebooks, and the live rasacare.app deployment).
- * `screenshot` is empty until the user supplies real captures — cards
- * render a styled placeholder, never a stock image.
+ * Project content. Ground truth: the "Project Portfolio, Technical Deep-Dive"
+ * PDF, source-verified from the GitHub repos, Kaggle notebooks and the live
+ * rasacare.app deployment.
+ *
+ * `shot` is a real capture and only RasaCare has one. The other eight had
+ * generated poster images whose text contradicted the repos (the DrishtiManas
+ * one still claimed DenseNet121 and 0.81 F1); they were removed. A project
+ * without a capture shows its `figure` if it has one, and otherwise no image.
  */
 
 export interface ProjectCase {
@@ -13,7 +17,10 @@ export interface ProjectCase {
   title: string;
   oneLiner: string;
   techLine: string;
-  screenshot: string;
+  /** Real screenshot: path without the `-800.webp` / `-1600.webp` suffix. */
+  shot?: { base: string; width: number; height: number; alt: string };
+  /** Which home-page formation illustrates this project. */
+  figure?: Formation;
   github?: string;
   live?: string;
   extraLinks?: { label: string; href: string }[];
@@ -30,9 +37,10 @@ export const projectCases: ProjectCase[] = [
   {
     slug: "rasacare",
     title: "RasaCare",
-    oneLiner: "Ayurvedic Clinical Diet & Nutrition Portal",
+    oneLiner: "A clinical portal that builds Ayurvedic diet plans a doctor can review, audit and prescribe.",
     techLine: "Next.js 14 · FastAPI · Neo4j · XGBoost",
-    screenshot: "/project/RasaCare.png",
+    shot: { base: "/project/rasacare", width: 1600, height: 900, alt: "The rasacare.app landing page: a dark page headed The Future of Ayurvedic Nutrition, with sign-in and practitioner buttons" },
+    figure: "graph",
     github: "https://github.com/KirtirajChaudhari/RasaCare",
     live: "https://rasacare.app",
     problem:
@@ -46,7 +54,7 @@ export const projectCases: ProjectCase[] = [
       { name: "XGBoost", role: "Prakriti classification (86.74% five-fold CV accuracy) and 7-signal composite diet scoring" },
     ],
     decisions: [
-      "Total LLM isolation for clinical inference — 538 pathya-apathya rules were extracted directly from primary clinical PDFs, preventing hallucination.",
+      "Total LLM isolation for clinical inference: 538 pathya-apathya rules were extracted directly from primary clinical PDFs, preventing hallucination.",
       "Implemented a 7-signal composite scoring system weighting ML models, Dosha rules, and KG triples to rank meal candidates.",
       "Enforced clinical governance through non-suppressible disclaimers, doctor-only prescribing, and immutable audit logging.",
     ],
@@ -54,10 +62,10 @@ export const projectCases: ProjectCase[] = [
   },
   {
     slug: "drishtimanas",
-    title: "Drishti Manas",
-    oneLiner: "Retinal OCT classification with a neural network written from scratch",
+    title: "DrishtiManas",
+    oneLiner: "Retinal OCT classification with a neural network written from scratch in NumPy.",
     techLine: "NumPy · FastAPI · React · TypeScript · Tailwind",
-    screenshot: "/project/DrishtiManas.png",
+    figure: "network",
     github: "https://github.com/KirtirajChaudhari/DrishtiManas",
     live: "https://drishtimanas-mu.vercel.app",
     problem:
@@ -80,9 +88,9 @@ export const projectCases: ProjectCase[] = [
   {
     slug: "pravaas",
     title: "PRAVAAS",
-    oneLiner: "AI-based railway track safety system — obstacle detection and rail surface defect detection",
+    oneLiner: "Railway track safety: obstacle detection and rail-surface defect detection with two YOLO models.",
     techLine: "YOLO11s · YOLOv8-nano · PyTorch · Streamlit",
-    screenshot: "/project/PRAVAAS.png",
+    figure: "track",
     github: "https://github.com/KirtirajChaudhari/RailwayObjectDetectionProject",
     extraLinks: [
       { label: "Rail-Defect Repo", href: "https://github.com/pradeepxkumar/Rail-defect-detection" },
@@ -106,12 +114,11 @@ export const projectCases: ProjectCase[] = [
   {
     slug: "bhojansetu",
     title: "BhojanSetu",
-    oneLiner: "Role-based point-of-sale system for full-service Indian restaurants",
+    oneLiner: "A role-based point-of-sale system for full-service Indian restaurants.",
     techLine: "React 18.2 · Django 5.2 · DRF · SQLite/PostgreSQL",
-    screenshot: "/project/BhojanSetu.png",
     github: "https://github.com/KirtirajChaudhari/BhojanSetu",
     problem:
-      "Coordinating orders across waitstaff, kitchen, and front-desk billing in a busy restaurant is error-prone on paper or across disconnected tools — orders get miscommunicated, table status goes stale, and billing becomes a manual reconciliation task.",
+      "Coordinating orders across waitstaff, kitchen, and front-desk billing in a busy restaurant is error-prone on paper or across disconnected tools. Orders get miscommunicated, table status goes stale, and billing becomes a manual reconciliation task.",
     approach:
       "Three role-scoped portals share one backend: a Waiter portal for creating and editing orders against a categorized menu of 50+ Indian dishes (with vegetarian/vegan and spice-level indicators); a Kitchen portal showing a live order queue with preparation-status updates; and a Reception portal with real-time table-occupancy stats, an active-vs-closed order breakdown, and PDF bill generation with a preview step before a table is closed out. The backend is Django + Django REST Framework with token authentication and a custom User model carrying Waiter / Chef / Reception roles for permissioning. Invoices are generated server-side with ReportLab, and the React frontend polls for near-real-time updates on the kitchen and reception views.",
     stack: [
@@ -122,20 +129,19 @@ export const projectCases: ProjectCase[] = [
     ],
     decisions: [
       "Included a bill generation preview step on the Reception portal before a table is closed out to prevent costly billing errors.",
-      "Roles are strictly enforced in the data model — a custom User model gates endpoints via Waiter / Chef / Reception permissions.",
+      "Roles are strictly enforced in the data model: a custom User model gates endpoints via Waiter / Chef / Reception permissions.",
       "Demo-ready by design: ships with a Docker Compose setup and a management command that seeds the database with sample users and the full menu.",
     ],
-    outcome: "End-to-end POS system supporting Waiter, Kitchen, and Reception roles",
+    outcome: "End-to-end POS system for Waiter, Kitchen and Reception roles",
   },
   {
     slug: "id-boundary",
     title: "IdBoundaryDetection (RefurbEdge)",
-    oneLiner: "ID card segmentation and geometric rectification — built as an AI Trainee (Computer Vision) skills demonstration",
+    oneLiner: "ID card segmentation and geometric rectification, built as a computer-vision skills demonstration.",
     techLine: "PyTorch · U-Net · DeepLabV3+ · Shapely",
-    screenshot: "/project/IdBoundaryDetection.png",
     github: "https://github.com/KirtirajChaudhari/IdBoundaryDetection",
     problem:
-      "Document-verification and KYC pipelines need a clean, standardized, top-down crop of an ID card — but real photos come in at angles, under inconsistent lighting, and against cluttered backgrounds. This project was built under a deliberate, self-imposed constraint: solve it without YOLO, SAM, or heuristic-only OpenCV shortcuts, to demonstrate a from-first-principles computer-vision pipeline for an AI Trainee role application.",
+      "Document-verification and KYC pipelines need a clean, standardized, top-down crop of an ID card, but real photos come in at angles, under inconsistent lighting, and against cluttered backgrounds. This project was built under a deliberate, self-imposed constraint: solve it without YOLO, SAM, or heuristic-only OpenCV shortcuts, to demonstrate a from-first-principles computer-vision pipeline for an AI Trainee role application.",
     approach:
       "Two comparable solutions were developed. Approach A (primary): A U-Net with a ResNet-18 encoder performs binary segmentation to isolate the card from the background. The largest connected region's polygon is extracted and reduced to a minimum rotated rectangle via Shapely to estimate the four corners, then a projective transform warps the card into a standardized top-down crop. Approach B (alternative): A DeepLabV3+ model with a ResNet-34 encoder performs semantic segmentation for cleaner boundary quality on noisier images. Both pipelines support GPU training with mixed precision, merge datasets across multiple annotation formats (pre-generated masks, MIDV-500 JSON quadrilaterals, COCO), and are evaluated with IoU, Dice, and Normalized Corner Distance (NCD).",
     stack: [
@@ -145,7 +151,7 @@ export const projectCases: ProjectCase[] = [
       { name: "PyTorch, AMP, Albumentations", role: "Mixed-precision training with heavy augmentation" },
     ],
     decisions: [
-      "Segment first, then apply simple geometry — more stable and more explainable than regression-based corner prediction.",
+      "Segment first, then apply simple geometry. This is more stable and more explainable than regression-based corner prediction.",
       "Tuned to train on a limited-VRAM GPU (GTX 1650), representing a real hardware constraint rather than an assumed cloud GPU.",
       "Two full pipelines built for honest comparison, scored on IoU, Dice, and Normalized Corner Distance.",
     ],
@@ -154,12 +160,11 @@ export const projectCases: ProjectCase[] = [
   {
     slug: "lab-complaint",
     title: "Lab Complaint Management System",
-    oneLiner: bySlug["lab-complaint"]?.oneLiner || "",
+    oneLiner: "A ticketing system for lab-equipment complaints.",
     techLine: "Django · MySQL · REST APIs",
-    screenshot: "/project/Lab Complaint Management System.png",
     github: bySlug["lab-complaint"]?.links.github,
     problem:
-      "Lab-equipment complaints across 3 college labs lived in paper registers — no visibility into what was broken, who was fixing it, or how long anything took.",
+      "Lab-equipment complaints across 3 college labs lived in paper registers, with no visibility into what was broken, who was fixing it, or how long anything took.",
     approach:
       "A Django ticketing system with 4 user roles: staff raise tickets, admins move them through open → in-progress → resolved, with 8 complaint categories for reporting.",
     stack: [
@@ -168,40 +173,38 @@ export const projectCases: ProjectCase[] = [
       { name: "REST APIs", role: "Status updates and integrations" },
     ],
     decisions: [
-      "Deployed to real users early — 200+ tickets processed since launch shaped the category set and workflows.",
+      "Deployed to real users early. The 200+ tickets processed since launch shaped the category set and workflows.",
     ],
-    outcome: "Deployed and in active use — 200+ tickets processed.",
+    outcome: "Deployed and in active use · 200+ tickets processed",
   },
   {
     slug: "autonomous-driving",
     title: "Autonomous Driving",
-    oneLiner: bySlug["autonomous-driving"]?.oneLiner || "",
+    oneLiner: "Vehicle detection and an autopilot safety analysis.",
     techLine: "Python · TensorFlow/PyTorch · OpenCV · pandas",
-    screenshot: "/project/Autonomous Driving.png",
     github: bySlug["autonomous-driving"]?.links.github,
     problem:
       "Two sides of one question: can a model reliably detect vehicles in road imagery, and what do real autopilot-involved fatalities say about where these systems fail?",
     approach:
-      "A CNN-based detector that classifies and localizes vehicles, paired with a data-science investigation of the Tesla-Deaths dataset — cleaning, EDA across year, country, and model, and analysis of verified autopilot-involved fatalities.",
+      "A CNN-based detector that classifies and localizes vehicles, paired with a data-science investigation of the Tesla-Deaths dataset: cleaning, EDA across year, country, and model, and analysis of verified autopilot-involved fatalities.",
     stack: [
       { name: "TensorFlow / PyTorch", role: "CNN vehicle detection and localization" },
       { name: "OpenCV", role: "Image pipeline" },
       { name: "pandas", role: "Tesla-Deaths dataset cleaning and EDA" },
     ],
     decisions: [
-      "Paired the build with the failure analysis — the dataset work grounds the detector in why detection reliability matters.",
+      "Paired the build with the failure analysis: the dataset work grounds the detector in why detection reliability matters.",
     ],
-    outcome: "IIT-Kanpur capstone.",
+    outcome: "IIT-Kanpur capstone",
   },
   {
     slug: "preserving-heritage",
     title: "Preserving Heritage",
-    oneLiner: bySlug["preserving-heritage"]?.oneLiner || "",
+    oneLiner: "Architecture classification and a tourism recommender.",
     techLine: "Python · TensorFlow · OpenCV · pandas",
-    screenshot: "/project/Preserving Heritage.png",
     github: bySlug["preserving-heritage"]?.links.github,
     problem:
-      "Classifying 11 categories of historical architecture from photos, and recommending tourism destinations — with a training set too small to train from scratch.",
+      "Classifying 11 categories of historical architecture from photos, and recommending tourism destinations, with a training set too small to train from scratch.",
     approach:
       "Transfer learning on a pretrained CNN backbone, trained with and without augmentation and monitored for overfitting, plus a collaborative-filtering engine recommending Indonesian destinations from a tourist's location.",
     stack: [
@@ -211,17 +214,16 @@ export const projectCases: ProjectCase[] = [
     decisions: [
       "Ran augmented vs. non-augmented training as a controlled comparison rather than assuming augmentation helps.",
     ],
-    outcome: "IIT-Kanpur capstone.",
+    outcome: "IIT-Kanpur capstone",
   },
   {
     slug: "sales-forecasting",
     title: "Sales Forecasting",
-    oneLiner: bySlug["sales-forecasting"]?.oneLiner || "",
+    oneLiner: "Demand forecasting across a multi-restaurant chain.",
     techLine: "Python · scikit-learn · XGBoost · pandas",
-    screenshot: "/project/Sales Forecasting.png",
     github: bySlug["sales-forecasting"]?.links.github,
     problem:
-      "Item-level demand across a multi-restaurant chain — order too little and shelves run empty, too much and it's waste.",
+      "Item-level demand across a multi-restaurant chain. Order too little and shelves run empty; order too much and it is waste.",
     approach:
       "Merged sales, item, and store data, engineered temporal features, then compared Linear Regression, Random Forest, and XGBoost scored by RMSE on a held-out six months to produce a next-year forecast.",
     stack: [
@@ -230,12 +232,19 @@ export const projectCases: ProjectCase[] = [
       { name: "pandas", role: "Feature engineering across sales/item/store joins" },
     ],
     decisions: [
-      "Models compete on held-out RMSE — no model is trusted by default.",
+      "Models compete on held-out RMSE. No model is trusted by default.",
       "Temporal features engineered explicitly rather than relying on raw dates.",
     ],
-    outcome: "IIT-Kanpur capstone.",
+    outcome: "IIT-Kanpur capstone",
   }
 ];
 
 export const getProjectCase = (slug: string) =>
   projectCases.find((p) => p.slug === slug);
+
+/** The three projects the site leads with, and the six listed after them. */
+export const leadCases = projectCases.slice(0, 3);
+export const otherCases = projectCases.slice(3);
+
+/** Headline figures for a lead project, as written in `professionalProjects`. */
+export const caseFigures = (slug: string): string[] => bySlug[slug]?.metrics ?? [];

@@ -1,0 +1,14 @@
+/* The pre-re-dev stylesheets. Only /creator, /xray and /character import this
+   file, so it ships with their lazy chunks and never with the professional
+   pages. Rules here are unscoped; styles/site.css is scoped to
+   [data-chapter="pro"] and out-specifies them if this file is already loaded. */
+@import './tokens.css';
+@import './reset.css';
+@import './typography.css';
+@import './components.css';
+@import './animations.css';
+
+/* Set by GlowCursor while it is running; it draws its own pointer. */
+html.glow-cursor,
+html.glow-cursor * { cursor: none !important; }
+dd { margin: 0; }

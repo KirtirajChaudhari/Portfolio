@@ -1,21 +1,26 @@
-/* Tailwind v4 without preflight: styles/reset.css already owns the reset, and
-   preflight would shift button/heading/img defaults the hand-written CSS
-   relies on. The hand-written CSS is unlayered and would beat layered
-   utilities (reset.css `a { color: inherit }` did), so utilities are `important`:
-   a Tailwind class on an element always wins. */
+/* Tailwind v4 without preflight. The hand-written CSS is unlayered and would
+   beat layered utilities, so utilities are `important`: a Tailwind class on an
+   element always wins. */
 @layer theme, base, components, utilities;
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities) important;
 
-@import './styles/tokens.css';
-@import './styles/reset.css';
-@import './styles/typography.css';
-@import './styles/components.css';
-@import './styles/animations.css';
+@import './styles/site.css';
 
-/* Design tokens exposed as utilities (bg-surface, text-muted, font-display ...).
-   `inline` keeps them live-bound to the chapter-scoped custom properties. */
 @theme inline {
+  /* Professional pages (styles/site.css). */
+  --color-paper: var(--paper);
+  --color-sunk: var(--sunk);
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-rule: var(--rule);
+  --color-rule-2: var(--rule-2);
+  --color-signal: var(--signal);
+  --font-ui: var(--f-sans);
+  --font-data: var(--f-mono);
+
+  /* Legacy pages (styles/legacy.css): /creator, /xray, /character. */
   --color-bg: var(--bg);
   --color-surface: var(--surface-solid);
   --color-ink: var(--text);
@@ -26,11 +31,6 @@
   --font-body: var(--font-body);
   --font-mono: var(--font-mono);
 }
-
-/* Set by GlowCursor while it is running; it draws its own pointer. */
-html.glow-cursor,
-html.glow-cursor * { cursor: none !important; }
-dd { margin: 0; }
 
 /* The one piece of preflight that matters: Tailwind's `border-dashed` and `divide-dashed`
    set border-style on all four sides, and without a zero border-width reset the

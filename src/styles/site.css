@@ -1,0 +1,453 @@
+/* ============================================================
+   SITE SYSTEM (re-dev)
+
+   One identity for the professional pages. Tokens and element rules are
+   scoped to `:root[data-chapter="pro"]`; the legacy stylesheets that ship
+   with /creator, /xray and /character are scoped to everything else, so
+   neither set reaches the other even after both have loaded.
+
+   Colour is OKLCH and declared once with light-dark(). The theme follows
+   the system unless `data-theme` pins it (see ThemeToggle).
+   ============================================================ */
+
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  src: url('/fonts/archivo-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  src: url('/fonts/archivo-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1D00-1DBF, U+1E00-1E9F,
+    U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/geist-mono-latin.woff2') format('woff2');
+}
+
+:root[data-chapter='pro'] {
+  color-scheme: light dark;
+
+  /* Neutrals lean 0.003 to 0.012 chroma toward the accent's hue. Contrast on
+     --paper, light / dark: fg 16.5 / 17.0, fg-2 7.9 / 9.7, fg-3 5.2 / 6.2,
+     signal 5.0 / 6.7. */
+  --paper: light-dark(oklch(0.975 0.003 20), oklch(0.16 0.008 20));
+  --sunk: light-dark(oklch(0.945 0.004 20), oklch(0.205 0.01 20));
+  --fg: light-dark(oklch(0.21 0.012 20), oklch(0.955 0.005 20));
+  --fg-2: light-dark(oklch(0.42 0.012 20), oklch(0.78 0.01 20));
+  --fg-3: light-dark(oklch(0.52 0.01 20), oklch(0.66 0.012 20));
+  --rule: light-dark(oklch(0.21 0.012 20 / 0.14), oklch(0.955 0.005 20 / 0.16));
+  --rule-2: light-dark(oklch(0.21 0.012 20 / 0.3), oklch(0.955 0.005 20 / 0.34));
+  --signal: light-dark(oklch(0.55 0.215 27), oklch(0.7 0.19 27));
+  --on-signal: light-dark(oklch(1 0 0), oklch(0.16 0.008 20));
+  --shade: light-dark(oklch(0.21 0.012 20 / 0.16), oklch(0 0 0 / 0.6));
+
+  --f-sans: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+  --f-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --gutter: clamp(1.25rem, 4vw, 3.5rem);
+  --measure: 62ch;
+  --header-h: 4rem;
+
+  /* One radius rule: controls 6, image plates 10. Nothing is a pill. */
+  --r-control: 6px;
+  --r-plate: 10px;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* Layers, in order. Nothing else sets z-index on these pages. */
+  --z-field: 0;
+  --z-content: 1;
+  --z-header: 20;
+  --z-skip: 30;
+
+  font-feature-settings: normal;
+}
+:root[data-chapter='pro'][data-theme='light'] { color-scheme: light; }
+:root[data-chapter='pro'][data-theme='dark'] { color-scheme: dark; }
+
+/* ---------- Base ---------- */
+/* Element rules sit inside :where() so they weigh no more than a bare element
+   selector: every class below wins without a specificity fight. The legacy
+   reset is scoped the other way round, so the two never meet. */
+:where(:root[data-chapter='pro']) :is(*, *::before, *::after) { box-sizing: border-box; }
+
+:root[data-chapter='pro'] { background: var(--paper); scroll-padding-top: calc(var(--header-h) + 1rem); }
+
+:where(:root[data-chapter='pro']) body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--fg);
+  font-family: var(--f-sans);
+  font-size: clamp(1rem, 0.96rem + 0.18vw, 1.0625rem);
+  font-stretch: 100%;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+:where(:root[data-chapter='pro']) :is(h1, h2, h3, h4) {
+  margin: 0;
+  font-size: inherit;
+  font-weight: 650;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+:where(:root[data-chapter='pro']) :is(p, dl, dd, figure) { margin: 0; }
+:where(:root[data-chapter='pro']) p { text-wrap: pretty; }
+:where(:root[data-chapter='pro']) :is(ul, ol) { margin: 0; padding: 0; list-style: none; }
+:where(:root[data-chapter='pro']) a { color: inherit; text-decoration: none; }
+:where(:root[data-chapter='pro']) button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+:where(:root[data-chapter='pro']) :is(input, textarea, select) { font: inherit; color: inherit; }
+:where(:root[data-chapter='pro']) :is(img, svg, canvas) { display: block; max-width: 100%; }
+:where(:root[data-chapter='pro']) ::selection { background: var(--signal); color: var(--on-signal); }
+:where(:root[data-chapter='pro']) :focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- Type ---------- */
+/* The width axis does the work a second family would: expanded for display,
+   normal for reading. */
+.t-display {
+  font-size: clamp(2.5rem, 1.1rem + 5vw, 5.25rem);
+  font-weight: 680;
+  font-stretch: 112%;
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+}
+.t-h2 {
+  font-size: clamp(1.75rem, 1.2rem + 2.2vw, 3rem);
+  font-weight: 660;
+  font-stretch: 112%;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+.t-h3 {
+  font-size: clamp(1.1875rem, 1.1rem + 0.5vw, 1.5rem);
+  font-weight: 620;
+  font-stretch: 106%;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+.t-lede {
+  font-size: clamp(1.125rem, 1.02rem + 0.55vw, 1.4375rem);
+  line-height: 1.42;
+  color: var(--fg-2);
+  max-width: 34em;
+}
+.t-body { max-width: var(--measure); color: var(--fg-2); }
+.t-body + .t-body { margin-top: 1em; }
+/* Mono is for things that are data: figures, stacks, dates. */
+.t-data {
+  font-family: var(--f-mono);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-3);
+}
+.t-signal { color: var(--signal); }
+
+/* ---------- Layout ---------- */
+.wrap { width: min(100% - 2 * var(--gutter), 82rem); margin-inline: auto; }
+.band { padding-block: clamp(4.5rem, 3rem + 7vw, 9rem); }
+.band-tight { padding-block: clamp(3rem, 2rem + 4vw, 5.5rem); }
+.rule-top { border-top: 1px solid var(--rule); }
+
+/* ---------- Controls ---------- */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 2.875rem;
+  padding: 0 1.15rem;
+  border-radius: var(--r-control);
+  border: 1px solid var(--fg);
+  background: var(--fg);
+  color: var(--paper);
+  font-size: 0.9375rem;
+  font-weight: 560;
+  line-height: 1;
+  white-space: nowrap;
+  transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out), border-color 160ms var(--ease-out);
+}
+.button:active { transform: scale(0.97); }
+.button-line { background: transparent; color: var(--fg); border-color: var(--rule-2); }
+.button svg { transition: transform 200ms var(--ease-out); }
+@media (hover: hover) and (pointer: fine) {
+  .button:hover { background: var(--signal); border-color: var(--signal); color: var(--on-signal); }
+  .button-line:hover { background: transparent; border-color: var(--fg); color: var(--fg); }
+  .button:hover svg { transform: translate(2px, -2px); }
+}
+
+.link {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  text-decoration-color: var(--rule-2);
+  transition: text-decoration-color 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .link:hover { text-decoration-color: var(--signal); color: var(--signal); }
+}
+
+/* A text link with a travelling arrow: the one "go deeper" affordance. */
+.go { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 560; }
+.go svg { transition: transform 240ms var(--ease-out); }
+.go:active { transform: scale(0.98); }
+@media (hover: hover) and (pointer: fine) {
+  .go:hover { color: var(--signal); }
+  .go:hover svg { transform: translateX(4px); }
+}
+
+.tag-status {
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  line-height: 1;
+  padding: 0.3rem 0.45rem;
+  border: 1px solid var(--rule-2);
+  border-radius: 3px;
+  color: var(--fg-2);
+  white-space: nowrap;
+}
+
+/* ---------- Header ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  height: var(--header-h);
+  background: var(--paper);
+  border-bottom: 1px solid transparent;
+}
+/* The rule under the header appears once the page has moved. Scroll-driven
+   where supported; elsewhere the rule is simply always there. */
+@supports (animation-timeline: scroll()) {
+  .site-header { animation: header-rule linear both; animation-timeline: scroll(root); animation-range: 0 80px; }
+  @keyframes header-rule { to { border-bottom-color: var(--rule); } }
+}
+@supports not (animation-timeline: scroll()) {
+  .site-header { border-bottom-color: var(--rule); }
+}
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 0.7rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--fg-2);
+  transition: color 160ms var(--ease-out);
+}
+.nav-link[aria-current='page'] { color: var(--fg); }
+.nav-link[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  left: 0.7rem;
+  right: 0.7rem;
+  bottom: 0.55rem;
+  height: 2px;
+  background: var(--signal);
+}
+@media (hover: hover) and (pointer: fine) { .nav-link:hover { color: var(--fg); } }
+
+.skip {
+  position: fixed;
+  left: var(--gutter);
+  top: 0.75rem;
+  z-index: var(--z-skip);
+  transform: translateY(-300%);
+}
+.skip:focus-visible { transform: none; }
+
+/* ---------- Home stage ---------- */
+.stage { position: relative; }
+.stage-field {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-field);
+  height: 100svh;
+  margin-bottom: -100svh;
+  overflow: clip;
+  pointer-events: none;
+}
+.stage-field canvas { width: 100%; height: 100%; }
+.panel {
+  position: relative;
+  z-index: var(--z-content);
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding-block: 5rem;
+}
+.panel-hero { min-height: calc(100svh - var(--header-h)); padding-top: 2rem; }
+.panel-copy { width: min(100%, 35rem); }
+.panel-hero .panel-copy { width: min(100%, 52rem); }
+
+/* Captions under the figure: one per step, switched by the render loop
+   through `data-step` on the stage. */
+.stage-caption {
+  position: absolute;
+  right: calc(var(--gutter) - 0.5rem);
+  bottom: 1.25rem;
+  max-width: 25rem;
+  padding: 0.3rem 0.5rem;
+  background: var(--paper);
+  text-align: right;
+  opacity: 0;
+  transition: opacity 400ms var(--ease-out);
+}
+.stage[data-step='0'] .stage-caption[data-for='0'],
+.stage[data-step='1'] .stage-caption[data-for='0'],
+.stage[data-step='2'] .stage-caption[data-for='2'],
+.stage[data-step='3'] .stage-caption[data-for='3'] { opacity: 1; }
+
+@media (max-width: 899px) {
+  /* Phones: each panel is a window onto the pinned figure followed by its copy
+     on solid ground. Scrolling slides the copy up over the figure, and the next
+     window opens on the next formation. No point ever crosses a word. */
+  .panel {
+    display: block;
+    padding-block: 46svh 3rem;
+    background: linear-gradient(to bottom, transparent calc(46svh - 4rem), var(--paper) calc(46svh - 0.5rem));
+  }
+  .panel-hero { padding-block: calc(46svh - var(--header-h)) 1.5rem; background: linear-gradient(to bottom, transparent calc(46svh - var(--header-h) - 4rem), var(--paper) calc(46svh - var(--header-h) - 0.5rem)); }
+  .panel-copy, .panel-hero .panel-copy { width: 100%; }
+  .stage-caption { display: none; }
+}
+
+/* ---------- Plates (screenshots) ---------- */
+.plate {
+  position: relative;
+  border-radius: var(--r-plate);
+  overflow: clip;
+  background: var(--sunk);
+  box-shadow: 0 0 0 1px var(--rule), 0 30px 60px -34px var(--shade);
+}
+.plate img { width: 100%; height: auto; }
+.tilt { perspective: 1100px; }
+
+/* Case study: the plate starts tipped back and settles flat over the first
+   400px of scroll. Compositor-only, and skipped where unsupported. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .plate-settle {
+      transform-origin: 50% 100%;
+      animation: plate-settle linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 420px;
+    }
+    @keyframes plate-settle {
+      from { transform: perspective(1400px) rotateX(13deg) scale(0.955); }
+      to { transform: perspective(1400px) rotateX(0deg) scale(1); }
+    }
+  }
+}
+
+/* ---------- Ledger rows ---------- */
+.ledger > * { border-top: 1px solid var(--rule); }
+.ledger > *:last-child { border-bottom: 1px solid var(--rule); }
+
+/* ---------- Motion ---------- */
+/* Page-load sequence for a page's opening block. Keyframes with a fill, so
+   the end state is the resting state and nothing depends on a class flip. */
+@media (prefers-reduced-motion: no-preference) {
+  .intro > * {
+    animation: intro-rise 900ms var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 90ms + 60ms);
+  }
+  @keyframes intro-rise {
+    from { opacity: 0; transform: translateY(1.25rem); }
+  }
+}
+
+/* Scroll entrance for image plates: a short rise driven by the scroll position
+   itself. Movement only, never opacity, so nothing is ever hidden from a
+   renderer that does not scroll (print, link previews, crawlers). */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .enter {
+      animation: enter-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+    @keyframes enter-rise {
+      from { transform: translateY(3rem); }
+    }
+  }
+}
+
+/* Route changes: a short cross-fade, and the project plate travels from the
+   index into its case study. */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root) { animation: vt-out 160ms var(--ease-out) both; }
+  ::view-transition-new(root) { animation: vt-in 260ms var(--ease-out) both; }
+  @keyframes vt-out { to { opacity: 0; } }
+  @keyframes vt-in { from { opacity: 0; } }
+  ::view-transition-group(*) { animation-duration: 420ms; animation-timing-function: var(--ease-in-out); }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) { animation: none !important; }
+}
+
+/* ---------- Forms ---------- */
+.field-label { display: block; margin-bottom: 0.45rem; font-size: 0.875rem; font-weight: 560; }
+.field-input {
+  width: 100%;
+  min-height: 2.875rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--r-control);
+  background: var(--paper);
+  color: var(--fg);
+  transition: border-color 160ms var(--ease-out);
+}
+.field-input::placeholder { color: var(--fg-3); opacity: 1; }
+.field-input:focus-visible { outline: 2px solid var(--signal); outline-offset: 1px; border-color: var(--signal); }
+.field-input[aria-invalid='true'] { border-color: var(--signal); }
+.field-error { margin-top: 0.4rem; font-size: 0.875rem; color: var(--signal); }
+
+/* ---------- Home ---------- */
+/* Sized against the viewport so the three-line break holds from laptop to
+   desktop, and the block always ends left of the figure. */
+.home-title {
+  font-size: clamp(2.5rem, 4.6vw, 4.5rem);
+  font-weight: 680;
+  font-stretch: 112%;
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  max-width: 11.6em;
+}
+@media (max-width: 899px) {
+  .home-title { font-size: clamp(2.25rem, 9.6vw, 3.5rem); font-stretch: 104%; }
+}
+
+/* ---------- Lists that are links ---------- */
+.row-link { transition: color 160ms var(--ease-out); }
+.row-arrow { transition: transform 240ms var(--ease-out), color 160ms var(--ease-out); }
+.back-arrow { transition: transform 240ms var(--ease-out); }
+@media (hover: hover) and (pointer: fine) {
+  .row-link:hover .row-arrow { transform: translateX(6px); color: var(--signal); }
+  .lead-link:hover { color: var(--signal); }
+  .go:hover .back-arrow { transform: translateX(-4px); }
+}
+.lead-link { transition: color 160ms var(--ease-out); }
