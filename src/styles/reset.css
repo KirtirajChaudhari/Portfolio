@@ -1,12 +1,16 @@
 /* ============================================================
-   RESET
+   RESET (legacy pages)
+
+   Element rules are prefixed with a zero-specificity :where() so they keep
+   exactly the weight they always had on /creator, /xray and /character and
+   do not match at all on the professional pages (styles/site.css).
    ============================================================ */
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 /* Held while the boot curtain is up, so the page can't move underneath it. */
 html.is-booting, html.is-booting body { overflow: hidden; }
 /* Lenis smooth scrolling — height auto so Lenis can measure document. */
-body {
+:where(:root:not([data-chapter='pro'])) body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
@@ -23,7 +27,7 @@ body {
 
 /* Headlines are weight 600 and sentence case. Uppercase display is Chapter
    Two's voice, restored below. */
-h1, h2, h3, h4, h5, h6 {
+:where(:root:not([data-chapter='pro'])) :is(h1, h2, h3, h4, h5, h6) {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 600;
@@ -32,16 +36,16 @@ h1, h2, h3, h4, h5, h6 {
   text-transform: none;
 }
 
-p { margin: 0; }
-ul, ol { margin: 0; padding: 0; list-style: none; }
-a { color: inherit; text-decoration: none; }
-button { font: inherit; background: none; border: none; cursor: pointer; color: inherit; }
-input, textarea, select { font: inherit; }
-img, video { max-width: 100%; display: block; }
-::selection { background: var(--accent); color: #ffffff; }
+:where(:root:not([data-chapter='pro'])) p { margin: 0; }
+:where(:root:not([data-chapter='pro'])) :is(ul, ol) { margin: 0; padding: 0; list-style: none; }
+:where(:root:not([data-chapter='pro'])) a { color: inherit; text-decoration: none; }
+:where(:root:not([data-chapter='pro'])) button { font: inherit; background: none; border: none; cursor: pointer; color: inherit; }
+:where(:root:not([data-chapter='pro'])) :is(input, textarea, select) { font: inherit; }
+:where(:root:not([data-chapter='pro'])) :is(img, video) { max-width: 100%; display: block; }
+:where(:root:not([data-chapter='pro'])) ::selection { background: var(--accent); color: #ffffff; }
 
 /* Keyboard focus is the one place Apple documents a visible ring. */
-:focus-visible {
+:where(:root:not([data-chapter='pro'])) :focus-visible {
   outline: 2px solid var(--accent-focus, var(--accent));
   outline-offset: 2px;
 }

@@ -8,6 +8,10 @@ import PhotographyWall from '../components/chapter-two/PhotographyWall';
 import WritingsBook from '../components/creator/WritingsBook';
 import Reveal from '../components/shell/Reveal';
 import './CreatorPage.css';
+import { LEGACY_FONTS, loadStylesheet } from '../lib/fonts';
+
+loadStylesheet(LEGACY_FONTS);
+import '../styles/legacy.css';
 
 const TICKER = ['Tabla', 'Lens', 'Ink'];
 
@@ -39,7 +43,7 @@ function Hero({ vis }: { vis: boolean }) {
           <div className="relative rounded-sm bg-white p-3 pb-12 shadow-[0_24px_50px_-24px_rgb(60_40_30/0.5)]">
             <Tape hue="peach" rotate={-6} />
             <img
-              src="/avatars/artistic-full.png"
+              src="/avatars/artistic-full.webp"
               alt="Illustrated portrait of Kirtiraj as a creator, surrounded by a tabla, a camera, headphones, a notebook and a keyboard"
               width={512}
               height={512}

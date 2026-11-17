@@ -157,3 +157,41 @@
   each frame embeds the real Instagram post via the official embed.js, armed by an IntersectionObserver.
   Firefox-only console noise (Feature Policy `allow` warnings, WEBGL_debug_renderer_info) is not filtered;
   the console spec is a chromium gate.
+
+- **re-dev (2026-11-17, branch `re-dev`)**. Audit in `docs/redev-audit.md`, plan and outcome in
+  `docs/redev-plan.md`. The professional pages (`/`, `/work`, `/projects/:slug`, `/about`, `/contact`, 404) were
+  rebuilt on one system: `styles/site.css` (Archivo variable + Geist Mono, self-hosted and subset; OKLCH tokens
+  through `light-dark()`; light and dark; one accent), `components/site/` shell, no registry components. Home is a
+  pinned raw-WebGL2 figure (`components/field/`): 23,756 points morphing between a graph, the DrishtiManas network
+  at its real layer sizes and a track; 2D-canvas stills for software GPUs and reduced motion. `/creator`, `/xray`
+  and `/character` (the old head-tracker home) keep `SiteNav` and the old CSS, now `styles/legacy.css`, imported
+  only by those lazy chunks. The build prerenders 13 routes (`scripts/prerender.mjs`); `npm run preview` is
+  `scripts/serve-dist.mjs`. Eight generated project posters were deleted (they contradicted the repos); only
+  RasaCare has a `shot`. Gate: `scripts/redev.spec.ts` (replaces portfolio-v2 and portfolio-update specs).
+  Chapter values on `<html data-chapter>` are now `pro`, `one` (xray, character) and `two` (creator).
+
+## Learned constraints (re-dev)
+- Two stylesheet families share one document. Keep them apart with zero-specificity scopes, not with weight:
+  site base rules are `:where(:root[data-chapter='pro']) el`, legacy reset rules are
+  `:where(:root:not([data-chapter='pro'])) el`. Scoping base rules with a plain attribute selector makes them
+  out-rank every component class (the primary button rendered dark on dark).
+- `.panel:first-of-type` does not mean "first panel": the sticky canvas wrapper before it is also a `div`.
+- A heading that fades in from `opacity: 0` is not counted as the LCP element; Chrome reports whatever else painted
+  first. Intro animation on `h1` is transform-only.
+- Scroll-driven entrances must never start at `opacity: 0`: full-page captures, print and non-scrolling renderers
+  show the section blank. `.enter` moves, it does not fade.
+- `getComputedStyle` returns `light-dark(...)` token text unresolved. To get a colour for WebGL, set it as `color`
+  on a probe element and paint that computed value into a 1x1 canvas (`readColor` in `field/engine.ts`).
+- The WebGL context must not be released in effect cleanup: StrictMode remounts on the same canvas and gets the
+  lost context back.
+- `vite preview` falls back to `index.html` before looking for `work/index.html`, so it never serves a prerendered
+  route other than `/`. Test prerendering with `npm run preview` (`serve-dist.mjs`). An uncompressed test server
+  costs about 12 Lighthouse points and a second of LCP; `serve-dist.mjs` compresses.
+- The project's `@playwright/test` wants a browser build this sandbox does not have; `PW_EXECUTABLE` in
+  `playwright.config.ts` points the chromium project at an existing binary.
+- `main.tsx` hydrates only when `#root[data-prerendered]` equals the current path, and otherwise clears the root
+  and client-renders. A host that falls back to the wrong HTML file therefore still works.
+- A regex over built HTML that looks for "engine" matches "engineer". Match `assets/engine`.
+- Archivo with both axes is 90 kB; instanced to wght 400 to 720 and wdth 100 to 118 and cut to Latin-1 it is
+  47 kB (`fonttools`: `varLib.instancer` then `subset`). New weights or widths outside those ranges need a re-cut.
+

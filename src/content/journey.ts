@@ -1,7 +1,7 @@
 /*
  * Education & Experience slider data (spec v3 §1).
  * Education logos live in `public/education logos/`; none of the four
- * work organizations have a local logo yet — `logo: ""` renders a
+ * work organizations have a local logo yet, `logo: ""` renders a
  * clearly-marked monogram badge until a real file is dropped in.
  */
 
@@ -27,7 +27,7 @@ export const workJourney: JourneyEntry[] = [
     url: "https://quasarcybertech.com/",
     dateRange: "Apr 2026 – May 2026",
     description:
-      "Wrote the report-generation module for QRGT, the firm's internal penetration-testing platform — FastAPI endpoints and ReportLab-driven PDF generation turning raw findings into Web PT, API PT, and Network PT reports, with CVSS v3.1 scoring and OWASP Top 10 mapping.",
+      "Wrote the report-generation module for QRGT, the firm's internal penetration-testing platform: FastAPI endpoints and ReportLab-driven PDF generation that turn raw findings into Web PT, API PT, and Network PT reports, with CVSS v3.1 scoring and OWASP Top 10 mapping.",
     skills: ["FastAPI", "ReportLab", "CVSS v3.1", "OWASP Top 10"],
     logo: "/experience logo/quasarcybertech_logo_icon.png",
   },
@@ -49,7 +49,7 @@ export const workJourney: JourneyEntry[] = [
     url: "https://bitsparktechnologies.com/",
     dateRange: "Aug 2024 – Feb 2025",
     description:
-      "Built and maintained live Django full-stack applications — shipped new features, fixed bugs, and sped up several slow-loading pages by reworking their database queries.",
+      "Built and maintained live Django full-stack applications: shipped new features, fixed bugs, and sped up several slow-loading pages by reworking their database queries.",
     skills: ["Django", "Python", "SQL Optimization"],
     logo: "/experience logo/bitspark_logo.png",
   },
@@ -69,12 +69,12 @@ export const workJourney: JourneyEntry[] = [
 export const educationJourney: JourneyEntry[] = [
   {
     id: "mtech",
-    heading: "M.Tech, AI & ML — First Year, Semester I",
+    heading: "M.Tech, AI & ML (first year, semester I)",
     organization: "MIT WPU School of Engineering and Technology",
     url: "https://mitwpu.edu.in/",
     dateRange: "Current",
     description:
-      "Postgraduate specialization deepening the applied ML foundation — model explainability, systems thinking, and research method.",
+      "Postgraduate specialization deepening the applied ML foundation: model explainability, systems thinking, and research method.",
     skills: ["AI & ML", "Research"],
     logo: "/education logos/mit logo.jpeg",
     badgeLabel: "M.Tech, AI & ML",
@@ -86,7 +86,7 @@ export const educationJourney: JourneyEntry[] = [
     url: "https://kbtcoe.org/",
     dateRange: "Nov 2022 – Jun 2026",
     description:
-      "Bachelor of Engineering in Computer Engineering with Honours in AI & ML — CGPA 7.86.",
+      "Bachelor of Engineering in Computer Engineering with Honours in AI & ML. CGPA 7.86.",
     skills: ["Hons. AI & ML", "CGPA 7.86"],
     logo: "/education logos/kbtcoe logo.jpeg",
     badgeLabel: "B.E. Hons. AI & ML",
@@ -97,7 +97,7 @@ export const educationJourney: JourneyEntry[] = [
     organization: "M.J. College, Jalgaon",
     url: "https://mjcollege.kces.in/",
     dateRange: "Jun 2022",
-    description: "Higher secondary — 73.33%.",
+    description: "Higher secondary, 73.33%.",
     skills: ["Science", "73.33%"],
     logo: "/education logos/mjc logo.png",
   },
@@ -107,7 +107,7 @@ export const educationJourney: JourneyEntry[] = [
     organization: "Shree Swaminarayan Gurukul C.B.S.E. School, Savda",
     url: "https://swaminarayaneducation.org/",
     dateRange: "May 2020",
-    description: "Secondary school — 92.8%.",
+    description: "Secondary school, 92.8%.",
     skills: ["CBSE", "92.8%"],
     logo: "/education logos/Swaminarayan gurukul.jpg",
   },

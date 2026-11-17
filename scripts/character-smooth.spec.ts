@@ -99,7 +99,7 @@ async function boot(page: Page, hz = 0) {
         }, 4);
       });
   }, hz);
-  await page.goto('/');
+  await page.goto('/character');
   await page.waitForFunction(() => document.querySelectorAll('canvas').length === 1);
   /* All ring frames must be in, or the nearest-neighbour fallback skews every number. */
   await page.waitForFunction(async () => {
