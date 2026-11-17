@@ -69,7 +69,7 @@ export default function ContactPage() {
   };
 
   return (
-    <Page title="Contact" description="Contact Kirtiraj Chaudhari: open to AI/ML roles and to research or product collaborations." close={false}>
+    <Page close={false}>
       <header className="wrap intro pb-16 pt-14 sm:pt-20">
         <h1 className="t-display" style={{ '--i': 0 } as React.CSSProperties}>Let's talk.</h1>
         <p className="t-lede mt-6" style={{ '--i': 1 } as React.CSSProperties}>

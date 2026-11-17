@@ -34,7 +34,7 @@ export default function WorkPage() {
   const [first, ...rest] = leadCases;
 
   return (
-    <Page title="Work" description="Nine builds by Kirtiraj Chaudhari: a clinical diet engine, a retinal classifier written by hand, a railway safety detector, and six more.">
+    <Page>
       <header className="wrap intro pb-16 pt-14 sm:pt-20">
         <h1 className="t-display" style={{ '--i': 0 } as React.CSSProperties}>Work</h1>
         <p className="t-lede mt-6" style={{ '--i': 1 } as React.CSSProperties}>

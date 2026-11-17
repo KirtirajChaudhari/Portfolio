@@ -2,6 +2,9 @@ import { defineConfig, devices } from '@playwright/test';
 
 /* Measurement, not CI. One worker and no parallelism — two browsers sharing a
    CPU cannot produce a frame-timing number anyone should act on. */
+/* Sandboxes that ship their own Chromium point at it with PW_EXECUTABLE. */
+const chromium = process.env.PW_EXECUTABLE ? { launchOptions: { executablePath: process.env.PW_EXECUTABLE } } : {};
+
 export default defineConfig({
   testDir: './scripts',
   fullyParallel: false,
@@ -19,7 +22,7 @@ export default defineConfig({
     timeout: 120_000,
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 } } },
+    { name: 'chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 }, ...chromium } },
     { name: 'firefox',  use: { ...devices['Desktop Firefox'], viewport: { width: 1280, height: 800 } } },
     { name: 'webkit',   use: { ...devices['Desktop Safari'],  viewport: { width: 1280, height: 800 } } },
   ],

@@ -79,9 +79,21 @@ screenshot that settles from a tilt to flat as it scrolls in.
 5. Reduced motion and `hover: none` each land on a complete, static-safe page.
 6. Existing lens and character specs still pass on their routes.
 
+## Outcome (2026-11-17)
+
+- `scripts/redev.spec.ts`: 37 checks pass on the production build. Lens, registration and
+  head-tracker specs: 28 pass.
+- Lighthouse mobile, simulated slow 4G, local build: home 95 to 98, LCP 1.8 to 1.9 s, CLS 0,
+  accessibility, best practices and SEO 100. Work, About, Contact and the case studies score 91
+  to 99 with CLS 0; where the largest element is an image their LCP measured 2.0 to 2.7 s.
+- Prerendering moved into this pass: it was the only way to bring home LCP under 2.0 s.
+- Not verified here: real devices, Safari and Firefox, a real GPU (the WebGL path was exercised
+  on a software rasteriser), and the Vercel routing of the prerendered files.
+
 ## Not in this pass
 
 - Rebuilding the Creator page in the new identity.
-- Prerendering or SSR for crawlers that do not run JavaScript.
 - Removing `public/creator/photos` (161 MB, unreferenced): flagged, left for the owner to decide.
-- Second screenshots, diagrams and result plots for case studies: need source material.
+- Real captures for the eight projects that have none, second screenshots, diagrams and result
+  plots for case studies: need source material.
+- Root-level clutter (old HTML portfolios, other brands' design docs, `spike/`): flagged, untouched.

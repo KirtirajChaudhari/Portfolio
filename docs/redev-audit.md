@@ -239,6 +239,18 @@ one WebGL scene that exists is switched off for most visitors' first paint path 
 100. **P3** `components.json` exists only so a CLI can drop components in; `lib/utils.ts` and
      `components/lib/utils.ts` are duplicates.
 
+## Found during the rebuild
+
+101. **P1** Eight of the nine project images are generated posters, not screenshots. Only RasaCare
+     has a real capture. The DrishtiManas poster still advertises "DenseNet121", "37,649 fundus
+     images", "0.81 weighted F1" and "Grad-CAM heatmaps", all of which `CLAUDE.md` records as
+     claims the repository does not support. Anyone who opens the repo after seeing the image
+     finds a NumPy MLP at 69.1%.
+102. **P2** The other posters show invented dashboards with invented numbers (ticket counts, sales
+     figures, detection scores) and marketing lines such as "Real-Time Ready" and "Early Alerts".
+103. **P2** `main.tsx` renders into an empty root and every route shares one static `<head>`, so the
+     per-page titles only exist after JavaScript runs.
+
 ## What a premium version has to do
 
 1. **Show the work on the first screen and the first scroll.** Home becomes a narrative: statement,

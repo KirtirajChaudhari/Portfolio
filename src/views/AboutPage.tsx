@@ -31,7 +31,7 @@ const DEGREES = new Set(['mtech', 'be']);
 
 export default function AboutPage() {
   return (
-    <Page title="About" description="About Kirtiraj Nitin Chaudhari: AI/ML engineer, M.Tech student at MIT-WPU Pune, builder of RasaCare.">
+    <Page>
       <header className="wrap grid items-end gap-x-16 gap-y-12 pb-16 pt-14 sm:pt-20 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
         <div className="intro">
           <h1 className="t-display" style={{ '--i': 0 } as React.CSSProperties}>{siteMeta.fullName}</h1>

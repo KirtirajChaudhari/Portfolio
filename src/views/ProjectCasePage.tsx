@@ -37,7 +37,7 @@ export default function ProjectCasePage() {
   ].filter(Boolean) as { label: string; href: string }[];
 
   return (
-    <Page title={c.title} description={c.oneLiner}>
+    <Page>
       <article className="wrap">
         <header className="intro pb-12 pt-10 sm:pt-14">
           <Link to="/work" viewTransition className="go text-[0.9375rem] text-fg-2" style={{ '--i': 0 } as React.CSSProperties}>

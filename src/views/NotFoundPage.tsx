@@ -4,7 +4,7 @@ import Page from '../components/site/Page';
 
 export default function NotFoundPage() {
   return (
-    <Page title="Page not found" close={false} index={false}>
+    <Page close={false}>
       <section className="wrap intro flex min-h-[70svh] flex-col justify-center py-20">
         <p className="t-data" style={{ '--i': 0 } as React.CSSProperties}>404</p>
         <h1 className="t-display mt-4" style={{ '--i': 1 } as React.CSSProperties}>Nothing at this address.</h1>
