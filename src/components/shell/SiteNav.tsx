@@ -1,5 +1,4 @@
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import '../../styles/legacy.css';
 
@@ -9,50 +8,10 @@ const PROFILE1_LINKS = [
   { to: '/contact', label: 'Contact' },
 ];
 
-const CREATOR_SECTIONS = [
-  { id: 'photos', label: 'Photos' },
-  { id: 'music', label: 'Music' },
-  { id: 'poetry', label: 'Poetry' },
-];
-
-/** Tracks which section id is most visible in the viewport. */
-function useActiveSection(ids: string[]) {
-  const [active, setActive] = useState('');
-  const observer = useRef<IntersectionObserver | null>(null);
-
-  useEffect(() => {
-    observer.current?.disconnect();
-    observer.current = new IntersectionObserver(
-      (entries) => {
-        // Pick the entry with the greatest intersection ratio
-        const best = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (best) setActive(best.target.id);
-      },
-      { threshold: [0.15, 0.5] },
-    );
-    ids.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.current!.observe(el);
-    });
-    return () => observer.current?.disconnect();
-  }, [ids]);
-
-  return active;
-}
-
-/** One floating glass pill for every page. The second profile (Creator) sits at
- *  the end as its own chip, so the two sides of the site are always one click apart. */
+/** Legacy navigation for the lens and head-tracker experiments. */
 export default function SiteNav() {
   const { pathname } = useLocation();
-  const onCreator = pathname.startsWith('/creator') || pathname.startsWith('/profile-2');
-  /* The artistic profile and the lens experiment sit on pale grounds; the pill flips to dark ink there. */
-  const light = onCreator || pathname.startsWith('/xray');
-
-  const activeSection = useActiveSection(
-    onCreator ? CREATOR_SECTIONS.map((s) => s.id) : [],
-  );
+  const light = pathname.startsWith('/xray');
 
   const shell = light
     ? 'border-black/10 bg-white/60 text-neutral-900 shadow-[inset_0_1px_0_rgb(255_255_255/0.8),0_14px_34px_-18px_rgb(60_40_30/0.45)]'
@@ -69,50 +28,29 @@ export default function SiteNav() {
         aria-label="Primary"
         className={`flex items-center gap-0.5 rounded-full border p-1.5 backdrop-blur-[20px] ${shell}`}
       >
-        {/* Home monogram — hidden on the root, always shown on creator so users can escape */}
-        {(
-          <Link to="/" aria-label="Home" className={`${item} inline-flex items-center`}>
-            <img src="/favicon-64.png" alt="" width={24} height={24} className="h-6 w-6 rounded-full" />
-          </Link>
-        )}
+        <Link to="/" aria-label="Home" className={`${item} inline-flex items-center`}>
+          <img src="/favicon-64.png" alt="" width={24} height={24} className="h-6 w-6 rounded-full" />
+        </Link>
 
-        {onCreator ? (
-          /* ── Artistic: in-page section anchors ── */
-          CREATOR_SECTIONS.map((s) => (
-            <a
-              key={s.id}
-              href={`#${s.id}`}
-              className={`${item} ${activeSection === s.id ? active : ''}`}
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
-            >
-              {s.label}
-            </a>
-          ))
-        ) : (
-          /* ── Professional: page-level routes ── */
-          PROFILE1_LINKS.map((l) => (
-            <NavLink
-              key={l.to}
-              to={l.to}
-              className={({ isActive }) => `${item} ${isActive ? active : ''}`}
-            >
-              {l.label}
-            </NavLink>
-          ))
-        )}
+        {PROFILE1_LINKS.map((l) => (
+          <NavLink
+            key={l.to}
+            to={l.to}
+            className={({ isActive }) => `${item} ${isActive ? active : ''}`}
+          >
+            {l.label}
+          </NavLink>
+        ))}
 
         <span aria-hidden="true" className={`mx-1 h-4 w-px ${light ? 'bg-black/15' : 'bg-white/25'}`} />
 
         {/* Profile switcher chip */}
         <Link
-          to={onCreator ? '/' : '/creator'}
-          className={`${item} inline-flex items-center gap-1 ${onCreator ? '' : active}`}
-          title={onCreator ? 'Back to the professional profile' : 'See the other side: music, photography, poems'}
+          to="/creator"
+          className={`${item} inline-flex items-center gap-1 ${active}`}
+          title="See the other side: music, photography, poems"
         >
-          {onCreator ? 'Professional' : 'Artistic'}
+          Artistic
           <ArrowUpRight size={12} strokeWidth={1.75} />
         </Link>
       </nav>

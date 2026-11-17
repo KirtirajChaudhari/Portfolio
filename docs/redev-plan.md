@@ -97,3 +97,28 @@ screenshot that settles from a tilt to flat as it scrolls in.
 - Real captures for the eight projects that have none, second screenshots, diagrams and result
   plots for case studies: need source material.
 - Root-level clutter (old HTML portfolios, other brands' design docs, `spike/`): flagged, untouched.
+
+## Creator migration addendum (2026-11-17)
+
+The page list, engineering notes and outcome above describe the original re-dev pass.
+The separate Creator rebuild in `docs/creator-plan.md` supersedes its decision to keep
+`/creator` and `/profile-2` on the legacy identity. This addendum records implementation;
+its gate results are tracked separately and must not be inferred from the earlier 37-test result.
+
+- VERIFIED in source: Creator now uses the same `Page`, Header, Footer, Archivo/Geist Mono,
+  tokens, light/dark theme and `data-chapter="pro"` as the professional pages. Only `/xray`
+  and `/character` retain the lazy legacy stylesheet and Google Fonts loader.
+- VERIFIED in source: the former random 57-photo three.js gallery has been replaced by
+  14 selected photographs in a fixed order, with descriptive alt text, intrinsic dimensions,
+  lazy grid images and a native dialog. Pointer depth is CSS-only; touch and reduced motion
+  remain a static grid. The unused renderer/book subtree and its three/r3f packages were removed.
+- VERIFIED in source: the hero uses a real photograph; no avatar, duplicate epigraph, tape,
+  marquee or book remains. The debut story, artist bio and subscriber count were omitted under
+  the owner's defaults. Supplied reel URLs retain neutral labels. Empty poetry stays empty.
+- VERIFIED in source: metadata and prerendering now include both Creator paths, for 15 routes.
+  `/profile-2` serves the same page with `/creator` as canonical; only `/creator` is in the sitemap.
+- ASSUMED: the artistic-layer LCP rule concerns the `/xray` lens layers. A real photograph may
+  be Creator's LCP element if the measured mobile gates pass. No lens artwork is introduced there.
+- UNVERIFIED at the time of this addendum: final browser/performance gates. See the completed
+  measurements and screenshots in `docs/creator-plan.md` rather than treating source inspection
+  as behavioral evidence. Original photos in `public/creator/photos` remain untouched.

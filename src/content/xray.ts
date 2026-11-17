@@ -10,8 +10,9 @@
  *
  * Sourcing: every factual claim here already exists in professional.ts or
  * novel.ts (tabla / lens / ink comes from `creatorIntro`; the three domains
- * come from `novelHero.subtitle`; the explainability thesis is
- * `professionalMission`). Nothing creative is invented — no poem lines, no
+ * are preserved in the local heroPro literal, formerly also novelHero.subtitle;
+ * the explainability thesis is `professionalMission`). There is no runtime
+ * dependency on the pruned novelHero export. Nothing creative is invented — no poem lines, no
  * lyrics, no photo captions. That rule is in CLAUDE.md and it is not
  * negotiable when this file grows.
  */

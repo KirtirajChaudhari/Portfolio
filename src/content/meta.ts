@@ -6,6 +6,8 @@ export interface RouteMeta {
   description: string;
   /** False for pages search engines should skip. */
   index: boolean;
+  /** Aliases keep their route but identify the original page to search engines. */
+  canonicalPath?: string;
 }
 
 const HOME =
@@ -24,6 +26,10 @@ const PAGES: Record<string, { title: string; description: string }> = {
     title: 'Contact',
     description: 'Contact Kirtiraj Chaudhari: open to AI/ML roles and to research or product collaborations.',
   },
+  '/creator': {
+    title: 'Creator',
+    description: 'Photography, music and writing by Kirtiraj Nitin Chaudhari.',
+  },
 };
 
 const titled = (title: string) => `${title} · ${siteMeta.displayName}`;
@@ -32,6 +38,7 @@ const titled = (title: string) => `${title} · ${siteMeta.displayName}`;
  *  page (components/site/Page) and for the build-time prerender. */
 export function routeMeta(pathname: string): RouteMeta {
   const path = pathname.replace(/\/+$/, '') || '/';
+  if (path === '/profile-2') return { ...routeMeta('/creator'), canonicalPath: '/creator' };
   if (path === '/') return { title: `${siteMeta.displayName} · ${siteMeta.role}`, description: HOME, index: true };
   if (PAGES[path]) return { title: titled(PAGES[path].title), description: PAGES[path].description, index: true };
   const project = path.startsWith('/projects/') ? getProjectCase(path.slice('/projects/'.length)) : undefined;
@@ -40,4 +47,4 @@ export function routeMeta(pathname: string): RouteMeta {
 }
 
 /** Every route that is rendered to static HTML at build time. */
-export const PRERENDERED = ['/', '/work', '/about', '/contact', ...projectCases.map((p) => `/projects/${p.slug}`)];
+export const PRERENDERED = ['/', '/work', '/about', '/contact', '/creator', '/profile-2', ...projectCases.map((p) => `/projects/${p.slug}`)];
