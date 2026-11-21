@@ -23,6 +23,7 @@ export const musicSection = {
   spotifyArtistUrl: "https://open.spotify.com/artist/3zAV56brdo1aaVpR5WReag",
   spotifyTrackUrl: "https://open.spotify.com/track/4VkfpcwdnNnzNWVlCRupxY",
   spotifyEmbedUrl: "https://open.spotify.com/embed/track/4VkfpcwdnNnzNWVlCRupxY?utm_source=generator&theme=0",
+  spotifyArtistEmbedUrl: "https://open.spotify.com/embed/artist/3zAV56brdo1aaVpR5WReag?utm_source=generator&theme=0",
 
   // Channel identity from shared.ts; omit the stale subscriber count.
   youtubeChannelUrl: siteMeta.socials.youtube,
@@ -34,6 +35,9 @@ export const musicSection = {
   // Supplied release title; the unconfirmed story is deliberately omitted.
   debutLabel: "Debut single",
   debutTitle: "Invisible Available Replaceable",
+  /** The release artwork as published (it was saved as spotify-artist.jpg). 300x300. */
+  debutCover: "/creator/debut-single-cover.jpg",
+  youtubeAvatar: "/creator/youtube-profile.jpg",
 
   // Supplied reel URLs, with neutral labels until the owner supplies titles.
   reels: [

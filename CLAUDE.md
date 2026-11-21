@@ -50,6 +50,15 @@
   retain neutral labels until the owner supplies titles. Preserve every word of the
   supplied `creatorIntro`; its one em dash was changed to a semicolon for the dash rule.
 
+- **Owner decisions, 2026-11-21 (crimson redesign)** override the lines above where they
+  differ: the Writing section uses the f03c96b notebook book again (cover
+  `public/creator/notebook-cover.webp`); its only page is the verbatim `poetryMeta.blurb`
+  and the Instagram link until `poemFragments` has entries. The debut single is shown with
+  its real cover (`public/creator/debut-single-cover.jpg`, formerly misnamed
+  `spotify-artist.jpg`) and the Spotify artist-profile embed. The Creator hero image is a
+  collage of real material (a photo from the selection, the cover, the notebook line) and
+  is a placeholder for the owner's own illustration. Still no invented copy.
+
 ## Performance budget (hard gates)
 - 60fps sustained during lens movement with Chrome DevTools CPU throttle 4x.
 - No long task > 50ms during the ink-spill expansion.
@@ -238,3 +247,47 @@ legacy shell and gallery. Historical results are not new validation of the curre
   Three-run mobile median Performance96, CLS0, LCP2.801s (FAIL<2s). Legacy font/registration
   and two experimental timing gates remain failed here; see docs/creator-plan.md. No full
   acceptance claim. Gallery thumbnails reduce transfer; viewers retain original sources.
+
+
+- Professional UI polish: the home scene reads `--field-wide` from its stage on
+  resize. CSS owns the width/aspect layout contract for both copy and canvas;
+  separate responsive conditions previously caused portrait-tablet overlap and
+  hidden landscape figures. Keep the renderer, formations and easing intact.
+- Professional UI validation is documented in `docs/pro-ui-plan.md`; run the
+  new `scripts/pro-ui.spec.ts` alongside the existing redev gate. The mobile
+  header uses a native disclosure, and client navigation focuses the loaded main
+  landmark while browser Back/Forward retains its normal restoration.
+
+- **UI fix pass (2026-11-21)**, `docs/ui-fix-plan.md`. A sticky element with a negative
+  bottom margin equal to its height has a zero-height margin box, so it stays pinned one
+  screen past its parent: the home figure drew over Recognition. The field is now an
+  absolute layer over the stage with a sticky `.stage-pin` inside it. The stage starts
+  under the header so the pin never travels. Stacked framing reads `.stage-window` (CSS
+  owns it, like `--field-wide`). Home project titles are capped at 14cqi of their column.
+
+- **Crimson redesign (2026-11-21, branch `re-dev`)**, `docs/crimson-plan.md`. The look and
+  elements of `f03c96b` on the re-dev mechanics: crimson (dark) is the default and the
+  toggle offers a blush light variant (`light-dark()` tokens, `color-scheme: dark` unless
+  `data-theme="light"`). Floating glass pill nav (no disclosure; fits 320px). Home = the
+  head-tracker hero (`CharacterCanvas contained`), About block (server-rendered hanging ID
+  card, typing keyboard), then the unchanged 3D stage. About = sticky card + numbered
+  chapters; Work = project index, alternating internship timeline, bento; Contact = card
+  hero, form card, ASCII band. Creator re-points the tokens on `:root:has(.creator)` (paper
+  / darkroom), self-hosted Antonio / Spectral / Caveat. Specs updated, 71/71.
+
+## Learned constraints (crimson)
+- A bottom-anchored hero (`align-items: flex-end`) turns any reflow of its copy into a
+  layout shift of everything above it. Text that can reflow when a web font swaps needs a
+  metric-matched local fallback (`size-adjust`, `ascent-override`): `Archivo Fallback` and
+  `Antonio Fallback` are measured against Arial (Liberation Sans is metric-compatible).
+- `buildFormations()` is a ~270 ms task at 4x CPU. Never run it during first load; the
+  stage mounts its figure from an IntersectionObserver one screen ahead.
+- Specs that wait for `.stage canvas` must scroll to `#work` first (`reachStage`).
+- A canvas `fillStyle` cannot take `var(--token)`: resolve tokens through a probe element
+  and a 1x1 canvas (see `FooterBand` and `readColor`).
+- Lighthouse's simulated LCP charges the main module script to first paint when the trace
+  shows the first paint after it executed; observed LCP is ~0.15s while the simulated value
+  is 2 to 3.4s. Report both; do not call the simulated gate met.
+- A cross-origin iframe that fails still fires `load` (with an error page), so an embed's
+  failure cannot be detected from outside; give it a reload control and a direct link.
+

@@ -28,7 +28,7 @@ export default function FormationFigure({ formation, className = '' }: { formati
           sized.observe(el);
         });
       },
-      { rootMargin: '300px' },
+      { rootMargin: '100% 0px' },
     );
     near.observe(el);
     const sized = new ResizeObserver(() => paint?.());

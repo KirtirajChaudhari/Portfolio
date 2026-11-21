@@ -1,17 +1,17 @@
 /* ============================================================
-   SITE SYSTEM (re-dev)
+   SITE SYSTEM: Crimson (2026-11-21)
 
-   One identity for the professional pages. Tokens and element rules are
-   scoped to `:root[data-chapter="pro"]`; the legacy stylesheets that ship
-   with /xray and /character are scoped to everything else, so
-   neither set reaches the other even after both have loaded.
+   The look of f03c96b (oxblood ground, crimson glows, glass pill nav, pill
+   buttons, soft cards) on the re-dev mechanics (one token set, prerendering,
+   the WebGL figure). Tokens are scoped to `:root[data-chapter="pro"]`; the
+   legacy stylesheets that ship with /xray and /character are scoped to
+   everything else, so neither set reaches the other.
 
-   Colour is OKLCH and declared once with light-dark(). The theme follows
-   the system unless `data-theme` pins it (see ThemeToggle).
+   Crimson dark is the default. `data-theme="light"` (ThemeToggle, saved in
+   localStorage and pinned before first paint) switches to the blush variant.
+   Colour is declared once per token with light-dark().
    ============================================================ */
 
-/* Archivo is cut down to what the site sets: weights 400 to 720, widths 100 to
-   118, Latin-1 and a little punctuation. The full family is 90 kB; this cut is 47. */
 @font-face {
   font-family: 'Archivo';
   font-style: normal;
@@ -39,39 +39,66 @@
   font-weight: 100 900;
   src: url('/fonts/geist-mono-latin.woff2') format('woff2');
 }
+/* A local fallback shaped like Archivo (measured: 98.45% of Arial's advance,
+   ascent 878 / descent 210 per 1000), so text set before the web font arrives
+   takes the same room and nothing moves when it swaps in. */
+@font-face {
+  font-family: 'Archivo Fallback';
+  src: local('Arial'), local('Liberation Sans'), local('Helvetica Neue'), local('Helvetica');
+  size-adjust: 98.45%;
+  ascent-override: 89.18%;
+  descent-override: 21.33%;
+  line-gap-override: 0%;
+}
+/* The hero name only. Basic Latin, 28 kB, requested only when the name renders. */
+@font-face {
+  font-family: 'Dancing Script';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 700;
+  src: url('/fonts/dancing-script-latin.woff2') format('woff2');
+}
 
 :root[data-chapter='pro'] {
-  color-scheme: light dark;
+  color-scheme: dark;
 
-  /* Neutrals lean 0.003 to 0.012 chroma toward the accent's hue. Contrast on
-     --paper, light / dark: fg 16.5 / 17.0, fg-2 7.9 / 9.7, fg-3 5.2 / 6.2,
-     signal 5.0 / 6.7. */
-  --paper: light-dark(oklch(0.975 0.003 20), oklch(0.16 0.008 20));
-  --sunk: light-dark(oklch(0.945 0.004 20), oklch(0.205 0.01 20));
-  --fg: light-dark(oklch(0.21 0.012 20), oklch(0.955 0.005 20));
-  --fg-2: light-dark(oklch(0.42 0.012 20), oklch(0.78 0.01 20));
-  --fg-3: light-dark(oklch(0.52 0.01 20), oklch(0.66 0.012 20));
-  --rule: light-dark(oklch(0.21 0.012 20 / 0.14), oklch(0.955 0.005 20 / 0.16));
-  --rule-2: light-dark(oklch(0.21 0.012 20 / 0.3), oklch(0.955 0.005 20 / 0.34));
-  --signal: light-dark(oklch(0.55 0.215 27), oklch(0.7 0.19 27));
-  --on-signal: light-dark(oklch(1 0 0), oklch(0.16 0.008 20));
-  --shade: light-dark(oklch(0.21 0.012 20 / 0.16), oklch(0 0 0 / 0.6));
+  /* Crimson (dark) / blush (light). Text contrast on --paper, dark / light:
+     fg 17.3 / 15.9, fg-2 9.6 / 7.6, fg-3 5.6 / 5.0, signal 6.3 / 6.4. */
+  --paper: light-dark(oklch(0.975 0.008 25), oklch(0.155 0.022 18));
+  --sunk: light-dark(oklch(0.945 0.014 25), oklch(0.2 0.03 18));
+  --card: light-dark(oklch(1 0 0 / 0.78), oklch(1 0 0 / 0.045));
+  --card-2: light-dark(oklch(1 0 0), oklch(1 0 0 / 0.08));
+  --fg: light-dark(oklch(0.2 0.02 20), oklch(0.96 0.012 40));
+  --fg-2: light-dark(oklch(0.42 0.025 20), oklch(0.96 0.012 40 / 0.74));
+  --fg-3: light-dark(oklch(0.5 0.022 20), oklch(0.96 0.012 40 / 0.54));
+  --rule: light-dark(oklch(0.2 0.02 20 / 0.12), oklch(1 0 0 / 0.12));
+  --rule-2: light-dark(oklch(0.2 0.02 20 / 0.26), oklch(1 0 0 / 0.24));
+  --signal: light-dark(oklch(0.5 0.19 27), oklch(0.72 0.17 30));
+  --on-signal: light-dark(oklch(1 0 0), oklch(0.155 0.022 18));
+  --shade: light-dark(oklch(0.35 0.08 20 / 0.18), oklch(0 0 0 / 0.55));
+  /* The ambient glows behind every page. */
+  --glow-1: light-dark(oklch(0.72 0.16 27 / 0.22), oklch(0.5 0.19 27 / 0.55));
+  --glow-2: light-dark(oklch(0.8 0.12 45 / 0.22), oklch(0.66 0.2 35 / 0.2));
+  /* The avatar video's red: the hero stage, in both themes. */
+  --crimson: #b41d1c;
 
-  --f-sans: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+  --f-sans: 'Archivo', 'Archivo Fallback', ui-sans-serif, system-ui, sans-serif;
   --f-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --f-script: 'Dancing Script', 'Segoe Script', cursive;
 
   --gutter: clamp(1.25rem, 4vw, 3.5rem);
   --measure: 62ch;
-  --header-h: 4rem;
+  /* The floating nav pill: the space content keeps clear of at the top. */
+  --header-h: 5rem;
 
-  /* One radius rule: controls 6, image plates 10. Nothing is a pill. */
-  --r-control: 6px;
-  --r-plate: 10px;
+  --r-control: 999px;
+  --r-card: 1.5rem;
+  --r-plate: 1.25rem;
 
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-out: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 
-  /* Layers, in order. Nothing else sets z-index on these pages. */
+  --z-back: -1;
   --z-field: 0;
   --z-content: 1;
   --z-header: 20;
@@ -84,8 +111,7 @@
 
 /* ---------- Base ---------- */
 /* Element rules sit inside :where() so they weigh no more than a bare element
-   selector: every class below wins without a specificity fight. The legacy
-   reset is scoped the other way round, so the two never meet. */
+   selector: every class below wins without a specificity fight. */
 :where(:root[data-chapter='pro']) :is(*, *::before, *::after) { box-sizing: border-box; }
 
 :root[data-chapter='pro'] { background: var(--paper); scroll-padding-top: calc(var(--header-h) + 1rem); }
@@ -107,12 +133,12 @@
 :where(:root[data-chapter='pro']) :is(h1, h2, h3, h4) {
   margin: 0;
   font-size: inherit;
-  font-weight: 650;
+  font-weight: 620;
   line-height: 1.08;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
   text-wrap: balance;
 }
-:where(:root[data-chapter='pro']) :is(p, dl, dd, figure) { margin: 0; }
+:where(:root[data-chapter='pro']) :is(p, dl, dd, figure, blockquote) { margin: 0; }
 :where(:root[data-chapter='pro']) p { text-wrap: pretty; }
 :where(:root[data-chapter='pro']) :is(ul, ol) { margin: 0; padding: 0; list-style: none; }
 :where(:root[data-chapter='pro']) a { color: inherit; text-decoration: none; }
@@ -120,39 +146,63 @@
 :where(:root[data-chapter='pro']) :is(input, textarea, select) { font: inherit; color: inherit; }
 :where(:root[data-chapter='pro']) :is(img, svg, canvas) { display: block; max-width: 100%; }
 :where(:root[data-chapter='pro']) ::selection { background: var(--signal); color: var(--on-signal); }
-:where(:root[data-chapter='pro']) :focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 2px; }
+:where(:root[data-chapter='pro']) :focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 4px; }
+
+/* ---------- Backdrop ---------- */
+/* The f03c96b ambient: two crimson glows on oxblood, drifting very slowly by
+   transform only. Behind everything, never interactive, still under reduced
+   motion. The page ground under it is --paper. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-back);
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--paper);
+}
+.backdrop::before,
+.backdrop::after {
+  content: '';
+  position: absolute;
+  width: 90vmax;
+  height: 90vmax;
+  border-radius: 50%;
+}
+.backdrop::before { top: -48vmax; right: -30vmax; background: radial-gradient(closest-side, var(--glow-1), transparent); }
+.backdrop::after { bottom: -55vmax; left: -36vmax; background: radial-gradient(closest-side, var(--glow-2), transparent); }
+@media (prefers-reduced-motion: no-preference) {
+  .backdrop::before { animation: drift-a 38s var(--ease-in-out) infinite alternate; }
+  .backdrop::after { animation: drift-b 46s var(--ease-in-out) infinite alternate; }
+  @keyframes drift-a { to { transform: translate3d(-12vmax, 8vmax, 0) scale(1.08); } }
+  @keyframes drift-b { to { transform: translate3d(10vmax, -6vmax, 0) scale(1.12); } }
+}
 
 /* ---------- Type ---------- */
-/* The width axis does the work a second family would: expanded for display,
-   normal for reading. */
 .t-display {
-  font-size: clamp(2.5rem, 1.1rem + 5vw, 5.25rem);
-  font-weight: 680;
-  font-stretch: 112%;
-  line-height: 0.98;
-  letter-spacing: -0.025em;
+  font-size: clamp(2.5rem, 1.2rem + 4.6vw, 5rem);
+  font-weight: 640;
+  line-height: 1;
+  letter-spacing: -0.035em;
 }
 .t-h2 {
-  font-size: clamp(1.75rem, 1.2rem + 2.2vw, 3rem);
-  font-weight: 660;
-  font-stretch: 112%;
-  line-height: 1.02;
-  letter-spacing: -0.02em;
+  font-size: clamp(1.875rem, 1.25rem + 2.4vw, 3.25rem);
+  font-weight: 630;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
 }
 .t-h3 {
   font-size: clamp(1.1875rem, 1.1rem + 0.5vw, 1.5rem);
-  font-weight: 620;
-  font-stretch: 106%;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
 }
 .t-lede {
-  font-size: clamp(1.125rem, 1.02rem + 0.55vw, 1.4375rem);
-  line-height: 1.42;
+  font-size: clamp(1.0625rem, 1rem + 0.45vw, 1.3125rem);
+  line-height: 1.5;
   color: var(--fg-2);
-  max-width: 34em;
+  max-width: 36em;
 }
-.t-body { max-width: var(--measure); color: var(--fg-2); }
+.t-body { max-width: var(--measure); color: var(--fg-2); line-height: 1.7; }
 .t-body + .t-body { margin-top: 1em; }
 /* Mono is for things that are data: figures, stacks, dates. */
 .t-data {
@@ -163,39 +213,99 @@
   font-variant-numeric: tabular-nums;
   color: var(--fg-3);
 }
+/* The small uppercase label above a section: "—— ABOUT". */
+.t-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--f-mono);
+  font-size: 0.71875rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+.t-kicker::before { content: ''; width: 1.75rem; height: 1px; background: currentColor; opacity: 0.7; }
 .t-signal { color: var(--signal); }
+/* The big outlined chapter numerals on About. */
+.t-numeral {
+  font-size: clamp(3.5rem, 2.4rem + 4vw, 6rem);
+  font-weight: 300;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--rule-2);
+  font-variant-numeric: tabular-nums;
+}
 
 /* ---------- Layout ---------- */
-.wrap { width: min(100% - 2 * var(--gutter), 82rem); margin-inline: auto; }
-.band { padding-block: clamp(4.5rem, 3rem + 7vw, 9rem); }
-.band-tight { padding-block: clamp(3rem, 2rem + 4vw, 5.5rem); }
+.wrap { width: min(100% - 2 * var(--gutter), 76rem); margin-inline: auto; }
+.wrap-narrow { width: min(100% - 2 * var(--gutter), 60rem); margin-inline: auto; }
+.band { padding-block: clamp(4.5rem, 3rem + 6vw, 8rem); }
+.band-tight { padding-block: clamp(3rem, 2rem + 4vw, 5rem); }
 .rule-top { border-top: 1px solid var(--rule); }
+/* The page's opening block, clear of the floating nav. */
+.page-top { padding-top: calc(var(--header-h) + clamp(2.5rem, 2rem + 4vw, 5rem)); }
+
+.card {
+  border: 1px solid var(--rule);
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: 0 1px 0 0 oklch(1 0 0 / 0.04) inset, 0 30px 60px -40px var(--shade);
+}
 
 /* ---------- Controls ---------- */
+/* Pills. Primary is the light fill on crimson (dark fill on blush); line is glass. */
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.6rem;
+  gap: 0.55rem;
   min-height: 2.875rem;
-  padding: 0 1.15rem;
+  padding: 0 1.35rem;
   border-radius: var(--r-control);
   border: 1px solid var(--fg);
   background: var(--fg);
   color: var(--paper);
   font-size: 0.9375rem;
-  font-weight: 560;
+  font-weight: 580;
   line-height: 1;
   white-space: nowrap;
-  transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out), border-color 160ms var(--ease-out);
+  transition: transform 300ms var(--ease-out), background-color 300ms var(--ease-out), border-color 300ms var(--ease-out), color 300ms var(--ease-out);
 }
 .button:active { transform: scale(0.97); }
-.button-line { background: transparent; color: var(--fg); border-color: var(--rule-2); }
-.button svg { transition: transform 200ms var(--ease-out); }
+.button-line { background: var(--card); color: var(--fg); border-color: var(--rule-2); }
+.button svg { transition: transform 300ms var(--ease-out); }
+/* A pill whose arrow sits in its own disc at the end: "Open the case (->)". */
+.button-disc { padding-right: 0.35rem; gap: 0.85rem; }
+.button-disc .disc {
+  display: grid;
+  place-items: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--fg);
+}
+.button-line.button-disc .disc { background: var(--fg); color: var(--paper); }
 @media (hover: hover) and (pointer: fine) {
   .button:hover { background: var(--signal); border-color: var(--signal); color: var(--on-signal); }
-  .button-line:hover { background: transparent; border-color: var(--fg); color: var(--fg); }
+  .button-line:hover { background: var(--card-2); border-color: var(--fg); color: var(--fg); }
   .button:hover svg { transform: translate(2px, -2px); }
+  .button-disc:hover .disc svg { transform: translate(1px, -1px) rotate(0deg); }
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--rule-2);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  line-height: 1;
+  color: var(--fg-2);
+  white-space: nowrap;
 }
 
 .link {
@@ -203,15 +313,15 @@
   text-decoration-thickness: 1px;
   text-underline-offset: 0.22em;
   text-decoration-color: var(--rule-2);
-  transition: text-decoration-color 160ms var(--ease-out), color 160ms var(--ease-out);
+  transition: text-decoration-color 200ms var(--ease-out), color 200ms var(--ease-out);
 }
 @media (hover: hover) and (pointer: fine) {
-  .link:hover { text-decoration-color: var(--signal); color: var(--signal); }
+  .link:hover { text-decoration-color: var(--signal); color: var(--fg); }
 }
 
 /* A text link with a travelling arrow: the one "go deeper" affordance. */
-.go { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 560; }
-.go svg { transition: transform 240ms var(--ease-out); }
+.go { min-height: 2.75rem; display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 580; }
+.go svg { transition: transform 300ms var(--ease-out); }
 .go:active { transform: scale(0.98); }
 @media (hover: hover) and (pointer: fine) {
   .go:hover { color: var(--signal); }
@@ -220,55 +330,85 @@
 
 .tag-status {
   font-family: var(--f-mono);
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   line-height: 1;
-  padding: 0.3rem 0.45rem;
+  padding: 0.35rem 0.55rem;
   border: 1px solid var(--rule-2);
-  border-radius: 3px;
+  border-radius: 999px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--fg-2);
   white-space: nowrap;
 }
 
-/* ---------- Header ---------- */
+/* ---------- Header: the floating glass pill ---------- */
 .site-header {
-  position: sticky;
-  top: 0;
+  position: fixed;
+  top: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+  left: 50%;
   z-index: var(--z-header);
-  height: var(--header-h);
-  background: var(--paper);
-  border-bottom: 1px solid transparent;
+  transform: translateX(-50%);
+  max-width: calc(100vw - 1rem);
 }
-/* The rule under the header appears once the page has moved. Scroll-driven
-   where supported; elsewhere the rule is simply always there. */
-@supports (animation-timeline: scroll()) {
-  .site-header { animation: header-rule linear both; animation-timeline: scroll(root); animation-range: 0 80px; }
-  @keyframes header-rule { to { border-bottom-color: var(--rule); } }
+.navpill {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.3rem;
+  border: 1px solid var(--rule-2);
+  border-radius: 999px;
+  background: light-dark(oklch(1 0 0 / 0.72), oklch(0.2 0.03 18 / 0.62));
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(20px) saturate(1.4);
+  box-shadow: inset 0 1px 0 light-dark(oklch(1 0 0 / 0.9), oklch(1 0 0 / 0.14)), 0 14px 34px -16px var(--shade);
 }
-@supports not (animation-timeline: scroll()) {
-  .site-header { border-bottom-color: var(--rule); }
+/* Over the red hero the pill is always light glass on crimson. */
+:root[data-over='hero'] .navpill {
+  color: #fff;
+  background: oklch(0.22 0.07 22 / 0.42);
+  border-color: oklch(1 0 0 / 0.28);
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.28), 0 14px 34px -14px oklch(0 0 0 / 0.45);
 }
-.nav-link {
-  position: relative;
+:root[data-over='hero'] .navpill :is(.nav-link, .nav-icon) { color: #fff; }
+:root[data-over='hero'] .nav-divider { background: oklch(1 0 0 / 0.3); }
+.nav-link,
+.nav-icon {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
   min-height: 2.75rem;
-  padding: 0 0.7rem;
-  font-size: 0.9375rem;
+  padding: 0 0.6rem;
+  border-radius: 999px;
+  font-family: var(--f-mono);
+  font-size: 0.65625rem;
   font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   color: var(--fg-2);
-  transition: color 160ms var(--ease-out);
+  white-space: nowrap;
+  transition: background-color 300ms var(--ease-out), color 300ms var(--ease-out);
 }
-.nav-link[aria-current='page'] { color: var(--fg); }
-.nav-link[aria-current='page']::after {
-  content: '';
-  position: absolute;
-  left: 0.7rem;
-  right: 0.7rem;
-  bottom: 0.55rem;
-  height: 2px;
-  background: var(--signal);
+.nav-icon { width: 2.75rem; padding: 0; }
+.nav-home { width: 2.75rem; padding: 0; }
+.nav-home img { width: 1.75rem; height: 1.75rem; border-radius: 50%; }
+.nav-link[aria-current='page'] { background: light-dark(oklch(0.2 0.02 20 / 0.09), oklch(1 0 0 / 0.16)); color: var(--fg); }
+:root[data-over='hero'] .nav-link[aria-current='page'] { background: oklch(1 0 0 / 0.2); color: #fff; }
+.nav-chip { background: light-dark(oklch(0.2 0.02 20 / 0.06), oklch(1 0 0 / 0.1)); }
+.nav-divider { width: 1px; height: 1rem; margin: 0 0.2rem; background: var(--rule-2); }
+@media (hover: hover) and (pointer: fine) {
+  .nav-link:hover, .nav-icon:hover { background: light-dark(oklch(0.2 0.02 20 / 0.06), oklch(1 0 0 / 0.12)); color: var(--fg); }
+  :root[data-over='hero'] :is(.nav-link, .nav-icon):hover { background: oklch(1 0 0 / 0.16); color: #fff; }
 }
-@media (hover: hover) and (pointer: fine) { .nav-link:hover { color: var(--fg); } }
+@media (min-width: 640px) {
+  .nav-link { padding: 0 0.95rem; font-size: 0.6875rem; letter-spacing: 0.16em; }
+}
+@media (max-width: 379px) {
+  .navpill { gap: 0; padding: 0.2rem; }
+  .nav-link { padding: 0 0.4rem; letter-spacing: 0.04em; }
+  .nav-divider { margin: 0 0.05rem; }
+  .nav-home { display: none; }
+}
 
 .skip {
   position: fixed;
@@ -279,18 +419,129 @@
 }
 .skip:focus-visible { transform: none; }
 
-/* ---------- Home stage ---------- */
-.stage { position: relative; }
-.stage-field {
-  position: sticky;
-  top: 0;
-  z-index: var(--z-field);
-  height: 100svh;
-  margin-bottom: -100svh;
+/* ---------- Home: hero ---------- */
+/* The avatar video's own red, so the head and the page are one surface. The
+   canvas is contained in the hero and pauses once it has scrolled away. */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: flex-end;
   overflow: clip;
+  color: #fff;
+  background: var(--crimson);
+  isolation: isolate;
+}
+.hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
+/* Static scrims keep the copy legible without touching the canvas. */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 55%;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(to top, oklch(0.22 0.07 22 / 0.72), transparent);
+}
+.hero-copy { position: relative; padding-block: 0 clamp(2.5rem, 2rem + 3vw, 4.5rem); }
+.hero-name {
+  font-family: var(--f-script);
+  font-weight: 600;
+  font-size: clamp(4.5rem, 3rem + 7vw, 8.5rem);
+  line-height: 0.95;
+  letter-spacing: 0;
+  text-shadow: 0 10px 34px oklch(0.2 0.08 22 / 0.45);
+}
+.hero-hi {
+  font-family: var(--f-mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: oklch(1 0 0 / 0.82);
+}
+.hero .button { border-color: #fff; background: #fff; color: #1c0c0d; }
+.hero .button-line { background: oklch(1 0 0 / 0.1); border-color: oklch(1 0 0 / 0.6); color: #fff; }
+.hero .button-disc .disc { background: #1c0c0d; color: #fff; }
+@media (hover: hover) and (pointer: fine) {
+  .hero .button:hover { background: #ffe9e4; border-color: #ffe9e4; color: #1c0c0d; }
+  .hero .button-line:hover { background: oklch(1 0 0 / 0.2); border-color: #fff; color: #fff; }
+}
+.hero-explore {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: center;
+  color: oklch(1 0 0 / 0.86);
+}
+.hero-explore .t-kicker { color: inherit; }
+.hero-explore .t-kicker::before { display: none; }
+.hero-cue {
+  width: 1.5rem;
+  height: 2.4rem;
+  border: 1.5px solid oklch(1 0 0 / 0.7);
+  border-radius: 999px;
+  position: relative;
+}
+.hero-cue::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0.45rem;
+  width: 3px;
+  height: 0.5rem;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: #fff;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-cue::after { animation: cue 1.8s var(--ease-in-out) infinite; }
+  @keyframes cue { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(0.75rem); opacity: 0; } 100% { opacity: 0; } }
+}
+.hero-tour a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border: 1px solid oklch(1 0 0 / 0.3);
+  border-radius: 999px;
+  background: oklch(1 0 0 / 0.08);
+  font-size: 0.875rem;
+  color: #fff;
+  transition: background-color 300ms var(--ease-out), border-color 300ms var(--ease-out);
+}
+.hero-tour a span { font-family: var(--f-mono); font-size: 0.6875rem; color: oklch(1 0 0 / 0.7); }
+@media (hover: hover) and (pointer: fine) {
+  .hero-tour a:hover { background: oklch(1 0 0 / 0.18); border-color: #fff; }
+}
+
+/* ---------- Home stage (the 3D projects) ---------- */
+/* The field is a layer the height of the whole stage; the pin inside it is
+   sticky, so the figure stays put while the panels pass and leaves with the
+   last one. (A sticky field with a negative margin has a zero-height margin box
+   and stays pinned for a further screen, over whatever follows the stage.) */
+.stage { position: relative; --field-wide: 1; }
+.stage-field {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-field);
   pointer-events: none;
 }
-.stage-field canvas { width: 100%; height: 100%; }
+.stage-pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: clip;
+}
+.stage-pin canvas { width: 100%; height: 100%; }
+/* The part of the pin the figure is framed into on stacked layouts: from under
+   the nav to where the copy's fade begins. Read by the renderer on resize. */
+.stage-window {
+  position: absolute;
+  inset-inline: 0;
+  top: var(--header-h);
+  height: calc(46svh - 2.5rem - var(--header-h));
+  visibility: hidden;
+}
 .panel {
   position: relative;
   z-index: var(--z-content);
@@ -299,11 +550,14 @@
   align-items: center;
   padding-block: 5rem;
 }
-.panel-hero { min-height: calc(100svh - var(--header-h)); padding-top: 2rem; }
+.panel-intro { min-height: 70svh; }
 /* The copy column always ends left of the figure, whose near edge sits at about
-   52% of the width beside a project and 58% beside the hero. */
-.panel-copy { width: min(100%, 35rem, 47vw - var(--gutter)); }
-.panel-hero .panel-copy { width: min(100%, 52rem, 55vw - var(--gutter)); }
+   52% of the width beside a project. */
+.panel-copy { width: min(100%, 35rem, 47vw - var(--gutter)); container-type: inline-size; }
+/* Project names never break inside a word: the title is capped by the column it
+   sits in. "DrishtiManas", the longest, measures 6.75em at this weight. */
+.panel-copy .panel-title { font-size: min(clamp(2.5rem, 1.2rem + 4.6vw, 5rem), 14cqi); overflow-wrap: normal; }
+.panel-index { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.16em; color: var(--signal); }
 
 /* Captions under the figure: one per step, switched by the render loop
    through `data-step` on the stage. */
@@ -312,19 +566,21 @@
   right: calc(var(--gutter) - 0.5rem);
   bottom: 1.25rem;
   max-width: 25rem;
-  padding: 0.3rem 0.5rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
   background: var(--paper);
   text-align: right;
   opacity: 0;
   transition: opacity 400ms var(--ease-out);
 }
-.stage[data-step='0'] .stage-caption[data-for='0'],
-.stage[data-step='1'] .stage-caption[data-for='0'],
+.stage[data-step='0'] .stage-caption[data-for='1'],
+.stage[data-step='1'] .stage-caption[data-for='1'],
 .stage[data-step='2'] .stage-caption[data-for='2'],
 .stage[data-step='3'] .stage-caption[data-for='3'] { opacity: 1; }
 
-@media (max-width: 899px) {
-  /* Phones: each panel is a window onto the pinned figure followed by its copy
+@media (max-width: 899px), (max-aspect-ratio: 23/20) {
+  .stage { --field-wide: 0; }
+  /* Stacked layouts: each panel is a window onto the pinned figure followed by its copy
      on solid ground. Scrolling slides the copy up over the figure, and the next
      window opens on the next formation. No point ever crosses a word. */
   .panel {
@@ -332,24 +588,21 @@
     padding-block: 46svh 3rem;
     background: linear-gradient(to bottom, transparent calc(46svh - 4rem), var(--paper) calc(46svh - 0.5rem));
   }
-  .panel-hero { padding-block: calc(46svh - var(--header-h)) 1.5rem; background: linear-gradient(to bottom, transparent calc(46svh - var(--header-h) - 4rem), var(--paper) calc(46svh - var(--header-h) - 0.5rem)); }
-  .panel-copy, .panel-hero .panel-copy { width: 100%; }
+  .panel-intro { min-height: 0; padding-block: 4rem 2rem; background: var(--paper); }
+  .panel-copy { width: 100%; }
   .stage-caption { display: none; }
 }
 
-/* ---------- Plates (screenshots) ---------- */
+/* ---------- Plates (screenshots, figures) ---------- */
 .plate {
   position: relative;
   border-radius: var(--r-plate);
   overflow: clip;
   background: var(--sunk);
-  box-shadow: 0 0 0 1px var(--rule), 0 30px 60px -34px var(--shade);
+  box-shadow: 0 0 0 1px var(--rule), 0 40px 80px -46px var(--shade);
 }
 .plate img { width: 100%; height: auto; }
-.tilt { perspective: 1100px; }
 
-/* Case study: the plate starts tipped back and settles flat over the first
-   400px of scroll. Compositor-only, and skipped where unsupported. */
 @supports (animation-timeline: scroll()) {
   @media (prefers-reduced-motion: no-preference) {
     .plate-settle {
@@ -381,17 +634,16 @@
     from { opacity: 0; transform: translateY(1.25rem); }
   }
   /* The headline is the largest paint on every page. It is opaque from the first
-     frame and only moves, so the browser can count it; a fade from zero would
-     hide it from the LCP measurement and from the reader for a beat. */
-  .intro > h1 { animation-name: intro-shift; }
+     frame and only moves, so the browser can count it as LCP. */
+  .intro > h1, .intro > .hero-name { animation-name: intro-shift; }
   @keyframes intro-shift {
     from { transform: translateY(0.75rem); }
   }
 }
 
-/* Scroll entrance for image plates: a short rise driven by the scroll position
-   itself. Movement only, never opacity, so nothing is ever hidden from a
-   renderer that does not scroll (print, link previews, crawlers). */
+/* Scroll entrance: a short rise driven by the scroll position itself. Movement
+   only, never opacity, so nothing is ever hidden from a renderer that does not
+   scroll (print, link previews, crawlers). */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .enter {
@@ -405,8 +657,6 @@
   }
 }
 
-/* Route changes: a short cross-fade, and the project plate travels from the
-   index into its case study. */
 @media (prefers-reduced-motion: no-preference) {
   ::view-transition-old(root) { animation: vt-out 160ms var(--ease-out) both; }
   ::view-transition-new(root) { animation: vt-in 260ms var(--ease-out) both; }
@@ -421,44 +671,80 @@
 }
 
 /* ---------- Forms ---------- */
-.field-label { display: block; margin-bottom: 0.45rem; font-size: 0.875rem; font-weight: 560; }
+.field-label { display: block; margin-bottom: 0.45rem; font-size: 0.8125rem; font-weight: 560; color: var(--fg-2); }
 .field-input {
   width: 100%;
   min-height: 2.875rem;
-  padding: 0.65rem 0.8rem;
+  padding: 0.65rem 0.95rem;
   border: 1px solid var(--rule-2);
-  border-radius: var(--r-control);
-  background: var(--paper);
+  border-radius: 0.875rem;
+  background: light-dark(oklch(1 0 0), oklch(1 0 0 / 0.05));
   color: var(--fg);
-  transition: border-color 160ms var(--ease-out);
+  transition: border-color 200ms var(--ease-out), background-color 200ms var(--ease-out);
 }
 .field-input::placeholder { color: var(--fg-3); opacity: 1; }
 .field-input:focus-visible { outline: 2px solid var(--signal); outline-offset: 1px; border-color: var(--signal); }
 .field-input[aria-invalid='true'] { border-color: var(--signal); }
+select.field-input { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--fg-2) 50%), linear-gradient(135deg, var(--fg-2) 50%, transparent 50%); background-position: calc(100% - 1.15rem) 50%, calc(100% - 0.8rem) 50%; background-size: 0.35rem 0.35rem; background-repeat: no-repeat; padding-right: 2.25rem; }
+select.field-input option { color: #1c0c0d; }
 .field-error { margin-top: 0.4rem; font-size: 0.875rem; color: var(--signal); }
 
-/* ---------- Home ---------- */
-/* Sized against the viewport so the three-line break holds from laptop to
-   desktop, and the block always ends left of the figure. */
-.home-title {
-  font-size: clamp(2.5rem, 4.6vw, 4.5rem);
-  font-weight: 680;
-  font-stretch: 112%;
-  line-height: 0.98;
+/* The address in the closing band and on Contact. It breaks after the @ only,
+   and at 320px the local part still fits on one line. */
+.t-email {
+  font-size: clamp(1.5rem, 1.1rem + 2.2vw, 3rem);
+  font-weight: 620;
+  line-height: 1.12;
   letter-spacing: -0.025em;
-  max-width: 11.6em;
-}
-@media (max-width: 899px) {
-  .home-title { font-size: clamp(2.25rem, 9.6vw, 3.5rem); font-stretch: 104%; }
+  text-decoration-thickness: 2px;
 }
 
 /* ---------- Lists that are links ---------- */
-.row-link { transition: color 160ms var(--ease-out); }
-.row-arrow { transition: transform 240ms var(--ease-out), color 160ms var(--ease-out); }
-.back-arrow { transition: transform 240ms var(--ease-out); }
+.row-link { transition: color 200ms var(--ease-out); }
+.row-arrow { transition: transform 300ms var(--ease-out), color 200ms var(--ease-out); }
+.back-arrow { transition: transform 300ms var(--ease-out); }
 @media (hover: hover) and (pointer: fine) {
   .row-link:hover .row-arrow { transform: translateX(6px); color: var(--signal); }
-  .lead-link:hover { color: var(--signal); }
   .go:hover .back-arrow { transform: translateX(-4px); }
 }
-.lead-link { transition: color 160ms var(--ease-out); }
+
+/* Long project identifiers remain whole in the accessible name and wrap only
+   where a narrow column needs it. */
+.t-display, .t-h2, .t-h3 { overflow-wrap: anywhere; }
+
+/* ---------- Timeline (About, Work) ---------- */
+.timeline { position: relative; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 0.4rem;
+  bottom: 0;
+  left: 0.4rem;
+  border-left: 1px dashed var(--rule-2);
+}
+.timeline-dot {
+  position: absolute;
+  left: 0;
+  top: 0.35rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  border: 1px solid var(--fg-2);
+  background: var(--paper);
+}
+.logo-tile {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border-radius: 0.6rem;
+  background: #fff;
+  padding: 0.25rem;
+  box-shadow: 0 0 0 1px var(--rule);
+}
+.logo-tile img { width: 100%; height: 100%; object-fit: contain; }
+@media (min-width: 1024px) {
+  .timeline-split::before { left: 50%; }
+  .timeline-split .timeline-dot { left: 50%; transform: translateX(-50%); }
+}

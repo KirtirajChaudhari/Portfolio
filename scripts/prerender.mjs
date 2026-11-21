@@ -32,14 +32,20 @@ function page(route, markup) {
     return html.replace(pattern, value);
   };
   let html = shell.replace(sheet[0], () => inlineCss);
+  /* Each route's headline face, discovered in the head so the largest text paints in
+     its own font without waiting for the stylesheet to request it. */
+  const font = (file) => `<link rel="preload" href="/fonts/${file}" as="font" type="font/woff2" crossorigin />`;
+  const fonts = route === '/' ? [font('dancing-script-latin.woff2')]
+    : route === '/creator' || route === '/profile-2' ? [font('antonio-latin-700.woff2'), font('spectral-latin-400.woff2')]
+    : [];
   if (route === '/creator' || route === '/profile-2') {
-    // These faces/images are already in the initial HTML. Discover them in the
-    // head, before the module script and the browser's lazy gallery prefetches.
+    // These images are already in the initial HTML. Discover them in the head,
+    // before the module script and the browser's lazy gallery prefetches.
     const imagePreload = markup.match(/<link rel="preload" as="image"[^>]*>/)?.[0] ?? '';
     markup = markup.replace(imagePreload, '');
-    const preload = '<link rel="preload" href="/fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin />' + imagePreload;
-    html = html.replace(/(<script type="module")/, (_, script) => preload + script);
+    fonts.push(imagePreload);
   }
+  if (fonts.length) html = html.replace(/(<script type="module")/, (_, script) => fonts.join('') + script);
   html = swap(html, /<title>[^<]*<\/title>/, `<title>${attr(meta.title)}</title>`);
   html = swap(html, /(<meta name="description" content=")[^"]*/, `$1${attr(meta.description)}`);
   html = swap(html, /(<link rel="canonical" href=")[^"]*/, `$1${url}`);

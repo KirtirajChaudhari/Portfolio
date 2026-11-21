@@ -29,12 +29,17 @@ function ScrollManager() {
 
   useEffect(() => {
     if (hash) {
+      // Fragments are IDs, not CSS selectors. Encoded punctuation or malformed
+      // external fragments must never break navigation.
+      let target = hash.slice(1);
+      try { target = decodeURIComponent(target); } catch { /* retain the literal ID */ }
+      const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
       /* Lazy routes: the target may not be in the DOM yet, so retry for ~1s. */
       let id = 0;
       let tries = 0;
       const seek = () => {
-        const el = document.querySelector(hash);
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const el = document.getElementById(target);
+        if (el) el.scrollIntoView({ behavior, block: 'start' });
         else if (tries++ < 60) id = requestAnimationFrame(seek);
       };
       id = requestAnimationFrame(seek);

@@ -1,6 +1,7 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ArrowUpRight, Check, Copy } from 'lucide-react';
 import Page from '../components/site/Page';
+import Email from '../components/site/Email';
 import { siteMeta as meta } from '../content/shared';
 
 const REASONS = ['A role', 'Collaboration', 'Research', 'Something else'];
@@ -17,6 +18,10 @@ const ELSEWHERE = [
 type Fields = { name: string; email: string; reason: string; subject: string; message: string };
 type Errors = Partial<Record<keyof Fields, string>>;
 
+const trimmed = (f: Fields): Fields => ({
+  ...f, name: f.name.trim(), email: f.email.trim(), subject: f.subject.trim(), message: f.message.trim(),
+});
+
 function validate(f: Fields): Errors {
   const e: Errors = {};
   if (!f.name) e.name = 'Add your name.';
@@ -31,13 +36,34 @@ export default function ContactPage() {
   const [form, setForm] = useState<Fields>({ name: '', email: '', reason: REASONS[0], subject: '', message: '' });
   const [errors, setErrors] = useState<Errors>({});
   const [sent, setSent] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle');
+  const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const copyAttempt = useRef(0);
+  const copied = copyState === 'copied';
+
+  useEffect(() => () => {
+    if (copyTimer.current) clearTimeout(copyTimer.current);
+    copyAttempt.current++;
+  }, []);
 
   const bind = (k: keyof Fields) => ({
     id: `contact-${k}`,
     name: k,
     value: form[k],
-    onChange: (e: { target: { value: string } }) => setForm((f) => ({ ...f, [k]: e.target.value })),
+    required: k !== 'reason',
+    onChange: (e: { target: { value: string } }) => {
+      const next = { ...form, [k]: e.target.value };
+      setForm(next);
+      setSent(false);
+      // Keep partial/invalid input marked until it passes the submit validator.
+      if (errors[k] && !validate(trimmed(next))[k]) {
+        setErrors((current) => {
+          const remaining = { ...current };
+          delete remaining[k];
+          return remaining;
+        });
+      }
+    },
     'aria-invalid': errors[k] ? true : undefined,
     'aria-describedby': errors[k] ? `contact-${k}-error` : undefined,
   });
@@ -47,7 +73,7 @@ export default function ContactPage() {
   const send = (e: FormEvent) => {
     e.preventDefault();
     setSent(false);
-    const f: Fields = { ...form, name: form.name.trim(), email: form.email.trim(), subject: form.subject.trim(), message: form.message.trim() };
+    const f = trimmed(form);
     const found = validate(f);
     setErrors(found);
     const first = Object.keys(found)[0];
@@ -61,58 +87,74 @@ export default function ContactPage() {
   };
 
   const copy = async () => {
+    const attempt = ++copyAttempt.current;
+    if (copyTimer.current) clearTimeout(copyTimer.current);
+    setCopyState('idle');
     try {
       await navigator.clipboard.writeText(meta.email);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch { /* clipboard blocked: the address is on screen and selectable */ }
+      if (attempt !== copyAttempt.current) return;
+      setCopyState('copied');
+      copyTimer.current = setTimeout(() => setCopyState('idle'), 2000);
+    } catch {
+      if (attempt === copyAttempt.current) setCopyState('error');
+    }
   };
 
   return (
-    <Page close={false}>
-      <header className="wrap intro pb-16 pt-14 sm:pt-20">
-        <h1 className="t-display" style={{ '--i': 0 } as React.CSSProperties}>Let's talk.</h1>
-        <p className="t-lede mt-6" style={{ '--i': 1 } as React.CSSProperties}>
-          I'm open to AI/ML roles, and happy to work on research or product problems with other people. Email is the
-          quickest way to reach me, and I usually reply within a day.
-        </p>
-        <div className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-4" style={{ '--i': 2 } as React.CSSProperties}>
-          <a href={`mailto:${meta.email}`} className="t-h2 link break-all [text-decoration-thickness:2px] sm:break-normal">
-            {meta.email}
-          </a>
-          <button type="button" onClick={copy} className="button button-line">
-            {copied ? <Check size={16} strokeWidth={1.75} aria-hidden="true" /> : <Copy size={16} strokeWidth={1.75} aria-hidden="true" />}
-            <span aria-live="polite">{copied ? 'Copied' : 'Copy address'}</span>
-          </button>
-        </div>
-      </header>
+    <Page close={false} band>
+      <div className="wrap page-top">
+        <header className="card intro relative overflow-hidden px-6 py-12 sm:px-12 sm:py-16">
+          <div aria-hidden="true" className="pointer-events-none absolute -right-28 -top-28 h-96 w-96 rounded-full bg-[radial-gradient(closest-side,var(--glow-1),transparent)]" />
+          <p className="t-kicker" style={{ '--i': 0 } as React.CSSProperties}>Contact</p>
+          <h1 className="t-display mt-6" style={{ '--i': 1 } as React.CSSProperties}>Let's talk.</h1>
+          <p className="t-lede mt-6" style={{ '--i': 2 } as React.CSSProperties}>
+            I'm open to AI/ML roles, and happy to work on research or product problems with other people. Email is the
+            quickest way to reach me, and I usually reply within a day.
+          </p>
+          <div className="mt-9 flex flex-wrap items-center gap-x-5 gap-y-4" style={{ '--i': 3 } as React.CSSProperties}>
+            <a href={`mailto:${meta.email}`} className="t-email link max-w-full">
+              <Email address={meta.email} />
+            </a>
+            <button type="button" onClick={copy} aria-describedby="copy-address-status" className="button button-line">
+              {copied ? <Check size={16} strokeWidth={1.75} aria-hidden="true" /> : <Copy size={16} strokeWidth={1.75} aria-hidden="true" />}
+              <span>{copied ? 'Copied' : 'Copy address'}</span>
+            </button>
+          </div>
+          <p id="copy-address-status" role="status" className="mt-3 min-h-6 text-sm text-fg-2">
+            {copied && 'Email address copied.'}
+            {copyState === 'error' && "Copy failed. Select the address above."}
+          </p>
+        </header>
+      </div>
 
-      <div className="wrap grid gap-x-16 gap-y-16 pb-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
+      <div className="wrap grid items-start gap-x-14 gap-y-16 py-20 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <section aria-labelledby="elsewhere-title">
-          <h2 id="elsewhere-title" className="t-h3">Elsewhere</h2>
-          <ul className="ledger mt-6">
+          <h2 id="elsewhere-title" className="t-h2">Or reach me directly</h2>
+          <ul className="ledger mt-8">
             <li>
-              <a href={`tel:${meta.phone}`} className="row-link flex min-h-14 items-center justify-between gap-4 py-3">
-                <span>Phone</span>
-                <span className="font-data text-[0.9375rem] text-fg-2">{prettyPhone}</span>
+              <a href={`tel:${meta.phone}`} className="row-link grid min-h-14 grid-cols-[6.5rem_minmax(0,1fr)_auto] items-center gap-4 py-3">
+                <span className="t-kicker !gap-0 before:!hidden">Phone</span>
+                <span className="font-data text-[0.9375rem]">{prettyPhone}</span>
+                <ArrowUpRight size={16} strokeWidth={1.75} aria-hidden="true" className="row-arrow text-signal" />
               </a>
             </li>
-            <li className="flex min-h-14 items-center justify-between gap-4 py-3">
-              <span>Based in</span>
-              <span className="text-fg-2">{meta.location}</span>
+            <li className="grid min-h-14 grid-cols-[6.5rem_minmax(0,1fr)] items-center gap-4 py-3">
+              <span className="t-kicker !gap-0 before:!hidden">Based in</span>
+              <span>{meta.location}</span>
             </li>
             {ELSEWHERE.map((l) => (
               <li key={l.label}>
-                <a href={l.href} target="_blank" rel="noopener" className="row-link flex min-h-14 items-center justify-between gap-4 py-3">
-                  <span>{l.label}<span className="sr-only"> (opens in a new tab)</span></span>
-                  <ArrowUpRight size={18} strokeWidth={1.75} aria-hidden="true" className="row-arrow text-fg-3" />
+                <a href={l.href} target="_blank" rel="noopener" className="row-link grid min-h-14 grid-cols-[6.5rem_minmax(0,1fr)_auto] items-center gap-4 py-3">
+                  <span className="t-kicker !gap-0 before:!hidden">{l.label === 'Résumé' ? 'CV' : 'Find me on'}</span>
+                  <span className="text-[1.0625rem]">{l.label}<span className="sr-only"> (opens in a new tab)</span></span>
+                  <ArrowUpRight size={16} strokeWidth={1.75} aria-hidden="true" className="row-arrow text-signal" />
                 </a>
               </li>
             ))}
           </ul>
         </section>
 
-        <form noValidate onSubmit={send} aria-labelledby="form-title">
+        <form noValidate onSubmit={send} aria-labelledby="form-title" className="card px-6 py-8 sm:px-9 sm:py-10">
           <h2 id="form-title" className="t-h3">Write to me</h2>
           <p className="mt-2 text-[0.9375rem] text-fg-2">
             This opens a draft in your mail app. If nothing opens, use the address above.
@@ -150,9 +192,9 @@ export default function ContactPage() {
           </div>
 
           <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
-            <button type="submit" className="button">
+            <button type="submit" className="button button-disc">
               Open the draft
-              <ArrowUpRight size={17} strokeWidth={1.75} aria-hidden="true" />
+              <span className="disc"><ArrowUpRight size={15} strokeWidth={1.75} aria-hidden="true" /></span>
             </button>
             <p role="status" className="text-[0.9375rem] text-fg-2">
               {sent && 'Your mail app should have opened with the message ready. Press send there.'}

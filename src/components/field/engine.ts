@@ -166,6 +166,10 @@ export function mountField(canvas: HTMLCanvasElement, stage: HTMLElement, opts: 
     last: 0,
     time: 0,
     dirtySize: true,
+    wide: true,
+    /* Stacked layouts: centre and half-height, in clip space, of `.stage-window`. */
+    winY: 0.47,
+    winHalf: 0.46,
     dirtyColor: true,
     step: -1,
     /* shown (smoothed) values */
@@ -246,6 +250,15 @@ export function mountField(canvas: HTMLCanvasElement, stage: HTMLElement, opts: 
 
   function resize() {
     const rect = canvas.getBoundingClientRect();
+    // CSS owns both the copy layout and the scene framing. Read only on resize.
+    state.wide = getComputedStyle(stage).getPropertyValue('--field-wide').trim() === '1';
+    const win = stage.querySelector<HTMLElement>('.stage-window')?.getBoundingClientRect();
+    if (win && win.height > 0 && rect.height > 0) {
+      const top = 1 - (2 * (win.top - rect.top)) / rect.height;
+      const bottom = 1 - (2 * (win.bottom - rect.top)) / rect.height;
+      state.winY = (top + bottom) / 2;
+      state.winHalf = (top - bottom) / 2;
+    }
     state.dpr = Math.min(window.devicePixelRatio || 1, gl ? 2 : 1.5);
     state.w = Math.max(1, Math.round(rect.width * state.dpr));
     state.h = Math.max(1, Math.round(rect.height * state.dpr));
@@ -290,12 +303,12 @@ export function mountField(canvas: HTMLCanvasElement, stage: HTMLElement, opts: 
        headline and pushed in once the first project is on screen. Tall screens:
        it sits above the copy. Distance is whatever keeps RADIUS inside that frame. */
     const aspect = state.w / state.h;
-    const wide = aspect > 1.15;
+    const wide = state.wide;
     const halfX = wide ? 0.4 + 0.07 * state.dolly : 0.92;
-    const halfY = wide ? 0.88 : 0.46;
+    const halfY = wide ? 0.88 : state.winHalf;
     const dist = Math.max(RADIUS / (TAN * aspect * halfX), RADIUS / (TAN * halfY)) * mix3(g.zoom, n.zoom, t.zoom);
     const shiftX = wide ? 0.56 - 0.05 * state.dolly : 0;
-    const shiftY = wide ? 0 : 0.47;
+    const shiftY = wide ? 0 : state.winY;
     camera(mvp, proj, yaw, pitch, dist);
 
     /* Point size is set in screen pixels, so it does not change as the camera moves. */
