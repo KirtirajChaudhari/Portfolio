@@ -248,3 +248,11 @@ legacy shell and gallery. Historical results are not new validation of the curre
   new `scripts/pro-ui.spec.ts` alongside the existing redev gate. The mobile
   header uses a native disclosure, and client navigation focuses the loaded main
   landmark while browser Back/Forward retains its normal restoration.
+
+- **UI fix pass (2026-11-21)**, `docs/ui-fix-plan.md`. A sticky element with a negative
+  bottom margin equal to its height has a zero-height margin box, so it stays pinned one
+  screen past its parent: the home figure drew over Recognition. The field is now an
+  absolute layer over the stage with a sticky `.stage-pin` inside it. The stage starts
+  under the header so the pin never travels. Stacked framing reads `.stage-window` (CSS
+  owns it, like `--field-wide`). Home project titles are capped at 14cqi of their column.
+

@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Page from '../components/site/Page';
 import Tilt from '../components/site/Tilt';
+import OutLink from '../components/site/OutLink';
 import { siteMeta } from '../content/shared';
 import { educationJourney } from '../content/journey';
 import {
@@ -56,9 +57,9 @@ export default function AboutPage() {
       </header>
 
       <section aria-label="At a glance" className="wrap">
-        <dl className="rule-top grid gap-x-10 sm:grid-cols-2 lg:grid-cols-4">
+        <dl className="rule-top grid grid-cols-2 gap-x-6 sm:gap-x-10 lg:grid-cols-4">
           {FACTS.map((f) => (
-            <div key={f.label} className="py-7">
+            <div key={f.label} className="py-5 sm:py-7">
               <dt className="t-data">{f.label}</dt>
               <dd className="mt-2 font-[560]">{f.value}</dd>
             </div>
@@ -95,11 +96,7 @@ export default function AboutPage() {
               <li key={e.id} className="py-7">
                 <p className="t-data">{range(e.dateRange)}</p>
                 <h3 className="t-h3 mt-2">{e.heading}</h3>
-                <a href={e.url} target="_blank" rel="noopener" className="link mt-1.5 inline-flex items-center gap-1 text-[0.9375rem] text-fg-2">
-                  {e.organization}
-                  <ArrowUpRight size={14} strokeWidth={1.75} aria-hidden="true" />
-                  <span className="sr-only"> (opens in a new tab)</span>
-                </a>
+                <p className="mt-1.5 text-[0.9375rem] text-fg-2"><OutLink href={e.url}>{e.organization}</OutLink></p>
                 {DEGREES.has(e.id) && <p className="t-body mt-3">{e.description}</p>}
               </li>
             ))}

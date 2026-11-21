@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowDown, ArrowRight, ArrowUpRight } from 'lucide-react';
 import Page from '../components/site/Page';
 import Stack from '../components/site/Stack';
+import OutLink from '../components/site/OutLink';
 import { siteMeta } from '../content/shared';
 import { caseFigures, leadCases } from '../content/projects';
 import { workJourney } from '../content/journey';
@@ -30,21 +31,27 @@ export default function HomePage() {
   return (
     <Page>
       <section ref={stage} className="stage" data-step="0">
+        {/* The field covers the whole stage; its pin is sticky inside it, so the
+            figure is released with the last panel instead of drifting over the
+            sections that follow. */}
         <div className="stage-field">
-          {figure && (
-            <Suspense fallback={null}>
-              <Field stage={stage} />
-            </Suspense>
-          )}
-          <p className="stage-caption t-data" data-for="0" aria-hidden="true">
-            23,756 points, the node count of RasaCare's knowledge graph. The layout is illustrative.
-          </p>
-          <p className="stage-caption t-data" data-for="2" aria-hidden="true">
-            2,788 inputs, 256 hidden units, 4 classes: the real layer sizes. Connections are sampled.
-          </p>
-          <p className="stage-caption t-data" data-for="3" aria-hidden="true">
-            An illustrative length of track, with the frame a detector draws round an obstacle.
-          </p>
+          <div className="stage-pin">
+            <div className="stage-window" aria-hidden="true" />
+            {figure && (
+              <Suspense fallback={null}>
+                <Field stage={stage} />
+              </Suspense>
+            )}
+            <p className="stage-caption t-data" data-for="0" aria-hidden="true">
+              23,756 points, the node count of RasaCare's knowledge graph. The layout is illustrative.
+            </p>
+            <p className="stage-caption t-data" data-for="2" aria-hidden="true">
+              2,788 inputs, 256 hidden units, 4 classes: the real layer sizes. Connections are sampled.
+            </p>
+            <p className="stage-caption t-data" data-for="3" aria-hidden="true">
+              An illustrative length of track, with the frame a detector draws round an obstacle.
+            </p>
+          </div>
         </div>
 
         <div data-panel className="panel panel-hero">
@@ -76,7 +83,7 @@ export default function HomePage() {
           <article key={c.slug} data-panel id={i === 0 ? 'work' : undefined} className="panel">
             <div className="wrap">
               <div className="panel-copy">
-                <h2 className="t-display">{c.title}</h2>
+                <h2 className="t-display panel-title">{c.title}</h2>
                 <p className="t-lede mt-5">{c.oneLiner}</p>
                 <ul className="mt-7 grid gap-1.5 border-l border-rule-2 pl-4 font-data text-[0.9375rem] text-fg">
                   {caseFigures(c.slug).map((f) => <li key={f}>{f}</li>)}
@@ -140,11 +147,7 @@ export default function HomePage() {
                 <p className="t-data lg:pt-1.5">{range(j.dateRange)}</p>
                 <div>
                   <h3 className="t-h3">{j.heading}</h3>
-                  <a href={j.url} target="_blank" rel="noopener" className="link mt-1.5 inline-flex items-center gap-1 text-[0.9375rem] text-fg-2">
-                    {j.organization}
-                    <ArrowUpRight size={14} strokeWidth={1.75} aria-hidden="true" />
-                    <span className="sr-only"> (opens in a new tab)</span>
-                  </a>
+                  <p className="mt-1.5 text-[0.9375rem] text-fg-2"><OutLink href={j.url}>{j.organization}</OutLink></p>
                 </div>
                 <p className="t-body">{j.description}</p>
               </li>

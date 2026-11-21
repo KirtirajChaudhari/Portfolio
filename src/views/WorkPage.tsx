@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Page from '../components/site/Page';
 import Stack from '../components/site/Stack';
 import Shot from '../components/site/Shot';
 import Tilt from '../components/site/Tilt';
 import FormationFigure from '../components/site/FormationFigure';
+import OutLink from '../components/site/OutLink';
 import { caseFigures, leadCases, otherCases, type ProjectCase } from '../content/projects';
 import { workJourney } from '../content/journey';
 import { professionalExpertise as expertise } from '../content/professional';
@@ -101,11 +102,7 @@ export default function WorkPage() {
                 <p className="t-data lg:pt-1.5">{range(j.dateRange)}</p>
                 <div>
                   <h3 className="t-h3">{j.heading}</h3>
-                  <a href={j.url} target="_blank" rel="noopener" className="link mt-1.5 inline-flex items-center gap-1 text-[0.9375rem] text-fg-2">
-                    {j.organization}
-                    <ArrowUpRight size={14} strokeWidth={1.75} aria-hidden="true" />
-                    <span className="sr-only"> (opens in a new tab)</span>
-                  </a>
+                  <p className="mt-1.5 text-[0.9375rem] text-fg-2"><OutLink href={j.url}>{j.organization}</OutLink></p>
                 </div>
                 <div>
                   <p className="t-body">{j.description}</p>

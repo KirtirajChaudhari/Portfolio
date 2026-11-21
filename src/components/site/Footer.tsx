@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 import { siteMeta } from '../../content/shared';
 import ThemeToggle from './ThemeToggle';
+import Email from './Email';
 
 const SOCIAL = [
   { label: 'GitHub', href: siteMeta.socials.github },
@@ -29,11 +30,8 @@ export default function Footer({ close = true }: { close?: boolean }) {
         <section className="band rule-top" aria-labelledby="close-title">
           <div className="wrap">
             <h2 id="close-title" className="t-data">Contact</h2>
-            <a
-              href={`mailto:${siteMeta.email}`}
-              className="t-h2 link mt-4 block max-w-full break-all [text-decoration-thickness:2px] sm:break-normal"
-            >
-              {siteMeta.email}
+            <a href={`mailto:${siteMeta.email}`} className="t-email link mt-4 inline-block max-w-full">
+              <Email address={siteMeta.email} />
             </a>
             <p className="t-lede mt-6">
               I'm open to AI/ML roles, and happy to work on research or product problems with other people. I usually
@@ -44,8 +42,8 @@ export default function Footer({ close = true }: { close?: boolean }) {
       )}
 
       <div className="rule-top">
-        <div className="wrap grid gap-10 py-12 text-[0.9375rem] sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
-          <div>
+        <div className="wrap grid grid-cols-2 gap-x-6 gap-y-8 py-12 text-[0.9375rem] sm:gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div className="col-span-2 lg:col-span-1">
             <p className="font-[650] [font-stretch:112%]">{siteMeta.fullName}</p>
             <p className="mt-1 text-fg-2">{siteMeta.role}. Pune, India.</p>
             <ThemeToggle className="-ml-3 mt-3" />
@@ -62,7 +60,7 @@ export default function Footer({ close = true }: { close?: boolean }) {
           <div className="flex flex-col items-start">
             <Link to="/creator" className="link inline-flex min-h-11 items-center">Artistic profile</Link>
             <Link to="/xray" className="link inline-flex min-h-11 items-center">Experiment: lens</Link>
-            <Link to="/character" className="link inline-flex min-h-11 items-center">Experiment: head-tracker</Link>
+            <Link to="/character" className="link inline-flex min-h-11 items-center"><span>Experiment: <span className="whitespace-nowrap">head-tracker</span></span></Link>
           </div>
         </div>
       </div>

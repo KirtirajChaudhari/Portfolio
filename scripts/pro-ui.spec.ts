@@ -193,3 +193,83 @@ test('Contact clears only corrected valid field errors and marks required contro
   await expect(page.locator('#contact-email')).not.toHaveAttribute('aria-invalid');
   await expect(page.locator('#contact-message')).toHaveAttribute('aria-invalid', 'true');
 });
+
+/* ---- 2026-11-21 fix pass (docs/ui-fix-plan.md) ---- */
+
+for (const viewport of [{ width: 390, height: 844 }, { width: 1024, height: 768 }, { width: 1440, height: 900 }]) {
+  test(`home figure is released with the last panel at ${viewport.width}×${viewport.height}`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await page.goto('/');
+    await expect(page.locator('.stage canvas')).toHaveCount(1);
+    // Scroll so the section after the stage sits mid-screen.
+    await page.locator('#recognition-title').evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    await page.waitForTimeout(300);
+    const gap = await page.evaluate(() => {
+      const pin = document.querySelector('.stage-pin')!.getBoundingClientRect();
+      const stage = document.querySelector('.stage')!.getBoundingClientRect();
+      const recognition = document.querySelector('#recognition-title')!.getBoundingClientRect();
+      return { pinPastStage: pin.bottom - stage.bottom, pinOverRecognition: pin.bottom - recognition.top };
+    });
+    expect(gap.pinPastStage).toBeLessThanOrEqual(1);
+    expect(gap.pinOverRecognition).toBeLessThanOrEqual(0);
+  });
+}
+
+for (const width of [320, 768, 1024, 1440]) {
+  test(`home project titles never break inside a word at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/');
+    await page.evaluate(() => document.fonts.load('680 80px Archivo'));
+    const titles = await page.locator('.panel-title').evaluateAll((els) => els.map((el) => {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const lines = new Set([...range.getClientRects()].map((r) => Math.round(r.top)));
+      return { text: el.textContent, lines: lines.size, fits: range.getBoundingClientRect().width <= el.getBoundingClientRect().width + 1 };
+    }));
+    for (const t of titles) expect(t, t.text ?? '').toMatchObject({ lines: 1, fits: true });
+  });
+}
+
+test('stacked home frames the whole figure above the copy', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.locator('.stage canvas')).toHaveCount(1);
+  const box = await page.evaluate(() => {
+    const win = document.querySelector('.stage-window')!.getBoundingClientRect();
+    const copy = document.querySelector('.panel-hero .panel-copy')!.getBoundingClientRect();
+    return { winBottom: win.bottom, copyTop: copy.top, winTop: win.top };
+  });
+  expect(box.winTop).toBeGreaterThanOrEqual(64 - 1);
+  expect(box.winBottom).toBeLessThan(box.copyTop);
+});
+
+test('email addresses break only after the @ at 320px', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  for (const path of ['/contact', '/about']) {
+    await page.goto(path);
+    await page.evaluate(() => document.fonts.load('660 30px Archivo'));
+    const parts = await page.locator('a.t-email').first().evaluate((a) => {
+      const range = document.createRange();
+      range.selectNodeContents(a);
+      const rows = new Map<number, number>();
+      for (const r of range.getClientRects()) rows.set(Math.round(r.top), (rows.get(Math.round(r.top)) ?? 0) + r.width);
+      return { rows: rows.size, overflow: a.scrollWidth - a.clientWidth, text: a.textContent };
+    });
+    expect(parts.rows).toBeLessThanOrEqual(2);
+    expect(parts.overflow).toBeLessThanOrEqual(0);
+  }
+});
+
+test('outbound link arrows stay attached to their label when it wraps', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/about');
+  const gaps = await page.locator('#education-title ~ ol a.link').evaluateAll((links) => links.map((a) => {
+    const icon = a.querySelector('svg')!.getBoundingClientRect();
+    const range = document.createRange();
+    range.selectNodeContents(a.querySelector('span.whitespace-nowrap')!.firstChild!);
+    const word = range.getBoundingClientRect();
+    return Math.abs(icon.left - word.right);
+  }));
+  expect(gaps.length).toBeGreaterThan(0);
+  for (const g of gaps) expect(g).toBeLessThan(10);
+});

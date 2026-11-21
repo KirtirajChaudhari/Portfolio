@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ArrowUpRight, Check, Copy } from 'lucide-react';
 import Page from '../components/site/Page';
+import Email from '../components/site/Email';
 import { siteMeta as meta } from '../content/shared';
 
 const REASONS = ['A role', 'Collaboration', 'Research', 'Something else'];
@@ -108,8 +109,8 @@ export default function ContactPage() {
           quickest way to reach me, and I usually reply within a day.
         </p>
         <div className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-4" style={{ '--i': 2 } as React.CSSProperties}>
-          <a href={`mailto:${meta.email}`} className="t-h2 link break-all [text-decoration-thickness:2px] sm:break-normal">
-            {meta.email}
+          <a href={`mailto:${meta.email}`} className="t-email link max-w-full">
+            <Email address={meta.email} />
           </a>
           <button type="button" onClick={copy} aria-describedby="copy-address-status" className="button button-line">
             {copied ? <Check size={16} strokeWidth={1.75} aria-hidden="true" /> : <Copy size={16} strokeWidth={1.75} aria-hidden="true" />}
