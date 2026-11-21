@@ -201,7 +201,7 @@ test('touch: the page is complete without hover', async ({ browser }) => {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 780 }, hasTouch: true, isMobile: true });
   const page = await ctx.newPage();
   await page.goto('/');
-  await expect(page.getByRole('link', { name: 'Explore', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Scroll to explore', exact: true })).toBeVisible();
   for (const name of ['RasaCare', 'DrishtiManas', 'PRAVAAS']) {
     const h = page.getByRole('heading', { name });
     await h.scrollIntoViewIfNeeded();
@@ -258,7 +258,7 @@ test('prerendered pages read correctly with JavaScript off', async ({ browser })
   const ctx = await browser.newContext({ javaScriptEnabled: false });
   const page = await ctx.newPage();
   for (const [route, h1, title] of [
-    ['/', 'Kirtiraj Chaudhari, AI/ML engineer', 'Kirtiraj Chaudhari · AI/ML Engineer'],
+    ['/', 'Kirtiraj Chaudhari', 'Kirtiraj Chaudhari · AIML Engineer'],
     ['/work', "What I've built, and where I've worked.", 'Work · Kirtiraj Chaudhari'],
     ['/projects/drishtimanas', 'DrishtiManas', 'DrishtiManas · Kirtiraj Chaudhari'],
     ['/about', 'Machine learning that shows its reasoning.', 'About · Kirtiraj Chaudhari'],

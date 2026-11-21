@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import Page from '../components/site/Page';
 import PinnedCard from '../components/about/PinnedCard';
 import ToolsKeyboard from '../components/about/ToolsKeyboard';
+import ExperienceList from '../components/about/ExperienceList';
 import OutLink from '../components/site/OutLink';
 import { glance } from '../content/facts';
 import { tools } from '../content/tools';
@@ -24,14 +25,13 @@ const TIERS = [
 ] as const;
 
 /** One numbered chapter: the big outlined numeral beside its title, as in f03c96b. */
-function Chapter({ n, id, title, note, children }: { n: string; id: string; title: string; note?: string; children: ReactNode }) {
+function Chapter({ n, id, title, children }: { n: string; id: string; title: string; children: ReactNode }) {
   return (
     <section className="rule-top py-16 lg:py-20" aria-labelledby={`${id}-title`}>
       <div className="flex items-end gap-5">
         <span className="t-numeral" aria-hidden="true">{n}</span>
         <div className="pb-1">
           <h2 id={`${id}-title`} className="t-h2">{title}</h2>
-          {note && <p className="t-data mt-2">{note}</p>}
         </div>
       </div>
       <div className="mt-12">{children}</div>
@@ -56,11 +56,11 @@ export default function AboutPage() {
             </h1>
             <div className="mt-8 grid gap-4" style={{ '--i': 2 } as React.CSSProperties}>
               <p className="t-lede">{aboutBio[0]}</p>
-              {aboutBio.slice(1).map((p) => <p key={p} className="t-body">{p}</p>)}
+              <div>{aboutBio.slice(1).map((p) => <p key={p} className="t-body">{p}</p>)}</div>
             </div>
-            <dl className="mt-10 grid grid-cols-2 gap-x-8 gap-y-6 border-t border-rule pt-8 xl:grid-cols-4" style={{ '--i': 3 } as React.CSSProperties}>
-              {glance.map((f) => (
-                <div key={f.label}>
+            <dl className="mt-10 grid grid-cols-2 gap-x-8 gap-y-6 border-t border-rule pt-8 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1.4fr)]" style={{ '--i': 3 } as React.CSSProperties}>
+              {glance.map((f, i) => (
+                <div key={f.label} className={i === glance.length - 1 ? 'col-span-2 xl:col-span-1' : undefined}>
                   <dt className="t-kicker !gap-0 before:!hidden">{f.label}</dt>
                   <dd className="mt-2 font-[560]">{f.value}</dd>
                 </div>
@@ -68,7 +68,11 @@ export default function AboutPage() {
             </dl>
           </header>
 
-          <Chapter n="01" id="education" title="Education">
+          <Chapter n="01" id="experience" title="Experience">
+            <ExperienceList />
+          </Chapter>
+
+          <Chapter n="02" id="education" title="Education">
             <ol className="timeline">
               {educationJourney.map((e) => (
                 <li key={e.id} className="relative pb-12 pl-9 last:pb-0">
@@ -87,7 +91,7 @@ export default function AboutPage() {
             </ol>
           </Chapter>
 
-          <Chapter n="02" id="tools" title="Tools I use" note="Typed out on the keyboard, then sorted below.">
+          <Chapter n="03" id="tools" title="Tools I use">
             <ToolsKeyboard />
             <ul aria-label="Tool logos" className="mt-8 grid grid-cols-[repeat(auto-fill,minmax(3rem,1fr))] gap-3">
               {tools.map((t) => (
@@ -106,7 +110,7 @@ export default function AboutPage() {
             </dl>
           </Chapter>
 
-          <Chapter n="03" id="certifications" title="Certifications" note={`${certifications.length} courses and simulations.`}>
+          <Chapter n="04" id="certifications" title="Certifications">
             <div className="grid gap-10">
               {TIERS.map(({ tier, label }) => (
                 <div key={tier}>
@@ -127,7 +131,7 @@ export default function AboutPage() {
             </div>
           </Chapter>
 
-          <Chapter n="04" id="recognition" title="Recognition">
+          <Chapter n="05" id="recognition" title="Recognition">
             <ol className="grid gap-4">
               {recognition.map((r) => (
                 <li key={r.id} className="card grid gap-x-8 gap-y-3 p-6 sm:grid-cols-[7rem_minmax(0,1fr)] sm:p-8">
@@ -149,12 +153,18 @@ export default function AboutPage() {
 
       <section className="band-tight">
         <div className="wrap grid justify-items-center gap-4 text-center">
+          <Link to="/work" viewTransition className="button button-disc">
+            Explore my work
+            <span className="disc"><ArrowRight size={15} strokeWidth={1.75} aria-hidden="true" /></span>
+          </Link>
+        </div>
+        <div className="wrap mt-14 grid justify-items-center gap-4 border-t border-rule pt-14 text-center">
           <p className="t-kicker">There's more than the CV</p>
           <Link to="/creator" viewTransition className="button button-line button-disc max-w-full !whitespace-normal !py-1.5 text-left !leading-snug">
             Apart from the academics: know the real me
             <span className="disc"><ArrowRight size={15} strokeWidth={1.75} aria-hidden="true" /></span>
           </Link>
-          <p className="t-data">Photography, music and writing, on their own page.</p>
+          <p className="t-data">Photography, music and writing.</p>
         </div>
       </section>
     </Page>

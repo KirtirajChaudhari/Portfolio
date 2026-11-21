@@ -1,11 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ArrowUpRight, RotateCw } from 'lucide-react';
 
 /** A Spotify embed that only loads near the viewport, can be reloaded, and says so
  *  when it has not loaded in time (blocked networks, privacy extensions, Spotify
  *  outages), with the direct link right there. The iframe is remounted on reload. */
-export default function SpotifyPlayer({ src, title, height, href, label }: {
+export default function SpotifyPlayer({ src, title, height, href, label, header }: {
   src: string; title: string; height: number; href: string; label: string;
+  /** Replaces the label above the player (the reload control stays beside it). */
+  header?: ReactNode;
 }) {
   const host = useRef<HTMLDivElement>(null);
   const [near, setNear] = useState(false);
@@ -33,7 +35,7 @@ export default function SpotifyPlayer({ src, title, height, href, label }: {
   return (
     <div>
       <div className="mb-3 flex items-center justify-between gap-3">
-        <p className="t-kicker !text-[0.6875rem]">{label}</p>
+        {header ?? <p className="t-kicker !text-[0.6875rem]">{label}</p>}
         <button type="button" onClick={reload} className="nav-icon !h-9 !w-9 text-fg-2" aria-label={`Reload the ${label} player`} title="Reload player">
           <RotateCw size={15} strokeWidth={1.75} aria-hidden="true" />
         </button>

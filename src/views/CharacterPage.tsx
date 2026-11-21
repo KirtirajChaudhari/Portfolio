@@ -9,7 +9,8 @@ import { LEGACY_FONTS, loadStylesheet } from '../lib/fonts';
 import '../styles/legacy.css';
 
 /* Real facts only, from content/xray.ts and content/professional.ts. */
-const BIO = 'I build machine learning that shows its reasoning: clinical nutrition, disease screening, railway safety. M.Tech AI & ML at MIT-WPU, Pune. Currently building RasaCare.';
+/* Same identity as the home hero; no project list and no "currently building" status. */
+const BIO = 'AIML Engineer. I focus on interpretable machine learning: models whose outputs people can understand and check. Currently: M.Tech AI & ML at MIT-WPU, Pune.';
 
 const FONT_HREF = 'https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap';
 

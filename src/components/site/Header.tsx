@@ -3,9 +3,9 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 
+/* About and Work are reached from the pages themselves (Home's "The full story",
+   About's "Explore my work", the footer), not from the pill. */
 const PRO = [
-  { to: '/about', label: 'About' },
-  { to: '/work', label: 'Work' },
   { to: '/contact', label: 'Contact' },
 ];
 
@@ -50,7 +50,7 @@ export default function Header() {
       <header className="site-header">
         <nav aria-label="Primary" className="navpill">
           <Link to="/" viewTransition className="nav-link nav-home" aria-label="Home">
-            <img src="/favicon-64.png" alt="" width={28} height={28} />
+            <img src="/avatars/nav-avatar.webp" alt="" width={32} height={32} decoding="async" />
           </Link>
           {creator
             ? CREATOR.map((s) => <a key={s.id} href={`#${s.id}`} className="nav-link">{s.label}</a>)

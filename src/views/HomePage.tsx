@@ -8,19 +8,16 @@ import ToolsKeyboard from '../components/about/ToolsKeyboard';
 import { siteMeta } from '../content/shared';
 import { aboutBio } from '../content/professional';
 import { glance } from '../content/facts';
-import { caseFigures, leadCases, otherCases } from '../content/projects';
+import { caseFigures, leadCases } from '../content/projects';
 
 /* The figure loads after first paint: it is illustration, and the hero name is the LCP element. */
 const Field = lazy(() => import('../components/field/Field'));
 
-/* Real facts only, from content/professional.ts and content/projects.ts. */
-const BIO = 'I build machine learning that shows its reasoning: clinical nutrition, retinal screening, railway safety. M.Tech AI & ML at MIT-WPU, Pune.';
-
-const TOUR = [
-  { href: '#about', n: '01', label: 'About me' },
-  { href: '#work', n: '02', label: 'Projects in 3D' },
-  { to: '/creator', n: '03', label: 'The artistic side' },
-];
+/* Identity, focus and current education. The projects are told further down. */
+/* Broken after the colon from 360px, so the clause after it is never split. */
+const FOCUS = ['I focus on interpretable machine learning:', 'models whose outputs people can understand and check.'];
+/* Kept as written; the institution never breaks at its hyphen. */
+const EDUCATION = ['Currently: M.Tech AI & ML at ', 'MIT-WPU, Pune.'];
 
 export default function HomePage() {
   const stage = useRef<HTMLElement>(null);
@@ -43,16 +40,24 @@ export default function HomePage() {
       {/* ---- Hero: the head-tracking avatar on its own red. ---- */}
       <section className="hero" aria-labelledby="hero-title">
         <CharacterCanvas contained />
-        <div className="wrap hero-copy grid items-end gap-10 lg:grid-cols-[minmax(0,1fr)_auto]">
+        <div className="wrap hero-copy">
           <div className="intro max-w-[30rem]">
             <p className="hero-hi" style={{ '--i': 0 } as React.CSSProperties}>Hi, I'm</p>
             <h1 id="hero-title" className="hero-name mt-1" style={{ '--i': 1 } as React.CSSProperties}>
-              Kirtiraj<span className="sr-only"> Chaudhari, AI/ML engineer</span>
+              Kirtiraj<span className="sr-only"> Chaudhari</span>
             </h1>
-            <p className="mt-5 text-[1rem] leading-relaxed text-white/90 sm:text-[1.0625rem]" style={{ '--i': 2 } as React.CSSProperties}>{BIO}</p>
-            <div className="mt-8 flex flex-wrap gap-3" style={{ '--i': 3 } as React.CSSProperties}>
+            <p className="hero-role mt-2 min-[380px]:mt-4" style={{ '--i': 2 } as React.CSSProperties}>{siteMeta.role}</p>
+            <p className="mt-3 max-w-[27rem] text-[1rem] leading-relaxed text-white/90 sm:text-[1.0625rem]" style={{ '--i': 2 } as React.CSSProperties}>
+              {FOCUS[0]}<br className="hidden min-[360px]:inline" /> {FOCUS[1]}
+            </p>
+            <p className="hero-edu mt-3 min-[380px]:mt-4" style={{ '--i': 2 } as React.CSSProperties}>
+              {EDUCATION[0]}<span className="whitespace-nowrap">{EDUCATION[1]}</span>
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3 sm:mt-8" style={{ '--i': 3 } as React.CSSProperties}>
+              {/* The hero's one way on: the former "Explore" button, scroll cue and
+                  numbered tour, merged. */}
               <a href="#about" className="button button-disc">
-                Explore
+                Scroll to explore
                 <span className="disc"><ArrowDown size={15} strokeWidth={1.75} aria-hidden="true" /></span>
               </a>
               <a href={siteMeta.resumeUrl} target="_blank" rel="noopener" className="button button-line">
@@ -62,16 +67,7 @@ export default function HomePage() {
               </a>
             </div>
           </div>
-          <nav aria-label="Explore the site" className="hero-tour hidden gap-2 lg:grid lg:justify-items-end">
-            {TOUR.map((t) => t.to
-              ? <Link key={t.n} to={t.to} viewTransition><span>{t.n}</span>{t.label}<ArrowUpRight size={14} strokeWidth={1.75} aria-hidden="true" /></Link>
-              : <a key={t.n} href={t.href}><span>{t.n}</span>{t.label}<ArrowDown size={14} strokeWidth={1.75} aria-hidden="true" /></a>)}
-          </nav>
         </div>
-        <a href="#about" className="hero-explore absolute bottom-5 left-1/2 hidden -translate-x-1/2 md:grid" aria-label="Scroll to explore">
-          <span className="hero-cue" aria-hidden="true" />
-          <span className="t-kicker" aria-hidden="true">Scroll</span>
-        </a>
       </section>
 
       {/* ---- About: the ID card and the keyboard. ---- */}
@@ -85,9 +81,11 @@ export default function HomePage() {
             <h2 id="about-title" className="t-h2 mt-5 max-w-[14em]">Machine learning that shows its reasoning.</h2>
             <p className="t-lede mt-7">{aboutBio[0]}</p>
             <p className="t-body mt-4">{aboutBio[1]}</p>
-            <dl className="mt-10 grid grid-cols-2 gap-x-8 gap-y-6 border-t border-rule pt-8">
-              {glance.map((f) => (
-                <div key={f.label}>
+            {/* Three facts: two short ones side by side, the long Focus line on its own
+                row on phones, one row of three from `sm`. */}
+            <dl className="mt-10 grid grid-cols-2 gap-x-8 gap-y-6 border-t border-rule pt-8 sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1.4fr)]">
+              {glance.map((f, i) => (
+                <div key={f.label} className={i === glance.length - 1 ? 'col-span-2 sm:col-span-1' : undefined}>
                   <dt className="t-kicker !gap-0 before:!hidden">{f.label}</dt>
                   <dd className="mt-2 font-[560]">{f.value}</dd>
                 </div>
@@ -100,16 +98,11 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="wrap mt-24 grid items-center gap-x-16 gap-y-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
-          <div>
-            <p className="t-kicker">Tools</p>
-            <h3 className="t-h2 mt-5">The stack, typed out.</h3>
-            <p className="t-body mt-5">
-              Python for the models, FastAPI and Django for the services around them, React and Next.js for the
-              people who use them, and Neo4j when the problem is a graph.
-            </p>
-          </div>
-          <ToolsKeyboard />
+        {/* Same columns as the block above: the heading under the card, the keyboard
+            under the copy, so the two read as one section. */}
+        <div className="wrap mt-20 grid items-center gap-x-16 gap-y-6 lg:mt-24 lg:grid-cols-[17rem_minmax(0,1fr)]">
+          <h3 className="t-h2 lg:text-center">My Tools</h3>
+          <ToolsKeyboard className="mx-auto max-w-[38rem] lg:mx-0" />
         </div>
       </section>
 
@@ -138,12 +131,7 @@ export default function HomePage() {
         <div data-panel className="panel panel-intro">
           <div className="wrap">
             <div className="panel-copy">
-              <p className="t-kicker">Selected work</p>
-              <h2 id="work-title" className="t-h2 mt-5">Three builds, drawn in one figure.</h2>
-              <p className="t-lede mt-6">
-                Scroll on and 23,756 points rearrange themselves: a knowledge graph, a neural network at its real
-                layer sizes, a length of railway track.
-              </p>
+              <h2 id="work-title" className="t-h2">Selected Work</h2>
             </div>
           </div>
         </div>
@@ -184,8 +172,10 @@ export default function HomePage() {
         <div className="wrap">
           <div className="card flex flex-wrap items-center justify-between gap-6 px-6 py-8 sm:px-10">
             <p className="t-h3 max-w-[30em] text-fg-2">
-              {otherCases.length} more builds are on the Work page, from a restaurant point-of-sale system to ID-card
-              segmentation.
+              More such projects on{' '}
+              <a href={siteMeta.socials.github} target="_blank" rel="noopener" className="link text-fg">
+                my GitHub<span className="sr-only"> (opens in a new tab)</span>
+              </a>.
             </p>
             <Link to="/work" viewTransition className="button button-disc">
               All work

@@ -390,8 +390,18 @@
   transition: background-color 300ms var(--ease-out), color 300ms var(--ease-out);
 }
 .nav-icon { width: 2.75rem; padding: 0; }
-.nav-home { width: 2.75rem; padding: 0; }
-.nav-home img { width: 1.75rem; height: 1.75rem; border-radius: 50%; }
+/* The portrait keeps its square box at every width: the link's horizontal padding
+   (which grows at 640px) must never squeeze it, and the image never flex-shrinks. */
+.nav-link.nav-home { width: 2.75rem; padding: 0; flex: none; }
+.nav-home img {
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 35%;
+  box-shadow: 0 0 0 1px oklch(1 0 0 / 0.28);
+}
 .nav-link[aria-current='page'] { background: light-dark(oklch(0.2 0.02 20 / 0.09), oklch(1 0 0 / 0.16)); color: var(--fg); }
 :root[data-over='hero'] .nav-link[aria-current='page'] { background: oklch(1 0 0 / 0.2); color: #fff; }
 .nav-chip { background: light-dark(oklch(0.2 0.02 20 / 0.06), oklch(1 0 0 / 0.1)); }
@@ -407,7 +417,6 @@
   .navpill { gap: 0; padding: 0.2rem; }
   .nav-link { padding: 0 0.4rem; letter-spacing: 0.04em; }
   .nav-divider { margin: 0 0.05rem; }
-  .nav-home { display: none; }
 }
 
 .skip {
@@ -459,6 +468,25 @@
   text-transform: uppercase;
   color: oklch(1 0 0 / 0.82);
 }
+/* Role, then the focus sentence, then the education line: three steps down. */
+.hero-role {
+  font-size: clamp(1.375rem, 1.1rem + 1vw, 1.875rem);
+  font-weight: 640;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: #fff;
+}
+.hero-edu {
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: oklch(1 0 0 / 0.82);
+}
+/* The smallest phones: the name and the gaps step down so the copy stays below the eyes. */
+@media (max-width: 379px) {
+  .hero-name { font-size: 3.75rem; }
+}
 .hero .button { border-color: #fff; background: #fff; color: #1c0c0d; }
 .hero .button-line { background: oklch(1 0 0 / 0.1); border-color: oklch(1 0 0 / 0.6); color: #fff; }
 .hero .button-disc .disc { background: #1c0c0d; color: #fff; }
@@ -466,54 +494,6 @@
   .hero .button:hover { background: #ffe9e4; border-color: #ffe9e4; color: #1c0c0d; }
   .hero .button-line:hover { background: oklch(1 0 0 / 0.2); border-color: #fff; color: #fff; }
 }
-.hero-explore {
-  display: grid;
-  gap: 0.6rem;
-  justify-items: center;
-  color: oklch(1 0 0 / 0.86);
-}
-.hero-explore .t-kicker { color: inherit; }
-.hero-explore .t-kicker::before { display: none; }
-.hero-cue {
-  width: 1.5rem;
-  height: 2.4rem;
-  border: 1.5px solid oklch(1 0 0 / 0.7);
-  border-radius: 999px;
-  position: relative;
-}
-.hero-cue::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 0.45rem;
-  width: 3px;
-  height: 0.5rem;
-  margin-left: -1.5px;
-  border-radius: 2px;
-  background: #fff;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .hero-cue::after { animation: cue 1.8s var(--ease-in-out) infinite; }
-  @keyframes cue { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(0.75rem); opacity: 0; } 100% { opacity: 0; } }
-}
-.hero-tour a {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: 2.75rem;
-  padding: 0 1rem;
-  border: 1px solid oklch(1 0 0 / 0.3);
-  border-radius: 999px;
-  background: oklch(1 0 0 / 0.08);
-  font-size: 0.875rem;
-  color: #fff;
-  transition: background-color 300ms var(--ease-out), border-color 300ms var(--ease-out);
-}
-.hero-tour a span { font-family: var(--f-mono); font-size: 0.6875rem; color: oklch(1 0 0 / 0.7); }
-@media (hover: hover) and (pointer: fine) {
-  .hero-tour a:hover { background: oklch(1 0 0 / 0.18); border-color: #fff; }
-}
-
 /* ---------- Home stage (the 3D projects) ---------- */
 /* The field is a layer the height of the whole stage; the pin inside it is
    sticky, so the figure stays put while the panels pass and leaves with the
