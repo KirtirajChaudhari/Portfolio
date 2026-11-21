@@ -37,7 +37,7 @@ export const projectCases: ProjectCase[] = [
   {
     slug: "rasacare",
     title: "RasaCare",
-    oneLiner: "A clinical portal that builds Ayurvedic diet plans a doctor can review, audit and prescribe.",
+    oneLiner: "An Ayurvedic diet-planning platform that generates personalised, patient-specific diet charts for clinician review.",
     techLine: "Next.js 14 · FastAPI · Neo4j · XGBoost",
     shot: { base: "/project/rasacare", width: 1600, height: 900, alt: "The rasacare.app landing page: a dark page headed The Future of Ayurvedic Nutrition, with sign-in and practitioner buttons" },
     figure: "graph",
@@ -63,11 +63,11 @@ export const projectCases: ProjectCase[] = [
   {
     slug: "drishtimanas",
     title: "DrishtiManas",
-    oneLiner: "Retinal OCT classification with a neural network written from scratch in NumPy.",
+    oneLiner: "A web app that classifies retinal OCT scans as CNV, DME, drusen or normal.",
     techLine: "NumPy · FastAPI · React · TypeScript · Tailwind",
     figure: "network",
     github: "https://github.com/KirtirajChaudhari/DrishtiManas",
-    live: "https://drishtimanas-mu.vercel.app",
+    live: "https://drishtimanas.vercel.app/",
     problem:
       "Retinal OCT scans are read by specialists, and two of the four classes need urgent referral: CNV (wet age-related macular degeneration) and DME (diabetic macular edema). Drusen means routine follow-up and a normal retina means nothing. The project asks how far a small, fully transparent neural network can go at sorting these scans.",
     approach:
@@ -92,9 +92,6 @@ export const projectCases: ProjectCase[] = [
     techLine: "YOLO11s · YOLOv8-nano · PyTorch · Streamlit",
     figure: "track",
     github: "https://github.com/KirtirajChaudhari/RailwayObjectDetectionProject",
-    extraLinks: [
-      { label: "Rail-Defect Repo", href: "https://github.com/pradeepxkumar/Rail-defect-detection" },
-    ],
     problem:
       "Two distinct but related hazards threaten railway track safety: unauthorized objects or beings on the track (animals, people, debris, fallen trees) and physical defects in the rail surface itself (cracks, wear, joint failures). Both are traditionally caught through manual patrols and visual inspection, which cannot scale across thousands of kilometres of track and are prone to human fatigue and inconsistency.",
     approach:

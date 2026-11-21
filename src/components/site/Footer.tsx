@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
-import { siteMeta } from '../../content/shared';
+import { contactInvite, siteMeta } from '../../content/shared';
 import Email from './Email';
 import FooterBand from '../contact/FooterBand';
 
@@ -34,10 +34,7 @@ export default function Footer({ close = true, band = false }: { close?: boolean
               <a href={`mailto:${siteMeta.email}`} className="t-email link mt-6 inline-block max-w-full">
                 <Email address={siteMeta.email} />
               </a>
-              <p className="t-lede mt-5">
-                I'm open to AI/ML roles, and happy to work on research or product problems with other people. I usually
-                reply within a day.
-              </p>
+              <p className="t-lede mt-5">{contactInvite} I usually reply within a day.</p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link to="/contact" viewTransition className="button button-disc">
                   Write to me
@@ -79,9 +76,6 @@ export default function Footer({ close = true, band = false }: { close?: boolean
               ))}
             </ul>
           </div>
-          <p className="t-data lg:col-span-2">
-            Experiments: <Link to="/xray" className="link">lens</Link>, <Link to="/character" className="link">head-tracker</Link>
-          </p>
         </div>
       </div>
     </footer>

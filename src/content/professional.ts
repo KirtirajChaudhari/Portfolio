@@ -1,4 +1,4 @@
-import type { SkillGroup, Project, TimelineEntry, ExpertiseArea } from "./types";
+import type { SkillGroup, Project, ExpertiseArea } from "./types";
 import { siteMeta } from "./shared";
 
 /*
@@ -18,14 +18,15 @@ export const professionalVision =
   "A world where high-stakes AI is auditable by default: every prediction traceable to its evidence, every override logged, and every system built so the people it serves can question it.";
 
 /*
- * The About page renders `aboutBio`: the same facts as the author's paragraph
- * below it, in plain sentences. `professionalAbout.detail` is the author's own
- * wording, kept verbatim so the page can go back to it.
+ * `aboutBio` is rendered on Home (first two) and About (all three). Facts only:
+ * no tool inventory (the tools have their own section) and no "currently
+ * building" status. `professionalAbout.detail` is the author's own wording,
+ * kept verbatim so the page can go back to it.
  */
 export const aboutBio = [
-  "I'm an AI/ML engineer and a computer engineering graduate, now doing an M.Tech in Artificial Intelligence and Machine Learning at MIT-WPU, Pune.",
-  "My interests are health tech, computer vision and generative AI. I use PyTorch and TensorFlow for the models, FastAPI and Django for the services around them, and Neo4j when the problem is a graph.",
-  "The most recent build is RasaCare, a cloud-based practice-management and nutrient-analysis tool for Ayurvedic dietitians.",
+  "I'm an AIML engineer and a computer engineering graduate, now doing an M.Tech in Artificial Intelligence and Machine Learning at MIT-WPU, Pune.",
+  "My interests are health tech, computer vision, and generative AI.",
+  "One of my main projects is RasaCare, an Ayurvedic diet-planning platform that generates personalised, patient-specific diet charts for clinician review.",
 ];
 
 export const professionalAbout = {
@@ -54,26 +55,6 @@ export const professionalPrinciples = [
     title: "Accountable Engineering",
     text: "Building ML systems for domains where a wrong answer has a cost. Accuracy matters, but safety is paramount."
   }
-];
-
-export const professionalFacts: {
-  label: string;
-  value: string;
-  href?: string;
-}[] = [
-  { label: "Location", value: "Pune, India" },
-  { label: "Education", value: "M.Tech AI & ML, MIT-WPU" },
-  { label: "Experience", value: "4 internships" },
-  {
-    label: "GitHub",
-    value: "github.com/KirtirajChaudhari",
-    href: "https://github.com/KirtirajChaudhari",
-  },
-  {
-    label: "LinkedIn",
-    value: "linkedin.com/in/kirtirajchaudhari",
-    href: "https://linkedin.com/in/kirtirajchaudhari",
-  },
 ];
 
 /** "My Story" primary button target, in-page anchor to the journey (Experience & Education). */
@@ -261,15 +242,6 @@ export const professionalCertifications: Certification[] = [
     blurb: "Cohort programme in generative AI and applied machine learning.",
   },
   {
-    id: "meta-fullstack",
-    title: "Meta Full-Stack Developer",
-    provider: "Coursera · Meta",
-    tier: "program",
-    status: "On-going",
-    image: "",
-    blurb: "Professional certificate covering front-end, back-end, databases and deployment.",
-  },
-  {
     id: "iitg-cs",
     title: "Micro-Credit Program in Computer Science",
     provider: "IIT Guwahati",
@@ -324,7 +296,7 @@ export interface AchievementCard {
   category: "Research" | "Recognition" | "IP";
   /** Omit when the source gives no year. */
   year?: string;
-  /** Short label shown beside the year, e.g. "Under review". */
+  /** Short label shown beside the year, e.g. "Accepted". */
   status?: string;
   title: string;
   institution: string;
@@ -335,8 +307,8 @@ export interface AchievementCard {
 
 /*
  * Only source-verified entries (2026 resume + the user's own confirmations).
- * Statuses are literal: "Under review" is not "accepted", "Registered" carries
- * no date, diary number or placement beyond what is written here.
+ * Statuses are literal: "Accepted" is not "published" or "presented", and
+ * "Registered" carries no date, diary number or placement beyond what is written.
  */
 export const professionalAchievementCards: AchievementCard[] = [
   {
@@ -354,8 +326,8 @@ export const professionalAchievementCards: AchievementCard[] = [
     id: "icccmla-2026",
     category: "Research",
     year: "2026",
-    status: "Under review",
-    title: "Research paper submitted, ICCCMLA 2026",
+    status: "Accepted",
+    title: "Research paper accepted, ICCCMLA 2026",
     institution:
       "2026 IEEE 8th International Conference on Cybernetics, Cognition & Machine Learning Applications",
     description:
@@ -410,7 +382,7 @@ export const professionalProjects: Project[] = [
     techStack: ["NumPy", "FastAPI", "React", "TypeScript", "Docker"],
     metrics: ["69.1% test accuracy", "67.9% macro-F1", "1,000 balanced test images"],
     outcome: "69.1% test accuracy · live on Vercel",
-    links: { live: "https://drishtimanas-mu.vercel.app", github: "https://github.com/KirtirajChaudhari/DrishtiManas" },
+    links: { live: "https://drishtimanas.vercel.app/", github: "https://github.com/KirtirajChaudhari/DrishtiManas" },
     thumbnail: "", // Placeholder
     featured: true,
   },
@@ -477,134 +449,3 @@ export const professionalProjects: Project[] = [
     badge: "IIT-Kanpur Capstone",
   }
 ];
-
-export const professionalTimeline: TimelineEntry[] = [
-  {
-    id: "exp-1",
-    type: "internship",
-    title: "Software Developer Intern",
-    organization: "QuasarCyberTech Private Limited, Nashik",
-    dateRange: "Apr 2026 – May 2026",
-    description: "Wrote the report-generation module for QRGT, the firm's internal penetration-testing platform: FastAPI endpoints and ReportLab-driven PDF generation turning raw findings into Web PT, API PT, and Network PT reports, with CVSS v3.1 scoring and OWASP Top 10 mapping.",
-  },
-  {
-    id: "exp-2",
-    type: "internship",
-    title: "MERN Full-Stack Developer Intern",
-    organization: "Edunet Foundation (AICTE)",
-    dateRange: "Feb 2025 – Mar 2025",
-    description: "Built a full MERN-stack application (React, Express, Node.js, MongoDB) on an MVC architecture, delivered across weekly sprints.",
-  },
-  {
-    id: "exp-3",
-    type: "internship",
-    title: "Python Developer Intern",
-    organization: "BitSpark Technologies",
-    dateRange: "Aug 2024 – Feb 2025",
-    description: "Built and maintained live Django full-stack applications: shipped new features, fixed bugs, and sped up several slow-loading pages by reworking their database queries.",
-  },
-  {
-    id: "exp-4",
-    type: "internship",
-    title: "Data Science Trainee",
-    organization: "PCI LLP",
-    dateRange: "Jan 2024 – Feb 2024",
-    description: "Handled data cleaning and feature engineering for the team's models, and built the EDA visualizations used to catch bad data before training.",
-  },
-  {
-    id: "edu-1",
-    type: "education",
-    title: "M.Tech, AI & ML, First Year, Semester I",
-    organization: "MIT WPU School of Engineering and Technology",
-    dateRange: "Current",
-  },
-  {
-    id: "edu-2",
-    type: "education",
-    title: "B.E. Computer Engineering (Hons. AI & ML)",
-    organization: "MVPS's Karmaveer Adv. Baburao Ganpatrao Thakare College of Engineering, Nashik",
-    dateRange: "Nov 2022 – Jun 2026",
-    description: "GPA: 7.85/10",
-  },
-  {
-    id: "edu-3",
-    type: "education",
-    title: "Class XII",
-    organization: "M.J. College, Jalgaon",
-    dateRange: "Jun 2022",
-    description: "73.33%",
-  },
-  {
-    id: "edu-4",
-    type: "education",
-    title: "Class X",
-    organization: "Shree Swaminarayan Gurukul C.B.S.E. School, Savda",
-    dateRange: "May 2020",
-    description: "92.8%",
-  },
-  {
-    id: "cert-1",
-    type: "certification",
-    title: "Gen. AI & Machine Learning",
-    organization: "IIT-Kanpur",
-    dateRange: "Completed",
-    tier: "program",
-  },
-  {
-    id: "cert-2",
-    type: "certification",
-    title: "Meta Full-Stack Developer",
-    organization: "Coursera",
-    dateRange: "Completed",
-    tier: "program",
-  },
-  {
-    id: "cert-3",
-    type: "certification",
-    title: "Micro-Credit Program in Computer Science",
-    organization: "IIT-Guwahati",
-    dateRange: "Completed",
-    tier: "program",
-  },
-  {
-    id: "cert-4",
-    type: "certification",
-    title: "OCI Data Science",
-    organization: "Oracle",
-    dateRange: "Completed",
-    tier: "platform",
-  },
-  {
-    id: "cert-5",
-    type: "certification",
-    title: "OCI Generative AI",
-    organization: "Oracle",
-    dateRange: "Completed",
-    tier: "platform",
-  },
-  {
-    id: "cert-6",
-    type: "certification",
-    title: "Introduction to Machine Learning on AWS",
-    organization: "Coursera",
-    dateRange: "Completed",
-    tier: "platform",
-  },
-  {
-    id: "cert-7",
-    type: "certification",
-    title: "Deloitte Australia Data Analytics Job Simulation",
-    organization: "Forage",
-    dateRange: "Completed",
-    tier: "simulation",
-  },
-  {
-    id: "cert-8",
-    type: "certification",
-    title: "Tata GenAI Powered Data Analytics Job Simulation",
-    organization: "Forage",
-    dateRange: "Completed",
-    tier: "simulation",
-  }
-];
-

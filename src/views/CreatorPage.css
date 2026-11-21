@@ -307,7 +307,7 @@
 .release-title span { display: block; }
 .release-title span:nth-child(2) { color: #f3a06b; }
 
-/* Teentaal: 16 beats in four groups. A pulse walks the cycle; sam is marked. */
+/* The taal ornament: 16 beats in four groups. A pulse walks the cycle. */
 .taal { display: flex; flex-wrap: wrap; gap: 0.9rem 1.4rem; }
 .taal-group { display: flex; gap: 0.4rem; }
 .taal-beat {
@@ -317,6 +317,12 @@
   transform-origin: 50% 100%;
 }
 .taal-beat.sam { background: #f08a4b; }
+/* One row of sixteen on phones too: smaller beats rather than a wrapped cycle. */
+@media (max-width: 639px) {
+  .taal { flex-wrap: nowrap; gap: 0.75rem; }
+  .taal-group { gap: 0.3rem; }
+  .taal-beat { width: 0.7rem; height: 1.9rem; }
+}
 .taal-beat.khali { background: transparent; box-shadow: inset 0 0 0 1px #f6ede470; }
 @media (prefers-reduced-motion: no-preference) {
   .taal-beat { animation: beat 4.8s steps(1, end) infinite; animation-delay: calc(var(--b) * 0.3s); }

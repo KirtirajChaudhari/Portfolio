@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 /* Production UI regressions. The existing redev gate owns 3D context counts,
    scroll morphs, offscreen idle, accessibility and reduced-motion rendering. */
 
-test('the nav pill exposes every primary destination and the theme control at 320px', async ({ page }) => {
+test('the nav pill keeps home, Contact, Artistic and the theme control at 320px, without About or Work', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 800 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/about');
@@ -14,7 +14,8 @@ test('the nav pill exposes every primary destination and the theme control at 32
   await theme.click();
   expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).not.toBe(before);
 
-  for (const label of ['About', 'Work', 'Contact', 'Artistic']) {
+  for (const label of ['About', 'Work']) await expect(pill.getByRole('link', { name: label, exact: true })).toHaveCount(0);
+  for (const label of ['Home', 'Contact', 'Artistic']) {
     const link = pill.getByRole('link', { name: label, exact: true });
     await expect(link).toBeVisible();
     const box = await link.boundingBox();
@@ -35,19 +36,33 @@ test('the nav pill works before JavaScript runs', async ({ browser }) => {
     await page.goto('/about');
     const pill = page.locator('.site-header .navpill');
     await expect(pill.getByRole('link', { name: 'Artistic', exact: true })).toBeVisible();
-    await pill.getByRole('link', { name: 'Work', exact: true }).click();
-    await expect(page.locator('h1')).toHaveText("What I've built, and where I've worked.");
+    await pill.getByRole('link', { name: 'Contact', exact: true }).click();
+    await expect(page.locator('h1')).toHaveText("Let's talk.");
   } finally { await context.close(); }
+});
+
+test('About and Work stay reachable from the pages: The full story, Explore my work', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await page.getByRole('link', { name: 'The full story' }).click();
+  await expect(page).toHaveURL(/\/about$/);
+  await expect(page.locator('h1')).toHaveText('Machine learning that shows its reasoning.');
+  const work = page.getByRole('link', { name: 'Explore my work' });
+  const creator = page.getByRole('link', { name: /know the real me/ });
+  expect((await work.boundingBox())!.y).toBeLessThan((await creator.boundingBox())!.y);
+  await work.click();
+  await expect(page).toHaveURL(/\/work$/);
+  await expect(page.locator('h1')).toHaveText("What I've built, and where I've worked.");
 });
 
 test('keyboard route navigation hands focus to the new main content', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/about');
-  const work = page.locator('.site-header .navpill').getByRole('link', { name: 'Work', exact: true });
-  await work.focus();
+  const contact = page.locator('.site-header .navpill').getByRole('link', { name: 'Contact', exact: true });
+  await contact.focus();
   await page.keyboard.press('Enter');
-  await expect(page).toHaveURL(/\/work$/);
-  await expect(page.locator('h1')).toHaveText("What I've built, and where I've worked.");
+  await expect(page).toHaveURL(/\/contact$/);
+  await expect(page.locator('h1')).toHaveText("Let's talk.");
   await expect(page.locator('main')).toBeFocused();
 });
 

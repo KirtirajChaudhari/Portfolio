@@ -11,7 +11,7 @@ export interface RouteMeta {
 }
 
 const HOME =
-  'Kirtiraj Chaudhari is an AI/ML engineer in Pune building machine learning that shows its reasoning: clinical nutrition, retinal screening and railway safety.';
+  'Kirtiraj Chaudhari is an AIML engineer focused on interpretable machine learning, currently doing an M.Tech in AI & ML at MIT-WPU, Pune.';
 
 const PAGES: Record<string, { title: string; description: string }> = {
   '/work': {
@@ -20,7 +20,7 @@ const PAGES: Record<string, { title: string; description: string }> = {
   },
   '/about': {
     title: 'About',
-    description: 'About Kirtiraj Nitin Chaudhari: AI/ML engineer, M.Tech student at MIT-WPU Pune, builder of RasaCare.',
+    description: 'About Kirtiraj Nitin Chaudhari: AIML engineer, M.Tech student at MIT-WPU Pune, builder of RasaCare.',
   },
   '/contact': {
     title: 'Contact',

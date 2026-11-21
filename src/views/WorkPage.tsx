@@ -15,7 +15,7 @@ export default function WorkPage() {
           What I've built, and where I've worked.
         </h1>
         <p className="t-lede mt-7" style={{ '--i': 2 } as React.CSSProperties}>
-          The projects come first. Open one for the problem, the approach and what came out of it. The internships
+          The projects come first. Open one for the problem, the approach and what came out of it. My experience
           and what I'm good at are below them.
         </p>
       </header>
@@ -33,7 +33,7 @@ export default function WorkPage() {
       <section className="band rule-top" aria-labelledby="internships-title">
         <div className="wrap">
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <h2 id="internships-title" className="t-h2">Internships</h2>
+            <h2 id="internships-title" className="t-h2">Experience</h2>
             <p className="t-data">{workJourney.length} roles, most recent first.</p>
           </div>
           <InternshipTimeline />

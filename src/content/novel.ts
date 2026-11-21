@@ -19,7 +19,6 @@ export const poetryMeta = {
 
 export const musicSection = {
   heading: "The Musician",
-  body: "Tabla first: years of keeping taal before ever writing a line of code. The same discipline that debugging demands: listen closely, find the pattern, stay in rhythm.",
   spotifyArtistUrl: "https://open.spotify.com/artist/3zAV56brdo1aaVpR5WReag",
   spotifyTrackUrl: "https://open.spotify.com/track/4VkfpcwdnNnzNWVlCRupxY",
   spotifyEmbedUrl: "https://open.spotify.com/embed/track/4VkfpcwdnNnzNWVlCRupxY?utm_source=generator&theme=0",

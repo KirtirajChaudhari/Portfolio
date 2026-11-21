@@ -1,8 +1,7 @@
 /*
- * Education & Experience slider data (spec v3 §1).
- * Education logos live in `public/education logos/`; none of the four
- * work organizations have a local logo yet, `logo: ""` renders a
- * clearly-marked monogram badge until a real file is dropped in.
+ * Experience and education data. Logos live in `public/education logos/` and
+ * `public/experience logo/`; `logo: ""` renders a monogram badge until a real
+ * file is supplied.
  */
 
 export interface JourneyEntry {
@@ -11,25 +10,32 @@ export interface JourneyEntry {
   organization: string;
   url: string;
   dateRange: string;
-  description: string;
-  skills: string[];
+  /** Secondary line beside the organisation; omitted when the source gives none. */
+  location?: string;
+  /** Omitted when no confirmed detail exists: nothing is written in its place. */
+  description?: string;
+  skills?: string[];
   /** Path under /public. Empty → monogram placeholder badge. */
   logo: string;
   /** Compact two-line badge label; `heading` is too long for a credential card. */
   badgeLabel?: string;
 }
 
+/*
+ * Experience, newest first. The one source for /about and /work, so the two pages
+ * cannot drift. Descriptions are the résumé's, not stronger: "contributed to" stays
+ * "contributed to", and no performance claim appears without a source.
+ * Inspira Enterprise: role, company, start month and current status are confirmed;
+ * responsibilities are not yet supplied, so none are written.
+ */
 export const workJourney: JourneyEntry[] = [
   {
-    id: "quasar",
-    heading: "Software Developer Intern",
-    organization: "QuasarCyberTech Private Limited, Nashik",
-    url: "https://quasarcybertech.com/",
-    dateRange: "Apr 2026 – May 2026",
-    description:
-      "Wrote the report-generation module for QRGT, the firm's internal penetration-testing platform: FastAPI endpoints and ReportLab-driven PDF generation that turn raw findings into Web PT, API PT, and Network PT reports, with CVSS v3.1 scoring and OWASP Top 10 mapping.",
-    skills: ["FastAPI", "ReportLab", "CVSS v3.1", "OWASP Top 10"],
-    logo: "/experience logo/quasarcybertech_logo_icon.png",
+    id: "inspira",
+    heading: "AI Intern",
+    organization: "Inspira Enterprise",
+    url: "https://inspiraenterprise.com/",
+    dateRange: "Nov 2026 – Present",
+    logo: "",
   },
   {
     id: "edunet",
@@ -37,8 +43,9 @@ export const workJourney: JourneyEntry[] = [
     organization: "Edunet Foundation (AICTE)",
     url: "https://edunetfoundation.org/",
     dateRange: "Feb 2025 – Mar 2025",
+    location: "Remote",
     description:
-      "Built a full MERN-stack application (React, Express, Node.js, MongoDB) on an MVC architecture, delivered across weekly sprints.",
+      "Contributed to a project-management task application during a structured AICTE internship. Built REST APIs and CRUD task workflows on an MVC architecture across weekly sprints.",
     skills: ["React", "Express", "Node.js", "MongoDB"],
     logo: "/experience logo/edunet-logo.svg",
   },
@@ -48,9 +55,10 @@ export const workJourney: JourneyEntry[] = [
     organization: "BitSpark Technologies",
     url: "https://bitsparktechnologies.com/",
     dateRange: "Aug 2024 – Feb 2025",
+    location: "Nashik",
     description:
-      "Built and maintained live Django full-stack applications: shipped new features, fixed bugs, and sped up several slow-loading pages by reworking their database queries.",
-    skills: ["Django", "Python", "SQL Optimization"],
+      "Maintained and extended three Django full-stack web applications, and debugged URL-routing and dashboard data-fetching defects across them.",
+    skills: ["Python", "Django"],
     logo: "/experience logo/bitspark_logo.png",
   },
   {
@@ -59,9 +67,10 @@ export const workJourney: JourneyEntry[] = [
     organization: "PCI LLP",
     url: "https://www.projectcontest.com/",
     dateRange: "Jan 2024 – Feb 2024",
+    location: "Remote",
     description:
-      "Handled data cleaning and feature engineering for the team's models, and built the EDA visualizations used to catch bad data before training.",
-    skills: ["pandas", "EDA", "Feature Engineering"],
+      "Cleaned a 10,000-row student dataset and resolved its missing values, then produced exploratory visualisations whose data-quality findings supported the team's models.",
+    skills: ["pandas", "EDA"],
     logo: "/experience logo/PCI Logo.avif",
   },
 ];

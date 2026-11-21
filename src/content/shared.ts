@@ -3,7 +3,7 @@ import type { SiteMeta } from './types';
 export const siteMeta: SiteMeta = {
   fullName: 'Kirtiraj Nitin Chaudhari',
   displayName: 'Kirtiraj Chaudhari',
-  role: 'AI/ML Engineer',
+  role: 'AIML Engineer',
   location: 'Pune, India (IST)',
   email: 'mrkirtirajchaudhari@gmail.com',
   phone: '+919730100346',
@@ -15,3 +15,6 @@ export const siteMeta: SiteMeta = {
     youtube: 'https://www.youtube.com/@MusicalKirtiraj',
   },
 };
+
+/** The closing invitation, shared by the footer contact card and the Contact page. */
+export const contactInvite = "I'm open to AI/ML roles, and happy to work on research or product development.";

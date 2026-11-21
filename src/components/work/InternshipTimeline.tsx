@@ -1,11 +1,10 @@
 import { workJourney } from '../../content/journey';
 import OutLink from '../site/OutLink';
+import { experienceRange as range, OrgMark } from '../about/ExperienceList';
 
-const range = (dates: string) => dates.replace(' – ', ' to ');
-
-/** The internships as one rule with the entries hung off it, alternating sides on
- *  desktop (from f03c96b). Newest first, like the content. A single column with the
- *  rule on the left below `lg`. */
+/** The experience as one rule with the entries hung off it, alternating sides on
+ *  desktop (from f03c96b). Newest first, like the content, which About shares. A
+ *  single column with the rule on the left below `lg`. */
 export default function InternshipTimeline() {
   return (
     <ol className="timeline timeline-split mt-12">
@@ -19,16 +18,19 @@ export default function InternshipTimeline() {
             <div className={`enter mt-3 lg:mt-0 ${left ? 'lg:order-1 lg:text-right' : ''}`}>
               <div className={left ? 'lg:ml-auto lg:max-w-[34rem]' : 'lg:max-w-[34rem]'}>
                 <div className={`flex items-center gap-3 ${left ? 'lg:flex-row-reverse' : ''}`}>
-                  {r.logo
-                    ? <span className="logo-tile"><img src={encodeURI(r.logo)} alt="" loading="lazy" /></span>
-                    : <span className="logo-tile font-[600] text-[#1c0c0d]">{r.organization.charAt(0)}</span>}
+                  <OrgMark logo={r.logo} organization={r.organization} />
                   <h3 className="t-h3">{r.heading}</h3>
                 </div>
-                <p className="mt-2 text-[0.9375rem] text-fg-2"><OutLink href={r.url}>{r.organization}</OutLink></p>
-                <p className="t-body mt-3 text-[0.9375rem]">{r.description}</p>
-                <ul aria-label="Skills" className={`mt-4 flex flex-wrap gap-2 ${left ? 'lg:justify-end' : ''}`}>
-                  {r.skills.map((s) => <li key={s} className="chip">{s}</li>)}
-                </ul>
+                <p className="mt-2 text-[0.9375rem] text-fg-2">
+                  <OutLink href={r.url}>{r.organization}</OutLink>
+                  {r.location && <span className="text-fg-3"> · {r.location}</span>}
+                </p>
+                {r.description && <p className="t-body mt-3 text-[0.9375rem]">{r.description}</p>}
+                {r.skills && r.skills.length > 0 && (
+                  <ul aria-label="Skills" className={`mt-4 flex flex-wrap gap-2 ${left ? 'lg:justify-end' : ''}`}>
+                    {r.skills.map((s) => <li key={s} className="chip">{s}</li>)}
+                  </ul>
+                )}
               </div>
             </div>
           </li>

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ArrowUpRight, Check, Copy } from 'lucide-react';
 import Page from '../components/site/Page';
 import Email from '../components/site/Email';
-import { siteMeta as meta } from '../content/shared';
+import { contactInvite, siteMeta as meta } from '../content/shared';
 
 const REASONS = ['A role', 'Collaboration', 'Research', 'Something else'];
 const prettyPhone = meta.phone.replace(/^(\+\d{2})(\d{5})(\d{5})$/, '$1 $2 $3');
@@ -108,8 +108,7 @@ export default function ContactPage() {
           <p className="t-kicker" style={{ '--i': 0 } as React.CSSProperties}>Contact</p>
           <h1 className="t-display mt-6" style={{ '--i': 1 } as React.CSSProperties}>Let's talk.</h1>
           <p className="t-lede mt-6" style={{ '--i': 2 } as React.CSSProperties}>
-            I'm open to AI/ML roles, and happy to work on research or product problems with other people. Email is the
-            quickest way to reach me, and I usually reply within a day.
+            {contactInvite} Email is the quickest way to reach me, and I usually reply within a day.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-x-5 gap-y-4" style={{ '--i': 3 } as React.CSSProperties}>
             <a href={`mailto:${meta.email}`} className="t-email link max-w-full">

@@ -291,3 +291,23 @@ legacy shell and gallery. Historical results are not new validation of the curre
 - A cross-origin iframe that fails still fires `load` (with an error page), so an embed's
   failure cannot be detected from outside; give it a reload control and a direct link.
 
+- **Copy and facts pass (2026-11-21, branch `re-dev`)**, `docs/copy-pass-plan.md`. Pill = home
+  portrait, Contact, Artistic, theme (About/Work reached via "The full story", "Explore my
+  work" and the footer). Hero = name, role "AIML Engineer" (`siteMeta.role`), one focus
+  sentence, "Currently: M.Tech AI & ML at MIT-WPU, Pune.", one "Scroll to explore" button.
+  Experience lives only in `content/journey.ts` (`workJourney`): Inspira (no duties until
+  supplied), Edunet, BitSpark, PCI; Quasar removed; rendered by `about/ExperienceList` and
+  `work/InternshipTimeline`. ICCCMLA = Accepted. Musician = single / Spotify artist /
+  YouTube channel as three groups; the taal and "Tabla first" passages are gone.
+
+## Learned constraints (copy pass)
+- `.nav-link` padding in a media query out-ranked `.nav-home { padding: 0 }` and squeezed
+  the portrait to 13.6x28. A fixed-size icon inside a flex link needs `flex: none` and a
+  selector that beats every padding variant (`.nav-link.nav-home`).
+- `.t-body + .t-body` adds a margin; inside a `grid gap-*` parent it doubles the gap.
+- The typing keyboard paints only ~63% x 69% of its 800x600 stage (screen 57px above it,
+  183px empty below). `ToolsKeyboard` sizes its box to the measured paint (`PAINT`), clips
+  sideways and disables pointer events on the stage; re-measure if the keyboard changes.
+- Tailwind utilities are `!important`: a media-query margin in site.css never beats `mt-*`;
+  use responsive utilities (`min-[380px]:mt-4`).
+
