@@ -13,6 +13,8 @@
   /* Professional pages (styles/site.css). */
   --color-paper: var(--paper);
   --color-sunk: var(--sunk);
+  --color-card: var(--card);
+  --color-card-2: var(--card-2);
   --color-fg: var(--fg);
   --color-fg-2: var(--fg-2);
   --color-fg-3: var(--fg-3);
@@ -21,6 +23,7 @@
   --color-signal: var(--signal);
   --font-ui: var(--f-sans);
   --font-data: var(--f-mono);
+  --font-script: var(--f-script);
 
   /* Legacy pages (styles/legacy.css): /xray, /character. */
   --color-bg: var(--bg);

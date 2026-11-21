@@ -4,9 +4,9 @@ import { routeMeta } from '../../content/meta';
 import Footer from './Footer';
 
 /** Frame for every professional page: keeps the document title, description and
- *  robots tag in step with the route (content/meta.ts), and renders the main
- *  landmark and the footer. */
-export default function Page({ close = true, children }: { close?: boolean; children: ReactNode }) {
+ *  robots tag in step with the route (content/meta.ts), and renders the ambient
+ *  backdrop, the main landmark and the footer. */
+export default function Page({ close = true, band = false, children }: { close?: boolean; band?: boolean; children: ReactNode }) {
   const { pathname, hash } = useLocation();
   const navigation = useNavigationType();
   const main = useRef<HTMLElement>(null);
@@ -45,8 +45,9 @@ export default function Page({ close = true, children }: { close?: boolean; chil
 
   return (
     <>
+      <div className="backdrop" aria-hidden="true" />
       <main ref={main} id="main" tabIndex={-1} className="outline-none">{children}</main>
-      <Footer close={close} />
+      <Footer close={close} band={band} />
     </>
   );
 }

@@ -1,13 +1,199 @@
-/* Creator uses the site's type, colour and spacing tokens. Depth belongs to the
-   photographs; touch, reduced motion and no-JS keep a plain static wall. */
-.creator-hero {
-  display: grid;
-  gap: 3rem;
-  align-items: center;
-  padding-block: clamp(3.5rem, 7vw, 7rem);
+/* ============================================================
+   CREATOR (chapter two, artistic profile)
+
+   The f03c96b paper look: Antonio caps for display, Spectral for reading,
+   Caveat for the hand-written kickers. Light theme is warm paper; the crimson
+   theme is a darkroom of the same palette. The tokens are re-pointed on the
+   root while `.creator` is on the page, so the shared header, footer, backdrop
+   and components follow.
+   The photo wall keeps its depth; touch, reduced motion and no-JS keep a plain
+   static wall.
+   ============================================================ */
+
+@font-face {
+  font-family: 'Antonio';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url('/fonts/antonio-latin-700.woff2') format('woff2');
 }
-.creator-hero .t-lede { max-width: 46ch; }
-.creator-hero-photo { width: 100%; max-width: 900px; }
+/* Arial narrowed to Antonio's measure (66.8% of its advance for caps; ascent 2365 /
+   descent 285 per 2048), so the condensed titles hold their lines while the face loads. */
+@font-face {
+  font-family: 'Antonio Fallback';
+  src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold'), local('Arial');
+  font-weight: 700;
+  size-adjust: 66.8%;
+  ascent-override: 172.9%;
+  descent-override: 20.8%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Spectral';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('/fonts/spectral-latin-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Spectral';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 400;
+  src: url('/fonts/spectral-latin-400-italic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 700;
+  src: url('/fonts/caveat-latin.woff2') format('woff2');
+}
+
+:root[data-chapter='pro']:has(.creator) {
+  --paper: light-dark(#f1eee8, #16100e);
+  --sunk: light-dark(#e7e2d9, #211816);
+  --card: light-dark(#fffdf8, oklch(1 0 0 / 0.05));
+  --card-2: light-dark(#ffffff, oklch(1 0 0 / 0.09));
+  --fg: light-dark(#1f1a17, #f3ebe2);
+  --fg-2: light-dark(#4a413b, #f3ebe2c2);
+  --fg-3: light-dark(#6c625a, #f3ebe28c);
+  --rule: light-dark(#1f1a171f, #f3ebe21f);
+  --rule-2: light-dark(#1f1a1740, #f3ebe23d);
+  --signal: light-dark(#a8501f, #e98b52);
+  --on-signal: light-dark(#fff, #16100e);
+  --glow-1: light-dark(#e9b98a55, #a8501f40);
+  --glow-2: light-dark(#b9c8e055, #3a4a6a40);
+  /* One colour per craft, for the highlighter behind each heading. */
+  --hl-photo: light-dark(#a9c3e6, #34507a);
+  --hl-music: light-dark(#f0b48a, #7a3a1c);
+  --hl-write: light-dark(#cdb8ea, #4f3a72);
+  --f-display: 'Antonio', 'Antonio Fallback', sans-serif;
+  --f-read: 'Spectral', Georgia, serif;
+  --f-hand: 'Caveat', 'Segoe Print', cursive;
+}
+
+.creator-read { font-family: var(--f-read); }
+.creator-hand { font-family: var(--f-hand); font-weight: 600; font-size: 1.5rem; line-height: 1; color: var(--signal); }
+
+/* ---------- Hero ---------- */
+.creator-hero {
+  overflow-x: clip;
+  display: grid;
+  gap: 3.5rem;
+  align-items: center;
+  padding-block: calc(var(--header-h) + clamp(2rem, 1.5rem + 3vw, 4rem)) clamp(3rem, 2rem + 4vw, 6rem);
+}
+.creator-title {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: clamp(4.25rem, 2.6rem + 7vw, 9.5rem);
+  line-height: 0.86;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+.creator-title span { display: block; color: var(--signal); }
+.creator-intro { font-family: var(--f-read); font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem); line-height: 1.65; color: var(--fg-2); max-width: 34em; }
+@media (min-width: 1024px) {
+  .creator-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4rem; }
+}
+
+/* The three crafts, as three objects on a desk. The slot for the owner's
+   own illustration: replace <CraftCollage /> when it arrives. */
+.collage { position: relative; aspect-ratio: 1 / 0.92; width: min(100%, 36rem); margin-inline: auto; }
+.collage > a {
+  position: absolute;
+  display: block;
+  transition: transform 500ms var(--ease-out);
+}
+.collage figcaption { margin-top: 0.6rem; text-align: center; font-family: var(--f-hand); font-size: 1.375rem; line-height: 1; color: var(--fg-2); }
+.collage .polaroid {
+  left: 2%; top: 6%; width: 46%;
+  padding: 0.65rem 0.65rem 0.4rem;
+  background: #fffdf8;
+  border-radius: 3px;
+  box-shadow: 0 1px 0 #0000000d, 0 26px 50px -24px var(--shade);
+  transform: rotate(-7deg);
+}
+.collage .polaroid img { aspect-ratio: 1; width: 100%; height: auto; object-fit: cover; }
+.collage .polaroid figcaption { color: #4a413b; }
+.collage .tape {
+  position: absolute; left: 50%; top: -0.7rem; width: 4.5rem; height: 1.4rem; margin-left: -2.25rem;
+  background: #e9c9a6b3; transform: rotate(3deg);
+}
+.collage .sleeve { right: 5%; top: 0; width: 46%; transform: rotate(5deg); }
+.collage .sleeve .cover { position: relative; z-index: 1; border-radius: 4px; box-shadow: 0 30px 60px -28px var(--shade); }
+.collage .sleeve .vinyl { position: absolute; z-index: 0; top: 4%; left: 16%; width: 92%; }
+.collage .notebook {
+  left: 24%; bottom: 0; width: 50%;
+  padding: 1.1rem 1.2rem 1rem 2rem;
+  border-radius: 4px 10px 10px 4px;
+  background: repeating-linear-gradient(to bottom, transparent 0 1.55rem, light-dark(#b8c7dc, #3a4a6a) 1.55rem calc(1.55rem + 1px)), light-dark(#fffdf8, #241b18);
+  box-shadow: inset 1.4rem 0 0 -1.35rem light-dark(#e6a8a0, #a8501f), 0 26px 50px -24px var(--shade);
+  transform: rotate(-2deg);
+}
+.collage .notebook p { font-family: var(--f-hand); font-size: clamp(0.95rem, 0.7rem + 1vw, 1.3rem); line-height: 1.55rem; color: var(--fg); }
+@media (max-width: 639px) {
+  .collage { aspect-ratio: 1 / 1.18; }
+  .collage figcaption { font-size: 1.1rem; }
+  .collage .polaroid { width: 50%; }
+  .collage .sleeve { width: 50%; top: 4%; }
+  .collage .notebook { left: 16%; width: 62%; padding: 0.8rem 0.9rem 0.7rem 1.6rem; }
+}
+@media (hover: hover) and (pointer: fine) {
+  .collage .polaroid:hover { transform: rotate(-3deg) translateY(-6px); }
+  .collage .sleeve:hover { transform: rotate(2deg) translateY(-6px); }
+  .collage .notebook:hover { transform: rotate(0deg) translateY(-6px); }
+}
+
+/* ---------- Marquee ---------- */
+.creator-marquee { overflow: hidden; border-block: 1px solid var(--rule); padding-block: 1rem; }
+.creator-marquee ul { display: flex; width: max-content; }
+.creator-marquee li {
+  display: flex; align-items: center; gap: 2.5rem; padding-right: 2.5rem;
+  font-family: var(--f-display); font-weight: 700; font-size: clamp(1.75rem, 1.4rem + 1.6vw, 2.75rem);
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.creator-marquee li::after { content: '\2726'; font-size: 0.6em; color: var(--signal); }
+@media (prefers-reduced-motion: no-preference) {
+  .creator-marquee ul { animation: marquee 32s linear infinite; }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+}
+
+/* ---------- Section headers ---------- */
+/* A hand-written kicker, the title in caps with a highlighter stroke behind it
+   and a drawn underline, then the handle. */
+.craft-head { display: grid; justify-items: start; gap: 0.25rem; }
+.craft-title {
+  position: relative;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: clamp(3.25rem, 2.2rem + 4.5vw, 6.5rem);
+  line-height: 0.9;
+  text-transform: uppercase;
+  isolation: isolate;
+}
+.craft-title::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: -0.12em; right: -0.18em; top: 42%; height: 0.48em;
+  border-radius: 0.3em 0.1em 0.35em 0.12em;
+  background: var(--hl, var(--hl-photo));
+  transform: rotate(-1.4deg) skewX(-8deg);
+}
+.craft-title + svg { width: min(100%, 15rem); height: 0.9rem; color: var(--signal); margin-top: 0.35rem; }
+.craft-photo { --hl: var(--hl-photo); }
+.craft-music { --hl: var(--hl-music); }
+.craft-write { --hl: var(--hl-write); }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .craft-title::before { transform-origin: left center; animation: hl-sweep linear both; animation-timeline: view(); animation-range: entry 10% cover 35%; }
+    @keyframes hl-sweep { from { transform: rotate(-1.4deg) skewX(-8deg) scaleX(0.04); } }
+  }
+}
+
+/* ---------- Photography (unchanged wall) ---------- */
 .creator-photo-wall { margin-top: 3rem; perspective: 1800px; }
 .creator-photo-grid { columns: 2; column-gap: 1rem; transform-origin: center; }
 .creator-photo {
@@ -16,7 +202,7 @@
   width: 100%;
   margin-bottom: 1rem;
   break-inside: avoid;
-  border-radius: var(--r-plate);
+  border-radius: 10px;
   overflow: hidden;
   background: var(--sunk);
   text-align: left;
@@ -32,14 +218,10 @@
   height: 2rem;
   background: var(--paper);
   color: var(--fg);
-  border-radius: var(--r-control);
+  border-radius: 999px;
   opacity: 0;
 }
 .creator-photo:focus-visible .creator-photo-open { opacity: 1; }
-.creator-release { padding: clamp(1.25rem, 4vw, 2rem); border: 1px solid var(--rule); border-radius: var(--r-plate); }
-.creator-player { height: 152px; border-radius: var(--r-control); overflow: hidden; background: var(--sunk); }
-.creator-player iframe { display: block; border: 0; }
-.creator-music-links { display: grid; gap: 1.5rem; }
 
 .creator-viewer {
   width: min(100% - 2rem, 980px);
@@ -54,16 +236,14 @@
 }
 .creator-viewer::backdrop { background: rgb(0 0 0 / .8); }
 .creator-viewer-bar { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
-.creator-viewer-control { display: grid; place-items: center; min-width: 44px; min-height: 44px; border-radius: var(--r-control); }
+.creator-viewer-control { display: grid; place-items: center; min-width: 44px; min-height: 44px; border-radius: 999px; }
 .creator-viewer-image { display: flex; justify-content: center; margin-block: .5rem; }
 .creator-viewer-image img { width: auto; height: auto; max-width: 100%; max-height: calc(100dvh - 11rem); object-fit: contain; }
 @media (min-width: 640px) {
   .creator-photo-grid { columns: 3; column-gap: 1.5rem; }
   .creator-photo { margin-bottom: 1.5rem; }
-  .creator-music-links { grid-template-columns: 1fr 1fr; }
 }
 @media (min-width: 1024px) {
-  .creator-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 4rem; }
   .creator-photo-grid { columns: 4; }
 }
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
@@ -74,3 +254,97 @@
   .creator-photo-grid { transform: none !important; }
   .creator-photo-open { opacity: 1; }
 }
+
+/* ---------- Music: the stage ---------- */
+/* A dark stage in both themes: spotlight, grain-free, the record and the beat. */
+.music-stage {
+  --fg: #f6ede4;
+  --fg-2: #f6ede4c7;
+  --fg-3: #f6ede48f;
+  --rule: #f6ede41f;
+  --rule-2: #f6ede43d;
+  --signal: #f08a4b;
+  --on-signal: #140b09;
+  --card: oklch(1 0 0 / 0.05);
+  --card-2: oklch(1 0 0 / 0.1);
+  --paper: #120a09;
+  position: relative;
+  overflow: clip;
+  color: var(--fg);
+  background:
+    radial-gradient(60% 70% at 22% 10%, #7a2a14b3, transparent 70%),
+    radial-gradient(50% 60% at 95% 100%, #3a1a40a6, transparent 70%),
+    #120a09;
+  border-radius: clamp(1.25rem, 3vw, 2.25rem);
+  isolation: isolate;
+}
+.music-stage .craft-title::before { background: #b4541f; }
+.music-stage .creator-hand { color: #f3a06b; }
+
+/* The record: the real debut cover, with the disc sliding out of the sleeve. */
+.record { position: relative; width: min(100%, 26rem); aspect-ratio: 1; }
+.record .cover { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; object-fit: cover; border-radius: 6px; box-shadow: 0 40px 80px -30px #000000d9, 0 0 0 1px #ffffff14; }
+.record .vinyl-slot { position: absolute; z-index: 1; inset: 3%; transform: translateX(34%); }
+.record .vinyl { width: 100%; height: 100%; }
+@media (prefers-reduced-motion: no-preference) {
+  .record .vinyl-slot { transition: transform 900ms var(--ease-out); }
+  .record:hover .vinyl-slot, .record:focus-within .vinyl-slot { transform: translateX(46%); }
+  .record .vinyl { animation: spin 7s linear infinite; }
+  @keyframes spin { to { transform: rotate(1turn); } }
+}
+@media (max-width: 639px) {
+  .record { width: 78%; }
+  .record .vinyl-slot { transform: translateX(22%); }
+}
+.release-title {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: clamp(2.75rem, 1.8rem + 4vw, 5.25rem);
+  line-height: 0.92;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.release-title span { display: block; }
+.release-title span:nth-child(2) { color: #f3a06b; }
+
+/* Teentaal: 16 beats in four groups. A pulse walks the cycle; sam is marked. */
+.taal { display: flex; flex-wrap: wrap; gap: 0.9rem 1.4rem; }
+.taal-group { display: flex; gap: 0.4rem; }
+.taal-beat {
+  width: 0.95rem; height: 2.4rem;
+  border-radius: 999px;
+  background: #f6ede42e;
+  transform-origin: 50% 100%;
+}
+.taal-beat.sam { background: #f08a4b; }
+.taal-beat.khali { background: transparent; box-shadow: inset 0 0 0 1px #f6ede470; }
+@media (prefers-reduced-motion: no-preference) {
+  .taal-beat { animation: beat 4.8s steps(1, end) infinite; animation-delay: calc(var(--b) * 0.3s); }
+  @keyframes beat { 0% { transform: scaleY(1.35); } 6.25% { transform: scaleY(1); } }
+}
+
+/* Spotify players: placeholder until near, a timed fallback, and a reload. */
+.player {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #ffffff0f;
+  box-shadow: 0 0 0 1px #ffffff1a;
+}
+.player iframe { display: block; width: 100%; border: 0; }
+.player-skeleton {
+  position: absolute; inset: 0;
+  display: grid; place-items: center; gap: 0.75rem;
+  padding: 1rem; text-align: center;
+  color: var(--fg-2);
+}
+
+/* ---------- Writing ---------- */
+.notebook-card {
+  background: repeating-linear-gradient(to bottom, transparent 0 2rem, light-dark(#c9d4e4, #3a4a6a) 2rem calc(2rem + 1px)), light-dark(#fffdf8, #211816);
+  border-radius: 6px 16px 16px 6px;
+  box-shadow: inset 2.2rem 0 0 -2.1rem light-dark(#e6a8a0, #a8501f), 0 30px 60px -36px var(--shade);
+  padding: 1.75rem 1.25rem 1.75rem 3rem;
+}
+.notebook-card .button { max-width: 100%; white-space: normal; }
+.notebook-card .creator-hand { font-size: 1.75rem; line-height: 2rem; color: var(--fg); }

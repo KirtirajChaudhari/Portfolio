@@ -11,6 +11,13 @@ import AxeBuilder from '@axe-core/playwright';
 const ROUTES = ['/', '/work', '/projects/rasacare', '/projects/drishtimanas', '/projects/lab-complaint', '/about', '/contact', '/creator', '/not-a-page'];
 const WIDTHS = [320, 390, 768, 1024, 1440];
 
+/* The 3D stage sits below the hero and About; its figure is built only once the
+   stage is within a screen of the viewport. */
+async function reachStage(page: Page) {
+  await page.locator('#work').evaluate((el) => el.scrollIntoView());
+  await page.waitForFunction(() => document.querySelector('.stage canvas'));
+}
+
 function watchConsole(page: Page) {
   const problems: string[] = [];
   page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') problems.push(`${m.type()}: ${m.text()}`); });
@@ -74,14 +81,15 @@ test('home: the headline is the LCP element and the figure is not in the first l
     }).observe({ type: 'largest-contentful-paint', buffered: true });
   }));
   expect(['H1', 'P']).toContain(lcp);
-  await page.waitForFunction(() => document.querySelector('.stage canvas'));
-  expect(scripts.some((u) => /engine/.test(u))).toBe(true);
+  await page.waitForTimeout(1500);
+  expect(scripts.some((u) => /engine/.test(u)), 'figure code fetched before the stage is near').toBe(false);
+  await reachStage(page);
+  await expect.poll(() => scripts.some((u) => /engine/.test(u))).toBe(true);
 });
 
 test('home: layout does not shift', async ({ page }) => {
   await page.goto('/');
-  await page.waitForFunction(() => document.querySelector('.stage canvas'));
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(2000);
   const cls = await page.evaluate(() => new Promise<number>((resolve) => {
     let total = 0;
     new PerformanceObserver((list) => {
@@ -117,7 +125,8 @@ const counters = (page: Page) => page.evaluate(() => ({ ...(window as unknown as
 test('home: one WebGL context, the loop stops when the stage leaves the screen', async ({ page }) => {
   await instrument(page, true);
   await page.goto('/');
-  await page.waitForFunction(() => document.querySelector('.stage canvas'));
+  // The stage sits below the hero and About; the loop runs only while it is on screen.
+  await reachStage(page);
   await page.waitForTimeout(1200);
   const running = await counters(page);
   expect(running.contexts).toBe(1);
@@ -134,7 +143,7 @@ test('home: one WebGL context, the loop stops when the stage leaves the screen',
 test('home: scroll steps through the three formations', async ({ page }) => {
   await instrument(page, true);
   await page.goto('/');
-  await page.waitForFunction(() => document.querySelector('.stage canvas'));
+  await reachStage(page);
   const stage = page.locator('.stage');
   await expect(stage).toHaveAttribute('data-step', '0');
   for (const step of [1, 2, 3]) {
@@ -151,13 +160,13 @@ test('reduced motion: still frames, no running loop, every step still reachable'
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await instrument(page, true);
   await page.goto('/');
-  await page.waitForFunction(() => document.querySelector('.stage canvas'));
+  await reachStage(page);
   await page.waitForTimeout(800);
   const a = await counters(page);
   await page.waitForTimeout(1000);
   const b = await counters(page);
   expect(b.draws - a.draws, 'draws while idle').toBe(0);
-  expect(await page.locator('.panel-hero h1').evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
+  expect(await page.locator('.hero h1').evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
 
   await page.evaluate(() => {
     const p = document.querySelectorAll<HTMLElement>('[data-panel]')[2];
@@ -171,7 +180,7 @@ test('reduced motion: still frames, no running loop, every step still reachable'
 test('no hardware GPU: the 2D fallback draws and creates no WebGL context', async ({ page }) => {
   await instrument(page, false);
   await page.goto('/');
-  await page.waitForFunction(() => document.querySelector('.stage canvas'));
+  await reachStage(page);
   await page.waitForTimeout(600);
   const hardware = await page.evaluate(() => {
     const gl = document.createElement('canvas').getContext('webgl2');
@@ -192,7 +201,7 @@ test('touch: the page is complete without hover', async ({ browser }) => {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 780 }, hasTouch: true, isMobile: true });
   const page = await ctx.newPage();
   await page.goto('/');
-  await expect(page.getByRole('link', { name: 'See the work' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Explore', exact: true })).toBeVisible();
   for (const name of ['RasaCare', 'DrishtiManas', 'PRAVAAS']) {
     const h = page.getByRole('heading', { name });
     await h.scrollIntoViewIfNeeded();
@@ -203,17 +212,19 @@ test('touch: the page is complete without hover', async ({ browser }) => {
   await ctx.close();
 });
 
-test('theme toggle flips the scheme and survives a reload', async ({ page }) => {
+test('theme: crimson by default whatever the system says, the light variant survives a reload', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'light' });
   await page.goto('/about');
   const bg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  const crimson = await bg();
+  await page.getByRole('button', { name: 'Switch to light theme' }).first().click();
   const light = await bg();
-  await page.getByRole('button', { name: 'Switch to dark theme' }).first().click();
-  const dark = await bg();
-  expect(dark).not.toBe(light);
+  expect(light).not.toBe(crimson);
   await page.reload();
   await page.locator('h1').waitFor();
-  expect(await bg()).toBe(dark);
+  expect(await bg()).toBe(light);
+  await page.getByRole('button', { name: 'Switch to dark theme' }).first().click();
+  expect(await bg()).toBe(crimson);
 });
 
 test('contact form: errors are tied to their fields', async ({ page }) => {
@@ -239,7 +250,7 @@ test('legacy pages still render in their own styles', async ({ page }) => {
   await page.goto('/about');
   await page.locator('h1').waitFor();
   expect(await page.evaluate(() => getComputedStyle(document.body).fontFamily)).toContain('Archivo');
-  expect(await page.locator('h1').evaluate((el) => getComputedStyle(el).fontStretch)).toBe('112%');
+  expect(await page.locator('h1').evaluate((el) => getComputedStyle(el).fontWeight)).toBe('640');
   expect(problems.filter((p) => !/GPU stall|ReadPixels/.test(p))).toEqual([]);
 });
 
@@ -247,10 +258,10 @@ test('prerendered pages read correctly with JavaScript off', async ({ browser })
   const ctx = await browser.newContext({ javaScriptEnabled: false });
   const page = await ctx.newPage();
   for (const [route, h1, title] of [
-    ['/', 'Machine learning that shows its reasoning.', 'Kirtiraj Chaudhari · AI/ML Engineer'],
-    ['/work', 'Work', 'Work · Kirtiraj Chaudhari'],
+    ['/', 'Kirtiraj Chaudhari, AI/ML engineer', 'Kirtiraj Chaudhari · AI/ML Engineer'],
+    ['/work', "What I've built, and where I've worked.", 'Work · Kirtiraj Chaudhari'],
     ['/projects/drishtimanas', 'DrishtiManas', 'DrishtiManas · Kirtiraj Chaudhari'],
-    ['/about', 'Kirtiraj Nitin Chaudhari', 'About · Kirtiraj Chaudhari'],
+    ['/about', 'Machine learning that shows its reasoning.', 'About · Kirtiraj Chaudhari'],
   ]) {
     await page.goto(route);
     await expect(page.locator('h1')).toHaveText(h1);
@@ -270,13 +281,13 @@ test('creator: the heading has a readable accessible name and the shared theme p
   await page.goto('/creator');
   await expect(page.getByRole('heading', { level: 1, name: 'Beyond the code', exact: true })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('data-chapter', 'pro');
-  const light = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-  await page.getByRole('button', { name: 'Switch to dark theme' }).first().click();
-  const dark = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-  expect(dark).not.toBe(light);
+  const darkroom = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  await page.getByRole('button', { name: 'Switch to light theme' }).first().click();
+  const paper = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  expect(paper).not.toBe(darkroom);
   await page.reload();
   await expect(page.locator('h1')).toBeVisible();
-  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(dark);
+  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(paper);
 });
 
 test('creator: photograph order survives reloads and every thumbnail decodes', async ({ page }) => {
@@ -395,9 +406,12 @@ test('creator: Spotify is deferred until the music section approaches', async ({
   expect(spotifyRequests).toEqual([]);
   await expect(page.locator('iframe[src^="https://open.spotify.com/embed/"]')).toHaveCount(0);
   await page.locator('#music').scrollIntoViewIfNeeded();
+  // The artist profile and the debut single, each titled, each with a reload control.
   const player = page.locator('iframe[src^="https://open.spotify.com/embed/"]');
-  await expect(player).toHaveCount(1);
-  await expect(player).toHaveAttribute('title', /.+/);
+  await expect(player).toHaveCount(2);
+  await expect(page.locator('iframe[src*="/embed/artist/"]')).toHaveAttribute('title', /artist profile/i);
+  await expect(page.locator('iframe[src*="/embed/track/"]')).toHaveAttribute('title', /.+/);
+  await expect(page.getByRole('button', { name: /Reload the .* player/ })).toHaveCount(2);
   await expect.poll(() => spotifyRequests.length).toBeGreaterThan(0);
 });
 

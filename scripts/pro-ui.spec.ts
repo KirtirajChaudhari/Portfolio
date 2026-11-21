@@ -3,63 +3,51 @@ import { test, expect } from '@playwright/test';
 /* Production UI regressions. The existing redev gate owns 3D context counts,
    scroll morphs, offscreen idle, accessibility and reduced-motion rendering. */
 
-test('mobile navigation exposes every primary destination and the theme control', async ({ page }) => {
+test('the nav pill exposes every primary destination and the theme control at 320px', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 800 });
-  await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/about');
-  const header = page.locator('.site-header');
-  const theme = header.getByRole('button', { name: 'Switch to dark theme' });
+  const pill = page.locator('.site-header .navpill');
+  const theme = pill.getByRole('button', { name: 'Switch to light theme' });
   await expect(theme).toBeVisible();
   const before = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
   await theme.click();
   expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).not.toBe(before);
 
-  const menu = header.locator('.mobile-nav');
-  const summary = menu.locator('summary');
-  await summary.click();
-  await expect(menu).toHaveJSProperty('open', true);
   for (const label of ['About', 'Work', 'Contact', 'Artistic']) {
-    const link = menu.getByRole('link', { name: label, exact: true });
+    const link = pill.getByRole('link', { name: label, exact: true });
     await expect(link).toBeVisible();
     const box = await link.boundingBox();
     expect(box!.height, `${label} touch target`).toBeGreaterThanOrEqual(44);
+    expect(box!.x, `${label} on screen`).toBeGreaterThanOrEqual(0);
+    expect(box!.x + box!.width, `${label} on screen`).toBeLessThanOrEqual(320);
   }
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
-  await page.keyboard.press('Escape');
-  await expect(menu).toHaveJSProperty('open', false);
-  await expect(summary).toBeFocused();
-
-  await summary.click();
-  await page.mouse.click(5, 500);
-  await expect(menu).toHaveJSProperty('open', false);
-  await summary.click();
-  await menu.getByRole('link', { name: 'Contact', exact: true }).click();
+  await pill.getByRole('link', { name: 'Contact', exact: true }).click();
   await expect(page).toHaveURL(/\/contact$/);
   await expect(page.locator('main')).toBeFocused();
-  await expect(menu).toHaveJSProperty('open', false);
 });
 
-test('mobile disclosure remains useful before JavaScript runs', async ({ browser }) => {
+test('the nav pill works before JavaScript runs', async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 320, height: 800 } });
   try {
     const page = await context.newPage();
     await page.goto('/about');
-    const menu = page.locator('.site-header .mobile-nav');
-    await menu.locator('summary').click();
-    await expect(menu.getByRole('link', { name: 'Artistic', exact: true })).toBeVisible();
-    await menu.getByRole('link', { name: 'Work', exact: true }).click();
-    await expect(page.locator('h1')).toHaveText('Work');
+    const pill = page.locator('.site-header .navpill');
+    await expect(pill.getByRole('link', { name: 'Artistic', exact: true })).toBeVisible();
+    await pill.getByRole('link', { name: 'Work', exact: true }).click();
+    await expect(page.locator('h1')).toHaveText("What I've built, and where I've worked.");
   } finally { await context.close(); }
 });
 
 test('keyboard route navigation hands focus to the new main content', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/about');
-  const work = page.locator('.site-header .desktop-nav').getByRole('link', { name: 'Work', exact: true });
+  const work = page.locator('.site-header .navpill').getByRole('link', { name: 'Work', exact: true });
   await work.focus();
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/\/work$/);
-  await expect(page.locator('h1')).toHaveText('Work');
+  await expect(page.locator('h1')).toHaveText("What I've built, and where I've worked.");
   await expect(page.locator('main')).toBeFocused();
 });
 
@@ -82,7 +70,7 @@ test('encoded or malformed fragments do not break pages and reduced motion avoid
   expect(scrolls.some((call) => call.behavior === 'smooth')).toBe(false);
   for (const hash of ['#[', '#%E0%A4%A']) {
     await page.goto(`/about${hash}`);
-    await expect(page.locator('h1')).toHaveText('Kirtiraj Nitin Chaudhari');
+    await expect(page.locator('h1')).toHaveText('Machine learning that shows its reasoning.');
     // The old selector lookup threw on its first animation frame.
     await page.waitForTimeout(100);
   }
@@ -107,16 +95,20 @@ test('all nine case studies and their next-project links fit a narrow viewport',
   }
 });
 
-test('Work reserves clear space below moving figure plates', async ({ page }) => {
+test('Work project index: arrow keys move the selection, only the button opens a case', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/work');
-  await page.evaluate(() => document.fonts.ready);
-  const gaps = await page.locator('article .enter').evaluateAll((plates) => plates.map((plate) => {
-    const heading = plate.closest('article')!.querySelector('h3')!;
-    return heading.getBoundingClientRect().top - plate.getBoundingClientRect().bottom;
-  }));
-  expect(gaps).toHaveLength(2);
-  for (const gap of gaps) expect(gap, 'offscreen entrance must not cover the next heading').toBeGreaterThan(0);
+  const list = page.getByRole('list', { name: 'Projects' });
+  const first = list.getByRole('button').first();
+  await first.focus();
+  await expect(first).toHaveAttribute('aria-expanded', 'true');
+  await page.keyboard.press('ArrowDown');
+  const second = list.getByRole('button').nth(1);
+  await expect(second).toBeFocused();
+  await expect(second).toHaveAttribute('aria-expanded', 'true');
+  await expect(page).toHaveURL(/\/work$/);
+  await page.getByRole('link', { name: 'Read the DrishtiManas case' }).filter({ visible: true }).click();
+  await expect(page).toHaveURL(/\/projects\/drishtimanas$/);
 });
 
 for (const viewport of [
@@ -128,15 +120,17 @@ for (const viewport of [
   test(`home framing keeps its copy clear at ${viewport.width}×${viewport.height}`, async ({ page }) => {
     await page.setViewportSize(viewport);
     await page.goto('/');
+    await page.locator('#work').evaluate((el) => el.scrollIntoView());
     await expect(page.locator('.stage canvas')).toHaveCount(1);
     const layout = await page.locator('.stage').evaluate((stage) => {
-      const copy = stage.querySelector('.panel-hero .panel-copy')!.getBoundingClientRect();
-      return { wide: getComputedStyle(stage).getPropertyValue('--field-wide').trim(), top: copy.top, right: copy.right, overflow: document.documentElement.scrollWidth - innerWidth };
+      const copy = stage.querySelector('article.panel .panel-copy')!.getBoundingClientRect();
+      const panel = stage.querySelector('article.panel')!.getBoundingClientRect();
+      return { wide: getComputedStyle(stage).getPropertyValue('--field-wide').trim(), offset: copy.top - panel.top, right: copy.right, overflow: document.documentElement.scrollWidth - innerWidth };
     });
     expect(layout.wide).toBe(viewport.wide ? '1' : '0');
     expect(layout.overflow).toBeLessThanOrEqual(0);
     if (viewport.wide) expect(layout.right).toBeLessThan(viewport.width * 0.56);
-    else expect(layout.top).toBeGreaterThanOrEqual(viewport.height * 0.4);
+    else expect(layout.offset).toBeGreaterThanOrEqual(viewport.height * 0.4);
     await expect(page.getByRole('link', { name: 'Read the RasaCare case', exact: true })).toHaveCount(1);
     await expect(page.getByRole('link', { name: 'Read the DrishtiManas case', exact: true })).toHaveCount(1);
     await expect(page.getByRole('link', { name: 'Read the PRAVAAS case', exact: true })).toHaveCount(1);
@@ -200,15 +194,15 @@ for (const viewport of [{ width: 390, height: 844 }, { width: 1024, height: 768 
   test(`home figure is released with the last panel at ${viewport.width}×${viewport.height}`, async ({ page }) => {
     await page.setViewportSize(viewport);
     await page.goto('/');
-    await expect(page.locator('.stage canvas')).toHaveCount(1);
     // Scroll so the section after the stage sits mid-screen.
-    await page.locator('#recognition-title').evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    await page.locator('#work + section').evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    await expect(page.locator('.stage canvas')).toHaveCount(1);
     await page.waitForTimeout(300);
     const gap = await page.evaluate(() => {
       const pin = document.querySelector('.stage-pin')!.getBoundingClientRect();
       const stage = document.querySelector('.stage')!.getBoundingClientRect();
-      const recognition = document.querySelector('#recognition-title')!.getBoundingClientRect();
-      return { pinPastStage: pin.bottom - stage.bottom, pinOverRecognition: pin.bottom - recognition.top };
+      const after = document.querySelector('#work + section')!.getBoundingClientRect();
+      return { pinPastStage: pin.bottom - stage.bottom, pinOverRecognition: pin.bottom - after.top };
     });
     expect(gap.pinPastStage).toBeLessThanOrEqual(1);
     expect(gap.pinOverRecognition).toBeLessThanOrEqual(0);
@@ -233,13 +227,19 @@ for (const width of [320, 768, 1024, 1440]) {
 test('stacked home frames the whole figure above the copy', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
+  // Bring the first project panel to the top, where its window shows the figure.
+  await page.evaluate(() => {
+    const panel = document.querySelector('article.panel')!;
+    window.scrollTo(0, window.scrollY + panel.getBoundingClientRect().top);
+  });
   await expect(page.locator('.stage canvas')).toHaveCount(1);
   const box = await page.evaluate(() => {
     const win = document.querySelector('.stage-window')!.getBoundingClientRect();
-    const copy = document.querySelector('.panel-hero .panel-copy')!.getBoundingClientRect();
-    return { winBottom: win.bottom, copyTop: copy.top, winTop: win.top };
+    const copy = document.querySelector('article.panel .panel-copy')!.getBoundingClientRect();
+    const nav = document.querySelector('.navpill')!.getBoundingClientRect();
+    return { winBottom: win.bottom, copyTop: copy.top, winTop: win.top, navBottom: nav.bottom };
   });
-  expect(box.winTop).toBeGreaterThanOrEqual(64 - 1);
+  expect(box.winTop).toBeGreaterThanOrEqual(box.navBottom - 1);
   expect(box.winBottom).toBeLessThan(box.copyTop);
 });
 
@@ -263,7 +263,7 @@ test('email addresses break only after the @ at 320px', async ({ page }) => {
 test('outbound link arrows stay attached to their label when it wraps', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/about');
-  const gaps = await page.locator('#education-title ~ ol a.link').evaluateAll((links) => links.map((a) => {
+  const gaps = await page.locator('section[aria-labelledby="education-title"] ol a.link').evaluateAll((links) => links.map((a) => {
     const icon = a.querySelector('svg')!.getBoundingClientRect();
     const range = document.createRange();
     range.selectNodeContents(a.querySelector('span.whitespace-nowrap')!.firstChild!);

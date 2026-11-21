@@ -49,7 +49,9 @@ const LOAD_ORDER = (() => {
   return out;
 })();
 
-export default function CharacterCanvas({ onReady }: { onReady?: (bgEdge: string) => void }) {
+/** `contained`: sized to its parent (the home hero) instead of the viewport, and idle
+ *  while its parent is off screen. The motion model is the same either way. */
+export default function CharacterCanvas({ onReady, contained = false }: { onReady?: (bgEdge: string) => void; contained?: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
 
@@ -69,7 +71,9 @@ export default function CharacterCanvas({ onReady }: { onReady?: (bgEdge: string
     const frames: (HTMLImageElement | null)[] = new Array(N).fill(null);
 
     /* Pointer handlers write this object and nothing else. The loop decides. */
-    const t = { angle: 0, dist: Infinity, seen: false, leave: false };
+    const t = { x: 0, y: 0, seen: false, leave: false };
+    let visible = true;
+    let boxLeft = 0, boxTop = 0;
 
     let near = FALLBACK.nearestToCenter!;
     let fPos = near;            /* aim: float position on the ring */
@@ -103,10 +107,15 @@ export default function CharacterCanvas({ onReady }: { onReady?: (bgEdge: string
 
     const layout = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      vw = window.innerWidth;
+      const box = contained ? canvas.getBoundingClientRect() : null;
+      vw = box ? box.width : window.innerWidth;
+      const vh = box ? box.height : window.innerHeight;
+      /* Page coordinates of the box, so the loop can place the face as the page scrolls. */
+      boxLeft = box ? box.left + window.scrollX : 0;
+      boxTop = box ? box.top + window.scrollY : 0;
       /* Setting width/height clears the bitmap, so paint again before the browser can. */
-      canvas.width = Math.round(vw * dpr);
-      canvas.height = Math.round(window.innerHeight * dpr);
+      canvas.width = Math.max(1, Math.round(vw * dpr));
+      canvas.height = Math.max(1, Math.round(vh * dpr));
       /* object-fit: cover, done by hand: the video frame fills the viewport and
          the face centre is mapped through the same transform. */
       scale = Math.max(canvas.width / manifest.width, canvas.height / manifest.height);
@@ -128,11 +137,17 @@ export default function CharacterCanvas({ onReady }: { onReady?: (bgEdge: string
       const dt = last ? Math.min((now - last) / 1000, MAX_DT) : 1 / 60;
       last = now;
 
+      /* 0. The pointer relative to the face, read here and not in the handler. */
+      const dx = t.x - (contained ? boxLeft - window.scrollX + faceX : faceX);
+      const dy = t.y - (contained ? boxTop - window.scrollY + faceY : faceY);
+      const dist = Math.hypot(dx, dy);
+      const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+
       /* 1. Where do we want to look? Hysteresis on the centre lock, so a cursor resting
             on the boundary cannot toggle it. */
       const rim = (inDead ? EXIT : ENTER) * vw;
-      inDead = !t.seen || t.leave || t.dist < rim;
-      const aim = inDead ? near : wrapN((t.angle + 90) / STEP);
+      inDead = !t.seen || t.leave || dist < rim;
+      const aim = inDead ? near : wrapN((angle + 90) / STEP);
 
       /* 2. Smooth the aim: time-based, so the refresh rate does not change the feel. */
       const alpha = 1 - Math.exp(-dt / TAU);
@@ -179,16 +194,14 @@ export default function CharacterCanvas({ onReady }: { onReady?: (bgEdge: string
       const moving =
         fPos !== aim || shown !== want ||
         pending || (inDead && pose === 'ring') || (!inDead && pose === 'centre');
-      if (moving) raf = requestAnimationFrame(frame);
+      if (moving && visible) raf = requestAnimationFrame(frame);
       else { last = 0; budget = 0; }
     };
-    const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
+    const kick = () => { if (!raf && visible) raf = requestAnimationFrame(frame); };
 
     const onMove = (e: PointerEvent) => {
-      const dx = e.clientX - faceX;
-      const dy = e.clientY - faceY;
-      t.dist = Math.hypot(dx, dy);
-      t.angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+      t.x = e.clientX;
+      t.y = e.clientY;
       t.seen = true;
       t.leave = false;
       kick();
@@ -229,6 +242,10 @@ export default function CharacterCanvas({ onReady }: { onReady?: (bgEdge: string
     })();
 
     window.addEventListener('resize', layout, { passive: true });
+    const sized = contained ? new ResizeObserver(() => { if (center) layout(); }) : null;
+    sized?.observe(canvas);
+    const seen = contained ? new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) { dirty = true; kick(); } }) : null;
+    seen?.observe(canvas);
     if (!still) {
       window.addEventListener('pointermove', onMove, { passive: true });
       document.documentElement.addEventListener('pointerleave', onLeave);
@@ -239,6 +256,8 @@ export default function CharacterCanvas({ onReady }: { onReady?: (bgEdge: string
       if (raf) cancelAnimationFrame(raf);
       raf = 0;
       window.removeEventListener('resize', layout);
+      sized?.disconnect();
+      seen?.disconnect();
       window.removeEventListener('pointermove', onMove);
       document.documentElement.removeEventListener('pointerleave', onLeave);
     };
@@ -251,7 +270,7 @@ export default function CharacterCanvas({ onReady }: { onReady?: (bgEdge: string
       ref={canvasRef}
       role="img"
       aria-label="Illustrated portrait of Kirtiraj whose head follows your cursor"
-      className="fixed inset-0 h-full w-full transition-opacity duration-700"
+      className={`${contained ? 'absolute' : 'fixed'} inset-0 h-full w-full transition-opacity duration-700`}
       style={{ opacity: ready ? 1 : 0, transitionTimingFunction: 'cubic-bezier(0.32, 0.72, 0, 1)' }}
     />
   );
